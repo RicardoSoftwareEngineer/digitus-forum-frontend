@@ -7,3 +7,7 @@ Desktop.ini
 infoshop todo.txt
 anotações infoshop.txt
 json do curso junior.txt
+
+# backups (had a debug token in tree)
+*bkp*
+bkp/
