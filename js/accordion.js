@@ -295,7 +295,14 @@ $(document).ready(function () {
 		if (/^https?:\/\//i.test(path)) {
 			return path;
 		}
-		return new URL(String(path).replace(/^\//, ""), MEDIA_BASE).href + "?v=" + Date.now();
+		if (/\.\.|\\/.test(path)) {
+			return "";
+		}
+		var rel = String(path).replace(/^\//, "");
+		if (rel.indexOf("buckets/digitus-forum-media/") !== 0) {
+			return "";
+		}
+		return new URL(rel, MEDIA_BASE).href + "?v=" + Date.now();
 	}
 
 	function renderLesson(video) {
