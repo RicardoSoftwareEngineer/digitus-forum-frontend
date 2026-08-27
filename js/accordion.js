@@ -12,6 +12,22 @@ $(document).ready(function () {
 		return value && value !== "null" ? value : "";
 	}
 
+	function escapeHtml(s) {
+		return String(s == null ? "" : s)
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#39;");
+	}
+
+	function safeHttpUrl(u) {
+		if (!u) {
+			return "";
+		}
+		return /^https?:\/\//i.test(String(u)) ? String(u) : "";
+	}
+
 	function firewall(path, body) {
 		return $.ajax({
 			url: FIREWALL + path,
@@ -54,7 +70,7 @@ $(document).ready(function () {
 
 	function navItem(selected, video, moduleId, label, icon) {
 		var cls = selected ? "selectedNav" : "";
-		return "<li class='" + cls + "'><a href='#' data-nav-video='" + video + "' data-nav-module='" + moduleId + "' class='navClick'><span class='nav-ico'>" + icon + "</span>" + label + "</a></li>";
+		return "<li class='" + cls + "'><a href='#' data-nav-video='" + escapeHtml(video) + "' data-nav-module='" + escapeHtml(moduleId) + "' class='navClick'><span class='nav-ico'>" + icon + "</span>" + escapeHtml(label) + "</a></li>";
 	}
 
 	function leftNavItems() {
@@ -87,14 +103,14 @@ $(document).ready(function () {
 		var desc = localStorage.getItem("courseSinopse") || i18("free_training_description");
 		var html = "<div class='sidebar-head brand-head'>";
 		html += "<div class='sidebar-icon'>🎓</div>";
-		html += "<div><h2>" + title + "</h2><p>" + desc + "</p></div>";
+		html += "<div><h2>" + escapeHtml(title) + "</h2><p>" + escapeHtml(desc) + "</p></div>";
 		html += "</div><ul class='topic-nav'>";
 		for (var i = 0; i < items.length; i++) {
 			var item = items[i];
 			html += navItem(String(navVideoId) === String(item.video), item.video, item.module, item.label, item.icon);
 		}
 		html += "</ul>";
-		html += "<div class='sidebar-profile'><div class='avatar'>LD</div><div><strong>Leonardo Da Vinci</strong><span>" + i18("simplicity") + "</span></div></div>";
+		html += "<div class='sidebar-profile'><div class='avatar'>LD</div><div><strong>Leonardo Da Vinci</strong><span>" + escapeHtml(i18("simplicity")) + "</span></div></div>";
 		$("#leftAccordion").html(html);
 	}
 
@@ -113,14 +129,14 @@ $(document).ready(function () {
 			if (String(m.moduleId) === String(moduleId)) {
 				active = i;
 			}
-			html += "<h3 class='" + (String(m.moduleId) === String(moduleId) ? "selectedModule" : "") + "'>" + i18("module") + " " + m.number + " · " + m.name + "</h3>";
-			html += "<div><p class='moduleDescription'>" + (m.description || "") + "</p><ul>";
+			html += "<h3 class='" + (String(m.moduleId) === String(moduleId) ? "selectedModule" : "") + "'>" + escapeHtml(i18("module")) + " " + escapeHtml(m.number) + " · " + escapeHtml(m.name) + "</h3>";
+			html += "<div><p class='moduleDescription'>" + escapeHtml(m.description || "") + "</p><ul>";
 			var videos = m.videos || [];
 			for (var j = 0; j < videos.length; j++) {
 				var v = videos[j];
 				courseGifOrder.push({ videoId: v.videoId, moduleId: m.moduleId });
 				html += "<li class='" + (String(v.videoId) === String(videoId) ? "selectedGif" : "") + "'>";
-				html += "<a href='#' data-course-video='" + v.videoId + "' data-course-module='" + m.moduleId + "' class='courseGifClick'>" + v.name + "</a></li>";
+				html += "<a href='#' data-course-video='" + escapeHtml(v.videoId) + "' data-course-module='" + escapeHtml(m.moduleId) + "' class='courseGifClick'>" + escapeHtml(v.name) + "</a></li>";
 			}
 			html += "</ul></div>";
 		}
@@ -199,8 +215,8 @@ $(document).ready(function () {
 		for (var i = 0; i < coursesForLocale.length; i++) {
 			var c = coursesForLocale[i];
 			var current = String(c.courseId) === String(selected && selected.courseId) ? " is-current" : "";
-			html += "<li><button type='button' class='" + current.trim() + "' data-course='" + c.courseId + "'>";
-			html += "<div class='sidebar-icon'>🎓</div><div><h2>" + (c.name || "") + "</h2><p>" + (c.sinopse || "") + "</p></div>";
+			html += "<li><button type='button' class='" + current.trim() + "' data-course='" + escapeHtml(c.courseId) + "'>";
+			html += "<div class='sidebar-icon'>🎓</div><div><h2>" + escapeHtml(c.name || "") + "</h2><p>" + escapeHtml(c.sinopse || "") + "</p></div>";
 			html += "</button></li>";
 		}
 		$("#coursePickerList").html(html);
@@ -301,21 +317,25 @@ $(document).ready(function () {
 	function renderLesson(video) {
 		var nav = "";
 		if (courseGifOrder.length) {
-			nav += "<a id='previousVideo' href='#'>" + (i18("previous_video") || "Previous") + "</a>";
-			nav += "<a id='nextVideo' href='#'>" + (i18("next_video") || "Next") + "</a>";
+			nav += "<a id='previousVideo' href='#'>" + escapeHtml(i18("previous_video") || "Previous") + "</a>";
+			nav += "<a id='nextVideo' href='#'>" + escapeHtml(i18("next_video") || "Next") + "</a>";
 		}
 		$("#previousAndNextVideo").html(nav);
-		$("#name").html(video.name || "");
-		$("#description").html(video.description || "");
+		$("#name").text(video.name || "");
+		$("#description").text(video.description || "");
 		var links = "";
 		var videoLinks = video.links || [];
 		for (var i = 0; i < videoLinks.length; i++) {
-			links += "<a target='_blank' href='" + videoLinks[i].url + "'>↗ " + videoLinks[i].name + "</a>";
+			var href = safeHttpUrl(videoLinks[i].url);
+			if (!href) {
+				continue;
+			}
+			links += "<a target='_blank' href='" + escapeHtml(href) + "'>↗ " + escapeHtml(videoLinks[i].name || "") + "</a>";
 		}
 		$("#links").html(links);
 		var src = gifSrc(video);
 		if (src) {
-			var title = (video.name || "").replace(/"/g, "&quot;");
+			var title = escapeHtml(video.name || "");
 			if (window.GifPlayer) {
 				window.GifPlayer.mount(document.getElementById("video"), src, title);
 			} else {
