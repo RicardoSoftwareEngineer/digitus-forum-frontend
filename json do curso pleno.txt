@@ -1,0 +1,68 @@
+subjects
+
+Preparando o ambiente
+"subjectId": "4f27fa1d-d1b5-4cf2-815b-764d7505ebb7",
+
+Programando
+"subjectId": "2aee98d7-4201-43f4-bf4d-5bea163083bf",
+
+Introdução
+"subjectId": "979b85f0-6c3a-4a90-b5c4-71492da64960",
++ O seu sucesso é o meu sucesso
++ Aqui existe o curso e a biblioteca/livraria/videoteca
+
+
+=============================================
+
+course Do zero ao junior contratado
+"courseId": "ba689fbf-6462-42ee-a16f-2151bb59781b",
+
+=============================================
+
+
+
+=============================================
+módulo aws
+video  gerando o DANFE totalmente escalavel no aws lambda e mais barato com spring native
+
+módulo cache
+video cache avançado, rápido e mais barato
+
+módulo segurança
+json web token (o mais usado)
+uuid web token (invenção minha)
+
+módulo kotlin
+video uma breve historia do passado, presente e futuro do java
+intercambeavel
+intelij convert file
+loops
+
+módulo a
+
+módulo spring framework
+
+
+
+
+módulo instalando java
+
+instalando spring tool suite
+
+módulo Tipos de objeto
+"moduleId": "",
+
+video Map
+video List
+video String
+video int e Integer
+
+módulo SQL
+dbeaver
+create
+retrieve
+update
+delete
+
+
+

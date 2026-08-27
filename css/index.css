@@ -1,0 +1,163 @@
+#flags {
+    top: 2vw;
+    left: 27vw;
+}
+
+#portugueseVersion {
+    left: 33.3vw;
+    top: 4.1vw;
+    width: 10vw;
+    height: 4vw;
+}
+
+#brazil {
+    top: 0.1vw;
+    left: 36.3vw;
+}
+
+#englishVersion {
+    top: 4.1vw;
+    left: 3vw;
+    width: 10vw;
+    height: 4vw;
+}
+
+#usa {
+    position: absolute;
+    top: 0.2vw;
+    left: 5.2vw;
+    width: 5.96vw;
+    height: 3.14vw;
+    transition: all 0.1s ease-in-out;
+}
+
+.rc-anchor-center-item .rc-anchor-error-message {
+	color: green;
+	font-size: 2vw;
+}
+
+.rc-anchor-error-message {
+	color: green;
+	font-size: 2vw;
+}
+
+.rc-anchor-center-item{
+	color: green;
+	font-size: 2vw;
+}
+
+.g-recaptcha iframe {
+    position: absolute !important;
+    left: 0vw !important;
+    top: 0vw !important;
+    width: 30vw !important;
+    height: 8vw !important;
+}
+
+.g-recaptcha {
+    position: absolute !important;
+    left: 21vw !important;
+    top: 19vw !important;
+}
+
+#createAccount {
+    position: absolute;
+    left: 27vw;
+    top: 21vw;
+    width: 7vw;
+    display: none;
+}
+
+#back {
+    position: absolute;
+    left: 26.5vw;
+    top: 25.5vw;
+    transition: all 0.5s ease-in-out;
+    width: 8vw;
+}
+
+#title {
+    position: absolute;
+    left: 10vw;
+    top: 4vw;
+    width: 40vw;
+    transition: all 0.5s ease-in-out;
+}
+
+#typeHere {
+    position: absolute;
+    left: 10vw;
+    top: 12vw;
+    width: 40vw;
+    transition: all 0.5s ease-in-out;
+}
+
+#loginForm {
+    position: absolute;
+    top: 2vw;
+    left: 20vw;
+    width: 60vw;
+}
+
+#inputEmail {
+	display: none;
+    position: absolute;
+    left: 10vw;
+    top: 16vw;
+    width: 40vw;
+}
+
+#inputPassword {
+	display: none;
+    position: absolute;
+    left: 20vw;
+    top: 19vw;
+    width: 20vw;
+}
+
+#submitButton {
+    position: absolute;
+    left: 25vw;
+    top: 31vw;
+    width: 11vw;
+}
+
+#createAccountButton {
+	display: none;
+    position: absolute;
+    left: 25.5vw;
+    top: 25.5vw;
+    width: 10vw;
+}
+
+#forgotPassword {
+	display: none;
+    position: absolute;
+    left: 23vw;
+    top: 28.2vw;
+    width: 14vw;
+}
+
+#welcome {
+    position: absolute;
+    left: 9vw;
+    top: 9vw;
+    width: 42vw;
+    transition: all 0.5s ease-in-out;
+}
+
+#glassBox {
+    position: absolute;
+    top: 0vw;
+    left: 0vw;
+    width: 100vw;
+    height: 100vh;
+    text-align: center;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 0vw;
+    box-shadow: none;
+    backdrop-filter: blur(35px);
+    -webkit-backdrop-filter: blur(35px);
+}
+

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	  <link rel="stylesheet" href="./../css/styles.css">
+	  <link rel="stylesheet" href="./../css/chatbot.css">
+	  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	</head>
+	<body>
+	
+		<div id="backgroundBlur"></div>
+
+			<div id="chatTitle"></div>
+			<div id="chatTitleIcon"><img src="logo.png" alt="GIF animado"></div>
+			<div id="chatTitleName">Chat Vet Prev</div>
+			<div id="chatMessages"></div>
+			  
+	</body>
+	
+	<script>document.body.setAttribute('style', 'background-image: '+localStorage.getItem("backgroundUrl"));</script>	
+	<script  src="./../js/jquery.js"></script>
+	<script  src="./../js/background1.js"></script>
+	<script  src="./../js/background2.js"></script>
+	<script  src="./../js/background3.js"></script>
+	<script>
+
+	$( document ).ready(function() {	
+	
+	var chatStatus = 1;
+	
+	$('#chatTitle, #chatTitleName, #chatTitleIcon').click(function() {
+		if(chatStatus == 0){
+			$('#chatMessages').animate({ height: "0vh" }, 1000);
+			$('#chatTitle').animate({ bottom: "0vh" }, 1000);
+			$('#chatTitleName').animate({ bottom: "3vh" }, 1000);
+			$('#chatTitleIcon ').animate({ bottom: "7vh" }, 1000);
+			chatStatus = 1;
+		}else{
+			$('#chatMessages').animate({ height: "50vh" }, 1000);
+			$('#chatTitle').animate({ bottom: "52vh" }, 1000);
+			$('#chatTitleName').animate({ bottom: "55vh" }, 1000);
+			$('#chatTitleIcon ').animate({ bottom: "59vh" }, 1000);
+			var container = $('#chatMessages');
+			var scrollHeight = container.prop('scrollHeight');
+			var clientHeight = container.prop('clientHeight');
+			var scrollBottom = scrollHeight - clientHeight;
+			container.animate({ scrollTop: scrollBottom }, 1000);
+			chatStatus = 0;
+		}
+	  
+	});
+	
+	var abreMessageClient = '<div class="messageClient"><span class="contentClient">';
+	var abreMessageUser = '<div class="messageUser"><span class="contentUser">';
+	var fechaMessage = '</span></div>';
+	
+	var message1 = abreMessageClient+'Olá, tudo bem?'+fechaMessage;
+	var message2 = abreMessageClient+'No que eu posso te ajudar?'+fechaMessage;
+	var message3 = abreMessageUser+'Quero saber sobre os planos que vocês tem'+fechaMessage;
+	var message4 = abreMessageClient+'Sim claro, planos para gato ou cachorro?'+fechaMessage;
+	var message5 = abreMessageClient;
+	message5 += '<b>Plano Júnior</b><br>';
+	message5 += 'Cães com até 8 anos incompletos<br>';
+	message5 += '<b>R$175,00</b>/mês';
+	message5 += fechaMessage;
+	var message6 = abreMessageClient+'Estes são os planos para cães'+fechaMessage;
+	var message7 = abreMessageClient+'Quer saber mais?'+fechaMessage;
+	var message8 = abreMessageClient+'Quero saber os planos para gato'+fechaMessage;
+	var message9 = abreMessageUser+'Quero saber os planos para cachorro'+fechaMessage;
+	var message10 = abreMessageClient;
+	message10 += '<b>Plano Sênior</b><br>';
+	message10 += 'Cães com idade entre 8 e 14 anos incompletos<br>';
+	message10 += '<b>R$245,00</b>/mês';
+	message10 += fechaMessage;
+	var message11 = abreMessageClient;
+	message11 += '<b>Plano Coparticipativo</b><br>';
+	message11 += 'Cães de todas as idades<br>';
+	message11 += '<b>R$68,00</b>/mês';
+	message11 += fechaMessage;
+	var message12 = abreMessageClient+'Sim temos, é o (19) 97121-3062'+fechaMessage;
+	var message13 = abreMessageUser+'Vocês tem Whatsapp?'+fechaMessage;
+	
+	var abreContainer = '<div class="container">';
+	var fechaContainer = '</div>';
+	
+	var option1 = '<div class="field" data-id="1">Lista de<br>planos</div>';
+	var option2 = '<div class="field" data-id="2">Nossos<br>serviços</div>';
+	var option3 = '<div class="field" data-id="3">Telefone<br>de vendas</div>';
+	var option4 = '<div class="field" data-id="4">Whatsapp</div>';
+	var option5 = '<div class="field" data-id="5">Especialidades</div>';
+	var option6 = '<div class="field" data-id="6">Gato</div>';
+	var option7 = '<div class="field" data-id="7">Cachorro</div>';
+	var option8 = '<div class="field" data-id="8">Quero o Plano Júnior</div>';
+	var option9 = '<div class="field" data-id="9">Sim</div>';
+	var option10 = '<div class="field" data-id="10">Não</div>';
+	var option11 = '<div class="field" data-id="8">Quero o Plano Sênior</div>';
+	var option12 = '<div class="field" data-id="8">Quero o Plano Coparticipativo</div>';
+	
+	var content = '';
+	
+	content += message1;
+	content += message2;
+	content += abreContainer;
+	content += option1;
+	content += option2;
+	content += option3;
+	content += option4;
+	content += option5;
+	content += fechaContainer;
+	$('#chatMessages').append(content);
+
+	
+		
+		//$('.field').click(function() {
+		$(document).on('click', '.field', function() {
+			content = '';
+			var id = $(this).data('id');
+			if (id == 1) { //List de planos
+				content += message3;
+				content += message4;
+				content += abreContainer;
+				content += option6;
+				content += option7;
+				content += fechaContainer;
+				$('#chatMessages').append(content);
+				var container = $('#chatMessages');
+				var scrollHeight = container.prop('scrollHeight');
+				var clientHeight = container.prop('clientHeight');
+				var scrollBottom = scrollHeight - clientHeight;
+				container.animate({ scrollTop: scrollBottom }, 1000);
+			}else if (id == 7) { //Cachorrro
+				content += message9;
+				content += message6;
+				content += message5;
+				content += message10;
+				content += message11;
+				content += abreContainer;
+				content += option8;
+				content += option11;
+				content += option12;
+				content += fechaContainer;
+				content += message7;
+				content += abreContainer;
+				content += option9;
+				content += option10;
+				content += fechaContainer;
+				$('#chatMessages').append(content);
+				var container = $('#chatMessages');
+				var scrollHeight = container.prop('scrollHeight');
+				var clientHeight = container.prop('clientHeight');
+				var scrollBottom = scrollHeight - clientHeight;
+				container.animate({ scrollTop: scrollBottom }, 1000);
+			}else if (id == 9) { //Sim
+				content += message2;
+				content += abreContainer;
+				content += option1;
+				content += option2;
+				content += option3;
+				content += option4;
+				content += option5;
+				content += fechaContainer;
+				$('#chatMessages').append(content);
+				var container = $('#chatMessages');
+				var scrollHeight = container.prop('scrollHeight');
+				var clientHeight = container.prop('clientHeight');
+				var scrollBottom = scrollHeight - clientHeight;
+				container.animate({ scrollTop: scrollBottom }, 1000);
+			}else if (id == 10) { //Não
+				$('#chatMessages').animate({ height: "0vh" }, 1000);
+				$('#chatTitle').animate({ bottom: "0vh" }, 1000);
+				$('#chatTitleName').animate({ bottom: "3vh" }, 1000);
+				$('#chatTitleIcon ').animate({ bottom: "7vh" }, 1000);
+				chatStatus = 1;
+			}else if(id == 8){ //Quero o plano X
+				window.location.href = "https://hospitalvetprev.com.br/cadastro/cadastro.php";
+			}else if(id == 4){ //Whatsapp
+				content += message13;
+				content += message12;
+				content += message7;
+				content += abreContainer;
+				content += option9;
+				content += option10;
+				content += fechaContainer;
+				$('#chatMessages').append(content);
+				var container = $('#chatMessages');
+				var scrollHeight = container.prop('scrollHeight');
+				var clientHeight = container.prop('clientHeight');
+				var scrollBottom = scrollHeight - clientHeight;
+				container.animate({ scrollTop: scrollBottom }, 1000);
+			}
+		  
+		});
+	
+		
+
+		
+	});
+
+
+</script>
+</html>
