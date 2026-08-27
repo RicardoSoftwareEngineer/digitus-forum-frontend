@@ -16,7 +16,18 @@ function generateWallpaper() {
 	return t.generate(window.innerWidth, window.innerWidth + 200).dataUrl;
 }
 
+function isSafeWallpaper(value) {
+	if (!value || value === "null") {
+		return false;
+	}
+	var s = String(value);
+	return /^data:image\//i.test(s) || /^url\(\s*["']?data:image\//i.test(s);
+}
+
 function asBgImage(dataUrl) {
+	if (!isSafeWallpaper(dataUrl)) {
+		return "";
+	}
 	var value = String(dataUrl);
 	if (/^url\(/i.test(value)) {
 		return value;
@@ -41,7 +52,7 @@ function ensureWallpaperLayers() {
 var fadeTimer = 0;
 
 function applyWallpaper(dataUrl, fade) {
-	if (!dataUrl || dataUrl === "null") {
+	if (!isSafeWallpaper(dataUrl)) {
 		return;
 	}
 	ensureWallpaperLayers();
@@ -81,7 +92,7 @@ var wallpaperHasShown = false;
 
 window.advanceBackground = function () {
 	var ready = localStorage.getItem("backgroundUrl");
-	if (!ready || ready === "null") {
+	if (!isSafeWallpaper(ready)) {
 		ready = generateWallpaper();
 	}
 	applyWallpaper(ready, wallpaperHasShown);
