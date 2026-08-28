@@ -1,0 +1,92 @@
+/* Cinema: gif no palco, menus em gavetas de vidro por cima do fundo. */
+
+body.layout-cinema .lesson-shell {
+	display: block;
+	position: relative;
+	min-height: 100vh;
+	padding: 14px 18px 22px;
+	overflow: visible;
+}
+
+body.layout-cinema #backgroundBlur {
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+}
+
+body.layout-cinema .center-col {
+	width: min(1320px, 100%);
+	margin: 0 auto;
+	align-self: stretch;
+}
+
+body.layout-cinema .lesson-align {
+	min-height: calc(100vh - 36px);
+}
+
+body.layout-cinema .stage {
+	min-height: calc(100vh - 110px);
+}
+
+body.layout-cinema .flip-scene,
+body.layout-cinema .flip-card {
+	height: 100%;
+}
+
+body.layout-cinema #box {
+	min-height: calc(100vh - 110px);
+	height: 100%;
+	padding: 52px 28px 22px;
+	display: flex;
+	flex-direction: column;
+}
+
+body.layout-cinema #video {
+	flex: 1 1 auto;
+	min-height: 0;
+	aspect-ratio: auto;
+	margin-top: 12px;
+}
+
+body.layout-cinema #name {
+	font-size: 30px;
+	letter-spacing: -0.02em;
+}
+
+body.layout-cinema .sidebar,
+body.layout-cinema .modules {
+	position: fixed;
+	top: 16px;
+	bottom: 16px;
+	z-index: 8;
+	margin-top: 0;
+	height: auto;
+	width: min(300px, 26vw);
+	box-shadow: 0 22px 48px -10px rgba(0, 0, 0, 0.45);
+}
+
+body.layout-cinema .sidebar {
+	left: 16px;
+}
+
+body.layout-cinema .modules {
+	right: 16px;
+}
+
+body.layout-cinema .lesson-shell.nav-collapsed,
+body.layout-cinema .lesson-shell.mod-collapsed,
+body.layout-cinema .lesson-shell.nav-collapsed.mod-collapsed {
+	grid-template-columns: none;
+}
+
+@media (max-width: 980px) {
+	body.layout-cinema .sidebar,
+	body.layout-cinema .modules {
+		position: relative;
+		top: auto;
+		bottom: auto;
+		left: auto;
+		right: auto;
+		width: auto;
+		margin: 0 0 14px;
+	}
+}
