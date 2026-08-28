@@ -123,7 +123,7 @@
 	display: none;
 }
 
-#changeCourseButton{
+#changeTrainingButton{
 	position: fixed;
 	left: calc(50% - 702px);
 	top: 175px;
@@ -135,7 +135,7 @@
 	display: none;
 }
 
-#changeCourseButton:hover{
+#changeTrainingButton:hover{
 	transition: all 0.1s ease-in-out;
 	box-shadow: 0px 20px 40px -6px rgba(0, 0, 0, 0.4);
 }
