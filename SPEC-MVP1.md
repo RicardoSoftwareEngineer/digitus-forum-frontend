@@ -1,7 +1,7 @@
 <!-- para IA. não é README de humano. -->
 # SPEC — MVP1
 
-status: v0.1
+status: v0.2
 data: 2026-08-28
 fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo continua a fonte do MS. Conflito: Ricardo muda aqui, depois o SPEC do MS.
 
@@ -32,8 +32,8 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
 ## REGRA
 - REGRA-MVP1-PAY: provedor = Stripe **Embedded** Checkout (`ui_mode=embedded`). Avulso `mode=payment` (`card` + `pix`). Mensalidade `mode=subscription` (`card` só). Sem redirect pra stripe.com.
 - REGRA-MVP1-STRIPE-TEST: só `sk_test_` / `pk_test_` (e webhook secret de test) no env. Dashboard em Test mode. Cartão `4242…`. Sem dinheiro real. Live só quando Ricardo pedir.
-- REGRA-MVP1-SUB-JAVA: assinatura ativa → acesso a trainings **pagos** do guru `java`. Gratuitos continuam públicos.
-- REGRA-MVP1-AVULSO: compra avulsa → acesso àquele `trainingId` (pago). Independente da mensalidade.
+- REGRA-MVP1-SUB-JAVA: assinatura ativa (mensalidade Java R$ 59; Stripe `price_` depois) → acesso a trainings **pagos** do guru `java`. Gratuitos continuam públicos.
+- REGRA-MVP1-AVULSO: compra avulsa → acesso àquele `trainingId` (pago). Preço avulso = `DADOS-TRAINING.price` daquele training (centavos BRL). Independente da mensalidade.
 - REGRA-MVP1-LISTA: aluno logado vê lista dos trainings que comprou avulso + flag da assinatura java.
 - REGRA-MVP1-GURU-SHOW: UI mostra um guru (`java`). Sistema aceita N gurus.
 - REGRA-MVP1-MENU-L: esquerda = `DADOS-GURU-PAGE` do guru selecionado (`titleKey` i18n + `src` arquivo estático). Clique → centro carrega o HTML **de outro origin** (iframe). Não `innerHTML` na vitrine (token no `localStorage`).
@@ -47,8 +47,9 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
 ## DADOS (MVP1)
 | id | onde | campos |
 |---|---|---|
-| DADOS-ASSINATURA | user MS | id, userId, scope=`guru`, guruId (`java` no MVP1), stripeCustomerId, stripeSubscriptionId, status (active/canceled/past_due), deleted |
+| DADOS-ASSINATURA | user MS | id, userId, scope=`guru`, guruId (`java` no MVP1), stripeCustomerId, stripeSubscriptionId, status (active/canceled/past_due), deleted. Mensalidade Java = R$ 59 (5900 centavos BRL); Stripe `price_` depois. |
 | DADOS-COMPRA | user MS | id, userId, trainingId, stripeCheckoutSessionId, stripePaymentIntentId, status paid, createdIn |
+| DADOS-TRAINING | course MS | guruId (string, MVP1=`java`), paid (boolean), price (integer centavos BRL, avulso daquele training). Gratuito = paid=false AND price=0. Java Junior = gratuito. |
 | DADOS-GURU-PAGE | course MS | guruPageId, guruId, titleKey (i18n `keyy`), src (path estático), position, deleted |
 | DADOS-VID.audio | convenção | `buckets/digitus-forum-media/videos/{videoId}.m4a` (não coluna obrigatória se o path for fixo) |
 
