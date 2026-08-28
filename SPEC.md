@@ -22,7 +22,7 @@ Vitrine estática (jQuery) do treinamento. **Não** é o app logado de aluno/adm
 - INV-I18-1: locale em `localStorage.language` (`pt_BR` / `en_US`). Textos de UI vêm do i18n (via borda).
 - INV-MEDIA-1: gif da aula é estático sob `buckets/digitus-forum-media/` (stand-in de S3). Não buscar origem arbitrária.
 - INV-XSS-1: strings da API/i18 são texto, não HTML. (PRs #1–#3 pendentes alinham o código.)
-- INV-AUTH-1: esta vitrine **não tem login**. Header `Authorization` vazio é o estado atual — não é um fluxo de sessão. Ver GAP-VITRINE no firewall.
+- INV-AUTH-1: esta vitrine **não tem login**. Header `Authorization: ""` é o estado atual. A borda exige `Bearer <uuid>` (INV-AUTH-2 do firewall). Ver GAP-VITRINE.
 
 ## NÃO
 - NÃO-LOGIN: não religar o login do bkp (token em localStorage) sem spec de cookie/sessão.
@@ -36,6 +36,8 @@ localStorage de produto: `language`, `internationalization.*`, `internationaliza
 **Não** é fonte de verdade. Servidor não lê isso.
 
 Não persiste user/senha/token no produto vivo.
+
+Chaves i18 que a vitrine lê (39): labels `welcome_title` `continue_training` `database_indexes` `internationalization` `scalability` `manutenability` `documentation` `tests` `requirement` `free_training` `free_training_description` `simplicity` `module` `previous_video` `next_video`; ids de vídeo `welcome_video` `continue_training_video` `start_training_video` `frontend_video` `backend_video` `database_indexes_video` `internationalization_video` `scalability_video` `manutenability_video` `documentation_video` `tests_video` `requirement_video`; ids de módulo `general_module` `continue_training_module` `start_training_module` `frontend_module` `backend_module` `database_indexes_module` `internationalization_module` `scalability_module` `manutenability_module` `documentation_module` `tests_module` `requirement_module`. “Frontend”/“Backend” e “Módulos/Idioma” estão hardcoded.
 
 ## END que a vitrine chama (hoje)
 - `POST .../internationalization/v1/frontend` body `{locale}` — **não existe na borda**
