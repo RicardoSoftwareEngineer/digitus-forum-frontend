@@ -28,15 +28,87 @@ $(document).ready(function () {
 		return /^https?:\/\//i.test(String(u)) ? String(u) : "";
 	}
 
+	function tokenUuid() {
+		var t = localStorage.getItem("token") || "";
+		if (t.indexOf("Bearer ") === 0) {
+			t = t.slice(7);
+		}
+		return t;
+	}
+
+	function bearerToken() {
+		var t = tokenUuid();
+		return t ? "Bearer " + t : "";
+	}
+
+	function storeToken(uuid) {
+		if (!uuid) {
+			return;
+		}
+		uuid = String(uuid);
+		if (uuid.indexOf("Bearer ") === 0) {
+			uuid = uuid.slice(7);
+		}
+		localStorage.setItem("token", uuid);
+	}
+
 	function firewall(path, body) {
+		var headers = {};
+		var auth = bearerToken();
+		if (auth) {
+			headers.Authorization = auth;
+		}
 		return $.ajax({
 			url: FIREWALL + path,
 			type: "POST",
 			contentType: "application/json",
 			data: JSON.stringify(body || {}),
 			dataType: "json",
-			headers: { Authorization: "" }
+			headers: headers
 		});
+	}
+
+	var accountStep = tokenUuid() ? "in" : "email";
+	var accountEmail = localStorage.getItem("email") || "";
+	var accountCodePrefill = "";
+
+	function accountCopy() {
+		var en = localStorage.getItem("language") === "en_US";
+		return {
+			email: "Email",
+			send: en ? "Send code" : "Enviar código",
+			code: en ? "Code" : "Código",
+			confirm: en ? "Confirm" : "Confirmar",
+			out: en ? "Sign out" : "Sair",
+			signed: en ? "Signed in" : "Entrou",
+			back: en ? "Change email" : "Trocar email"
+		};
+	}
+
+	function renderAccount() {
+		var c = accountCopy();
+		var html = "";
+		if (tokenUuid()) {
+			accountStep = "in";
+			var shown = accountEmail || localStorage.getItem("email") || "";
+			var initial = shown ? shown.charAt(0).toUpperCase() : "?";
+			html += "<div class='sidebar-profile'>";
+			html += "<div class='avatar'>" + escapeHtml(initial) + "</div>";
+			html += "<div><strong>" + escapeHtml(shown || c.signed) + "</strong><span>" + escapeHtml(c.signed) + "</span></div>";
+			html += "</div>";
+			html += "<button type='button' class='account-btn' id='accountLogout'>" + escapeHtml(c.out) + "</button>";
+		} else if (accountStep === "code") {
+			html += "<label class='account-label' for='accountCode'>" + escapeHtml(c.code) + "</label>";
+			html += "<input id='accountCode' class='account-input' type='text' inputmode='numeric' maxlength='6' autocomplete='one-time-code' value='" + escapeHtml(accountCodePrefill) + "' />";
+			html += "<button type='button' class='account-btn' id='accountConfirm'>" + escapeHtml(c.confirm) + "</button>";
+			html += "<button type='button' class='account-btn account-btn-ghost' id='accountBack'>" + escapeHtml(c.back) + "</button>";
+		} else {
+			accountStep = "email";
+			html += "<label class='account-label' for='accountEmail'>" + escapeHtml(c.email) + "</label>";
+			html += "<input id='accountEmail' class='account-input' type='email' autocomplete='email' value='" + escapeHtml(accountEmail) + "' />";
+			html += "<button type='button' class='account-btn' id='accountSend'>" + escapeHtml(c.send) + "</button>";
+		}
+		$("#accountBox").html(html);
 	}
 
 	function ajaxFailed(xhr) {
@@ -110,7 +182,6 @@ $(document).ready(function () {
 			html += navItem(String(navVideoId) === String(item.video), item.video, item.module, item.label, item.icon);
 		}
 		html += "</ul>";
-		html += "<div class='sidebar-profile'><div class='avatar'>LD</div><div><strong>Leonardo Da Vinci</strong><span>" + escapeHtml(i18("simplicity")) + "</span></div></div>";
 		$("#leftAccordion").html(html);
 	}
 
@@ -411,6 +482,7 @@ $(document).ready(function () {
 		$(".idioma-hint").text(en ? "Choose the showcase language" : "Escolha o idioma da vitrine");
 		$("#englishVersion").toggleClass("is-current", en);
 		$("#portugueseVersion").toggleClass("is-current", !en);
+		renderAccount();
 	}
 
 	function flipLanguagePanel(open) {
@@ -578,6 +650,63 @@ $(document).ready(function () {
 	$(document).on("click", function () {
 		closeTrainingPicker();
 	});
+
+	$(document).on("click", "#accountSend", function (e) {
+		e.preventDefault();
+		var email = $.trim($("#accountEmail").val() || "");
+		if (!email) {
+			alert(localStorage.getItem("language") === "en_US" ? "Email is required" : "Informe o email");
+			return;
+		}
+		firewall("/emailVerification/v1/sendValidationEmail", { email: email }).done(function (res) {
+			accountEmail = email;
+			accountCodePrefill = res && res.readableNumber != null ? String(res.readableNumber) : "";
+			accountStep = "code";
+			renderAccount();
+		}).fail(ajaxFailed);
+	});
+
+	$(document).on("click", "#accountConfirm", function (e) {
+		e.preventDefault();
+		var raw = $.trim($("#accountCode").val() || "");
+		var code = parseInt(raw, 10);
+		if (!raw || isNaN(code)) {
+			alert(localStorage.getItem("language") === "en_US" ? "Code is required" : "Informe o código");
+			return;
+		}
+		firewall("/emailVerification/v1/validateEmail", {
+			email: accountEmail,
+			readableNumber: code
+		}).done(function (tokenVO) {
+			storeToken(tokenVO && tokenVO.token);
+			if (tokenVO && tokenVO.email) {
+				accountEmail = tokenVO.email;
+			}
+			localStorage.setItem("email", accountEmail);
+			accountStep = "in";
+			accountCodePrefill = "";
+			renderAccount();
+		}).fail(ajaxFailed);
+	});
+
+	$(document).on("click", "#accountBack", function (e) {
+		e.preventDefault();
+		accountStep = "email";
+		accountCodePrefill = "";
+		renderAccount();
+	});
+
+	$(document).on("click", "#accountLogout", function (e) {
+		e.preventDefault();
+		localStorage.removeItem("token");
+		localStorage.removeItem("email");
+		accountStep = "email";
+		accountEmail = "";
+		accountCodePrefill = "";
+		renderAccount();
+	});
+
+	renderAccount();
 
 	loadI18n().done(function () {
 		updateChrome();

@@ -62,8 +62,8 @@ Chaves i18 que a vitrine lê (39): labels `welcome_title` `continue_training` `d
 - training: `retrieveAll` / `retrieveById` (público se gratuito). **Não** `retrieveByLocale`. JSON `trainingId`.
 - module: `retrieveByTrainingIdWithVideos` body `{trainingId}`.
 - video: `retrieveById` body `{videoId}` — campo de mídia `gif`. Público se o treinamento for gratuito.
-- CONTRATO-CONTA-SEND `POST /firewall/emailVerification/v1/sendValidationEmail` `{email}` — mock: usa `readableNumber` da response para popular a tela.
-- CONTRATO-CONTA-OK `POST /firewall/emailVerification/v1/validateEmail` `{email, readableNumber}` — guarda token em `localStorage`, prefixa `Bearer` no header.
+- CONTRATO-CONTA-SEND `POST /firewall/emailVerification/v1/sendValidationEmail` `{email}` — mock: usa `readableNumber` da response para popular a tela. código alinhado (video.html).
+- CONTRATO-CONTA-OK `POST /firewall/emailVerification/v1/validateEmail` `{email, readableNumber}` — guarda token em `localStorage`, prefixa `Bearer` no header. código alinhado.
 
 - CONTRATO-STRIPE-SUB / CONTRATO-STRIPE-BUY / CONTRATO-ME / CONTRATO-GURU-PAGES — ver SPEC-MVP1.md.
 - CONTRATO-GURU-PAGE-SRC: iframe `src` = host de mídia (`buckets/.../gurus/{guruId}/{pageId}.html`), **não** o origin da vitrine.
