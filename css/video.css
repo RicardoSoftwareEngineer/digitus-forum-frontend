@@ -247,3 +247,21 @@ body.layout-cinema .account-box .sidebar-profile {
 	padding-top: 0;
 	border-top: none;
 }
+
+body.layout-cinema .yt-player-audio {
+	position: absolute;
+	width: 0;
+	height: 0;
+	opacity: 0;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+body.layout-cinema .yt-player.is-loading-audio {
+	cursor: wait;
+}
+
+body.layout-cinema .yt-player.is-loading-audio .yt-play {
+	opacity: 0.4;
+	pointer-events: none;
+}
