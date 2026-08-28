@@ -1,6 +1,8 @@
 $(document).ready(function () {
 	var FIREWALL = "http://localhost:8080/firewall";
 	var MEDIA_BASE = new URL("../", window.location.href).href;
+	var GURU_ID = "java";
+	var guruPages = [];
 	var lessonSeq = 0;
 
 	if (!localStorage.getItem("language")) {
@@ -140,49 +142,128 @@ $(document).ready(function () {
 	var trainingsForLocale = [];
 	var trainingGifOrder = [];
 
-	function navItem(selected, video, moduleId, label, icon) {
-		var cls = selected ? "selectedNav" : "";
-		return "<li class='" + cls + "'><a href='#' data-nav-video='" + escapeHtml(video) + "' data-nav-module='" + escapeHtml(moduleId) + "' class='navClick'><span class='nav-ico'>" + icon + "</span>" + escapeHtml(label) + "</a></li>";
+	function lastVideoKey() {
+		return "guru." + GURU_ID + ".lastVideoId";
 	}
 
-	function leftNavItems() {
-		var general = i18("general_module");
-		var continueVideo = i18("continue_training_video");
-		var continueModule = i18("continue_training_module");
-		if (!continueVideo) {
-			continueVideo = i18("start_training_video");
-			continueModule = i18("start_training_module");
+	function lastModuleKey() {
+		return "guru." + GURU_ID + ".lastModuleId";
+	}
+
+	function titleFromSrc(src) {
+		var name = String(src || "").split("?")[0].split("/").pop() || "";
+		name = name.replace(/\.html$/i, "").replace(/[-_]+/g, " ").trim();
+		if (!name) {
+			return "Página";
 		}
-		return [
-			{ video: i18("welcome_video"), module: general, label: i18("welcome_title"), icon: "●" },
-			{ video: continueVideo, module: continueModule, label: i18("continue_training"), icon: "▷" },
-			{ video: i18("frontend_video"), module: i18("frontend_module") || general, label: "Frontend", icon: "▣" },
-			{ video: i18("backend_video"), module: i18("backend_module") || general, label: "Backend", icon: "⬡" },
-			{ video: i18("database_indexes_video"), module: i18("database_indexes_module") || general, label: i18("database_indexes"), icon: "▤" },
-			{ video: i18("internationalization_video"), module: i18("internationalization_module") || general, label: i18("internationalization"), icon: "🌐" },
-			{ video: i18("scalability_video"), module: i18("scalability_module") || general, label: i18("scalability"), icon: "↗" },
-			{ video: i18("manutenability_video"), module: i18("manutenability_module") || general, label: i18("manutenability"), icon: "🔧" },
-			{ video: i18("documentation_video") || i18("manutenability_video"), module: i18("documentation_module") || general, label: i18("documentation"), icon: "📄" },
-			{ video: i18("tests_video") || i18("manutenability_video"), module: i18("tests_module") || general, label: i18("tests"), icon: "✓" },
-			{ video: i18("requirement_video"), module: i18("requirement_module") || general, label: i18("requirement"), icon: "★" }
-		];
+		return name.charAt(0).toUpperCase() + name.slice(1);
 	}
 
-	function renderSidebar() {
-		var navVideoId = localStorage.getItem("navVideoId");
-		var items = leftNavItems();
-		var title = localStorage.getItem("trainingName") || i18("free_training");
-		var desc = localStorage.getItem("trainingSinopse") || i18("free_training_description");
+	function pageTitle(page) {
+		var key = page && page.titleKey;
+		var fromI18 = key ? i18(key) : "";
+		if (fromI18) {
+			return fromI18;
+		}
+		return titleFromSrc(page && page.src);
+	}
+
+	function pageSrc(page) {
+		var path = (page && page.src) || "";
+		if (!path) {
+			return "";
+		}
+		if (/^https?:\/\//i.test(path)) {
+			return path;
+		}
+		if (/\.\.|\\/.test(path)) {
+			return "";
+		}
+		var rel = String(path).replace(/^\//, "");
+		if (rel.indexOf("buckets/digitus-forum-media/") !== 0) {
+			if (rel.indexOf("gurus/") === 0) {
+				rel = "buckets/digitus-forum-media/" + rel;
+			} else if (rel.indexOf("/") === -1 && /\.html$/i.test(rel)) {
+				rel = "buckets/digitus-forum-media/gurus/" + GURU_ID + "/" + rel;
+			} else {
+				return "";
+			}
+		}
+		if (rel.indexOf("buckets/digitus-forum-media/gurus/") !== 0) {
+			return "";
+		}
+		return new URL(rel, MEDIA_BASE).href + "?v=" + Date.now();
+	}
+
+	function renderGuruPages(pages) {
+		guruPages = pages || [];
+		var title = i18("guru_java") || "Java";
+		var desc = i18("guru_java_sinopse") || "";
+		var selectedSrc = localStorage.getItem("guruPageSrc") || "";
 		var html = "<div class='sidebar-head brand-head'>";
-		html += "<div class='sidebar-icon'>🎓</div>";
+		html += "<div class='sidebar-icon'>☕</div>";
 		html += "<div><h2>" + escapeHtml(title) + "</h2><p>" + escapeHtml(desc) + "</p></div>";
 		html += "</div><ul class='topic-nav'>";
-		for (var i = 0; i < items.length; i++) {
-			var item = items[i];
-			html += navItem(String(navVideoId) === String(item.video), item.video, item.module, item.label, item.icon);
+		for (var i = 0; i < guruPages.length; i++) {
+			var page = guruPages[i];
+			var src = page.src || "";
+			var cls = String(selectedSrc) === String(src) ? "selectedNav" : "";
+			html += "<li class='" + cls + "'><a href='#' data-guru-src='" + escapeHtml(src) + "' data-guru-page='" + escapeHtml(page.guruPageId || "") + "' class='guruPageClick'><span class='nav-ico'>●</span>" + escapeHtml(pageTitle(page)) + "</a></li>";
 		}
 		html += "</ul>";
 		$("#leftAccordion").html(html);
+	}
+
+	function loadGuruPages() {
+		return firewall("/guru/v1/" + GURU_ID + "/pages", {}).done(renderGuruPages);
+	}
+
+	function markGuruPage(src) {
+		$(".topic-nav li").removeClass("selectedNav");
+		$(".guruPageClick").filter(function () {
+			return String($(this).attr("data-guru-src")) === String(src);
+		}).parent("li").addClass("selectedNav");
+	}
+
+	function openGuruPage(page, animate) {
+		if (!page) {
+			return;
+		}
+		var src = pageSrc(page);
+		if (!src) {
+			return;
+		}
+		localStorage.setItem("guruPageSrc", page.src || "");
+		localStorage.setItem("lessonSource", "guru-page");
+		markGuruPage(page.src || "");
+		var seq = ++lessonSeq;
+		var $fields = lessonFields();
+		if (animate) {
+			$fields.addClass("lesson-swap");
+		}
+		var videoEl = document.getElementById("video");
+		if (window.GifPlayer) {
+			window.GifPlayer.mount(videoEl, "", "", "");
+		} else if (videoEl) {
+			videoEl.innerHTML = "";
+		}
+		var iframe = document.createElement("iframe");
+		iframe.className = "guru-page-frame";
+		iframe.setAttribute("title", pageTitle(page));
+		iframe.src = src;
+		if (videoEl) {
+			videoEl.appendChild(iframe);
+		}
+		$("#previousAndNextVideo").empty();
+		$("#name").text(pageTitle(page));
+		$("#description").empty();
+		$("#links").empty();
+		requestAnimationFrame(function () {
+			if (seq !== lessonSeq) {
+				return;
+			}
+			$fields.removeClass("lesson-swap");
+		});
 	}
 
 	function renderModules(modules) {
@@ -247,7 +328,6 @@ $(document).ready(function () {
 
 	function loadModules() {
 		var trainingId = localStorage.getItem("internationalization.training_id");
-		renderSidebar();
 		if (!trainingId) {
 			return $.Deferred().resolve([]).promise();
 		}
@@ -344,14 +424,11 @@ $(document).ready(function () {
 	}
 
 	function markSelected(source) {
-		if (source === "nav") {
-			var navVideoId = localStorage.getItem("navVideoId");
-			$(".topic-nav li").removeClass("selectedNav");
-			$(".navClick").filter(function () {
-				return String($(this).attr("data-nav-video")) === String(navVideoId);
-			}).parent("li").addClass("selectedNav");
+		if (source === "guru-page") {
+			markGuruPage(localStorage.getItem("guruPageSrc") || "");
 			return;
 		}
+		$(".topic-nav li").removeClass("selectedNav");
 		var videoId = localStorage.getItem("trainingVideoId");
 		$("#accordion li").removeClass("selectedGif");
 		$("#accordion a.trainingGifClick").filter(function () {
@@ -487,6 +564,8 @@ $(document).ready(function () {
 		} else {
 			localStorage.setItem("trainingVideoId", videoId);
 			localStorage.setItem("trainingModuleId", moduleId || "");
+			localStorage.setItem(lastVideoKey(), videoId);
+			localStorage.setItem(lastModuleKey(), moduleId || "");
 		}
 		localStorage.setItem("isTraining", "true");
 		if (changed && typeof window.advanceBackground === "function") {
@@ -515,6 +594,7 @@ $(document).ready(function () {
 		localStorage.setItem("language", locale);
 		loadI18n().done(function () {
 			updateChrome();
+			loadGuruPages();
 			loadTrainings().done(function (trainings) {
 				fillTrainingPicker(trainings);
 				var training = trainingByFamily(familyId) || trainings[0];
@@ -525,9 +605,19 @@ $(document).ready(function () {
 		}).fail(ajaxFailed);
 	}
 
-	$(document).on("click", ".navClick", function (e) {
+	$(document).on("click", ".guruPageClick", function (e) {
 		e.preventDefault();
-		goToLesson($(this).attr("data-nav-video"), $(this).attr("data-nav-module"), true, "nav");
+		var src = $(this).attr("data-guru-src");
+		var page = null;
+		for (var i = 0; i < guruPages.length; i++) {
+			if (String(guruPages[i].src) === String(src)) {
+				page = guruPages[i];
+				break;
+			}
+		}
+		if (page) {
+			openGuruPage(page, true);
+		}
 	});
 
 	$(document).on("click", ".trainingGifClick", function (e) {
@@ -731,24 +821,30 @@ $(document).ready(function () {
 
 	loadI18n().done(function () {
 		updateChrome();
-		loadTrainings().done(function (trainings) {
-			fillTrainingPicker(trainings);
-			var currentId = localStorage.getItem("internationalization.training_id");
-			var training = trainingById(currentId) || trainingByFamily(localStorage.getItem("trainingFamilyId")) || trainings[0];
-			if (training) {
-				applyTrainingMeta(training);
-				fillTrainingPicker(trainings, training.trainingId);
-			}
-			loadModules().done(function (modules) {
-				var videoId = localStorage.getItem("videoId");
-				if (!videoId) {
+		loadGuruPages().done(function (pages) {
+			loadTrainings().done(function (trainings) {
+				fillTrainingPicker(trainings);
+				var currentId = localStorage.getItem("internationalization.training_id");
+				var training = trainingById(currentId) || trainingByFamily(localStorage.getItem("trainingFamilyId")) || trainings[0];
+				if (training) {
+					applyTrainingMeta(training);
+					fillTrainingPicker(trainings, training.trainingId);
+				}
+				loadModules().done(function (modules) {
+					var lastVideo = localStorage.getItem(lastVideoKey());
+					if (lastVideo) {
+						goToLesson(lastVideo, localStorage.getItem(lastModuleKey()) || "", false, "training");
+						return;
+					}
+					if (pages && pages.length) {
+						openGuruPage(pages[0], false);
+						return;
+					}
 					var first = firstLesson(modules);
 					if (first) {
 						goToLesson(first.videoId, first.moduleId, false, "training");
-						return;
 					}
-				}
-				loadLesson(false);
+				}).fail(ajaxFailed);
 			}).fail(ajaxFailed);
 		}).fail(ajaxFailed);
 	}).fail(ajaxFailed);
