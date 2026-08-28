@@ -136,12 +136,17 @@
 		return '<svg viewBox="0 0 36 36" aria-hidden="true"><path fill="#fff" d="M12 10h4v16h-4zm8 0h4v16h-4z"/></svg>';
 	}
 
-	function Player(container, src, alt) {
+	function Player(container, src, alt, audioUrl) {
 		this.originalSrc = src;
 		this.playSrc = src;
 		this.blobUrl = "";
 		this.container = container;
 		this.alt = alt || "";
+		this.audioUrl = audioUrl || "";
+		this.audio = null;
+		this.audioBlobUrl = "";
+		this.audioReady = false;
+		this.audioLoading = false;
 		this.playing = false;
 		this.elapsed = 0;
 		this.duration = 0;
@@ -171,7 +176,9 @@
 			'<div class="yt-controls">' +
 			'<button type="button" class="yt-play" aria-label="Play">' + iconPlay() + "</button>" +
 			'<div class="yt-time"><span class="yt-current">0:00</span> / <span class="yt-duration">0:00</span></div>' +
-			"</div></div></div>";
+			"</div></div>" +
+			'<audio class="yt-player-audio" preload="auto" playsinline></audio>' +
+			"</div>";
 		this.root = this.container.querySelector(".yt-player");
 		this.gif = this.container.querySelector(".yt-player-gif");
 		this.freeze = this.container.querySelector(".yt-player-freeze");
@@ -182,6 +189,7 @@
 		this.durationEl = this.container.querySelector(".yt-duration");
 		this.playBtn = this.container.querySelector(".yt-play");
 		this.progress = this.container.querySelector(".yt-progress");
+		this.audio = this.container.querySelector(".yt-player-audio");
 		this.gif.alt = this.alt;
 	};
 
@@ -193,7 +201,7 @@
 			self.toggle();
 		});
 		this.root.addEventListener("click", function (e) {
-			if (e.target.closest && (e.target.closest(".yt-play") || e.target.closest(".yt-progress"))) {
+			if (e.target.closest && (e.target.closest(".yt-play") || e.target.closest(".yt-progress") || e.target.closest(".yt-player-audio"))) {
 				return;
 			}
 			self.toggle();
@@ -220,10 +228,182 @@
 		}
 		var rect = this.progress.getBoundingClientRect();
 		this.elapsed = Math.min(this.duration, Math.max(0, ((e.clientX - rect.left) / rect.width) * this.duration));
+		if (this.audioReady && this.audio) {
+			this.audio.currentTime = this.elapsed / 1000;
+			this.updateTimeUi();
+			return;
+		}
 		this.playing = false;
 		this.setPlayUi();
 		this.paintAt(this.elapsed);
 		this.updateTimeUi();
+	};
+
+	Player.prototype.syncDurationFromAudio = function () {
+		if (!this.audio || !isFinite(this.audio.duration) || this.audio.duration <= 0) {
+			return;
+		}
+		this.duration = this.audio.duration * 1000;
+	};
+
+	Player.prototype.showLoopingGif = function () {
+		if (this.originalSrc) {
+			this.gif.hidden = false;
+			this.freeze.hidden = true;
+			if (!this.gif.getAttribute("src")) {
+				this.gif.src = this.originalSrc;
+			}
+		}
+	};
+
+	Player.prototype.pauseLoopingGif = function () {
+		if (this.gif && !this.gif.hidden && this.gif.naturalWidth) {
+			try {
+				this.freeze.width = this.gif.naturalWidth;
+				this.freeze.height = this.gif.naturalHeight;
+				this.ctx.drawImage(this.gif, 0, 0);
+				this.gif.hidden = true;
+				this.freeze.hidden = false;
+			} catch (e) {}
+		} else if (this.sprite && this.spec) {
+			this.freezeFrame();
+		}
+	};
+
+	Player.prototype.loadFullAudio = function (url) {
+		var self = this;
+		this.audioLoading = true;
+		this.root.classList.add("is-loading-audio");
+		return fetch(url).then(function (res) {
+			if (!res.ok) {
+				throw new Error("audio " + res.status);
+			}
+			return res.blob();
+		}).then(function (blob) {
+			if (self.dead) {
+				return;
+			}
+			if (self.audioBlobUrl) {
+				URL.revokeObjectURL(self.audioBlobUrl);
+			}
+			self.audioBlobUrl = URL.createObjectURL(blob);
+			return new Promise(function (resolve, reject) {
+				function ok() {
+					self.audio.removeEventListener("loadedmetadata", ok);
+					self.audio.removeEventListener("error", bad);
+					self.audioReady = true;
+					self.audioLoading = false;
+					self.syncDurationFromAudio();
+					resolve();
+				}
+				function bad() {
+					self.audio.removeEventListener("loadedmetadata", ok);
+					self.audio.removeEventListener("error", bad);
+					reject(new Error("audio decode"));
+				}
+				self.audio.addEventListener("loadedmetadata", ok);
+				self.audio.addEventListener("error", bad);
+				self.audio.src = self.audioBlobUrl;
+				self.audio.load();
+			});
+		}).then(function () {
+			if (self.dead) {
+				return;
+			}
+			self.root.classList.remove("is-loading-audio");
+		}).catch(function (err) {
+			if (!self.dead) {
+				self.audioLoading = false;
+				self.audioReady = false;
+				self.root.classList.remove("is-loading-audio");
+			}
+			throw err;
+		});
+	};
+
+	Player.prototype.bindAudioClock = function () {
+		var self = this;
+		if (!this.audio) {
+			return;
+		}
+		this.audio.addEventListener("timeupdate", function () {
+			if (self.dead || self.seeking) {
+				return;
+			}
+			self.elapsed = (self.audio.currentTime || 0) * 1000;
+			self.syncDurationFromAudio();
+			self.updateTimeUi();
+		});
+		this.audio.addEventListener("ended", function () {
+			if (self.dead) {
+				return;
+			}
+			self.playing = false;
+			self.elapsed = self.duration;
+			self.pauseLoopingGif();
+			self.setPlayUi();
+			self.updateTimeUi();
+		});
+		this.audio.addEventListener("play", function () {
+			if (self.dead) {
+				return;
+			}
+			if (!self.playing) {
+				self.playing = true;
+				self.showLoopingGif();
+				self.setPlayUi();
+				self.tick();
+			}
+		});
+		this.audio.addEventListener("pause", function () {
+			if (self.dead || self.seeking || self.audio.ended) {
+				return;
+			}
+			if (self.playing) {
+				self.playing = false;
+				self.pauseLoopingGif();
+				self.setPlayUi();
+			}
+		});
+		this.audio.addEventListener("seeked", function () {
+			if (self.dead) {
+				return;
+			}
+			self.elapsed = (self.audio.currentTime || 0) * 1000;
+			self.updateTimeUi();
+		});
+	};
+
+	Player.prototype.startLessonClock = function () {
+		var self = this;
+		this.showLoopingGif();
+		this.updateTimeUi();
+		if (this.audioReady && this.audio) {
+			var play = this.audio.play();
+			if (play && play.then) {
+				play.then(function () {
+					if (self.dead) {
+						return;
+					}
+					self.playing = true;
+					self.lastTs = performance.now();
+					self.setPlayUi();
+					self.tick();
+				}).catch(function () {
+					if (self.dead) {
+						return;
+					}
+					self.playing = false;
+					self.pauseLoopingGif();
+					self.setPlayUi();
+				});
+				return;
+			}
+		}
+		this.playing = true;
+		this.lastTs = performance.now();
+		this.setPlayUi();
+		this.tick();
 	};
 
 	Player.prototype.start = function () {
@@ -232,6 +412,33 @@
 		this.gif.hidden = true;
 		this.freeze.hidden = false;
 		this.elapsed = 0;
+		this.bindAudioClock();
+		if (this.audioUrl) {
+			if (this.originalSrc) {
+				this.gif.src = this.originalSrc;
+			}
+			this.duration = mappedDuration(this.originalSrc);
+			this.playing = false;
+			this.setPlayUi();
+			this.updateTimeUi();
+			this.loadFullAudio(this.audioUrl).then(function () {
+				if (self.dead) {
+					return;
+				}
+				self.startLessonClock();
+			}).catch(function () {
+				if (self.dead) {
+					return;
+				}
+				self.startVisualOnly(spec);
+			});
+			return;
+		}
+		this.startVisualOnly(spec);
+	};
+
+	Player.prototype.startVisualOnly = function (spec) {
+		var self = this;
 		if (!spec) {
 			this.duration = mappedDuration(this.originalSrc);
 			this.gif.hidden = false;
@@ -350,7 +557,7 @@
 	};
 
 	Player.prototype.toggle = function () {
-		if (this.dead) {
+		if (this.dead || this.audioLoading) {
 			return;
 		}
 		this.playing = !this.playing;
@@ -359,6 +566,18 @@
 		if (this.playing) {
 			if (this.duration && this.elapsed >= this.duration) {
 				this.elapsed = 0;
+				if (this.audioReady && this.audio) {
+					this.audio.currentTime = 0;
+				}
+			}
+			if (this.audioReady && this.audio) {
+				this.showLoopingGif();
+				var play = this.audio.play();
+				if (play && play.catch) {
+					play.catch(function () {});
+				}
+				this.tick();
+				return;
 			}
 			this.gif.hidden = true;
 			this.freeze.hidden = false;
@@ -369,12 +588,34 @@
 				cancelAnimationFrame(this.timer);
 				this.timer = 0;
 			}
-			this.freezeFrame();
+			if (this.audio) {
+				this.audio.pause();
+			}
+			if (this.audioReady) {
+				this.pauseLoopingGif();
+			} else {
+				this.freezeFrame();
+			}
 		}
 	};
 
 	Player.prototype.tick = function () {
 		if (this.dead || !this.playing) {
+			return;
+		}
+		if (this.audioReady && this.audio) {
+			this.elapsed = (this.audio.currentTime || 0) * 1000;
+			this.syncDurationFromAudio();
+			if (this.audio.ended || (this.duration && this.elapsed >= this.duration)) {
+				this.elapsed = this.duration;
+				this.playing = false;
+				this.pauseLoopingGif();
+				this.setPlayUi();
+				this.updateTimeUi();
+				return;
+			}
+			this.updateTimeUi();
+			this.timer = requestAnimationFrame(this.tick.bind(this));
 			return;
 		}
 		var now = performance.now();
@@ -410,21 +651,31 @@
 			URL.revokeObjectURL(this.blobUrl);
 			this.blobUrl = "";
 		}
+		if (this.audio) {
+			this.audio.pause();
+			this.audio.removeAttribute("src");
+			this.audio.load();
+			this.audio = null;
+		}
+		if (this.audioBlobUrl) {
+			URL.revokeObjectURL(this.audioBlobUrl);
+			this.audioBlobUrl = "";
+		}
 	};
 
 	window.GifPlayer = {
-		mount: function (container, src, alt) {
+		mount: function (container, src, alt, audioUrl) {
 			if (active) {
 				active.destroy();
 				active = null;
 			}
-			if (!container || !src) {
+			if (!container || (!src && !audioUrl)) {
 				if (container) {
 					container.innerHTML = "";
 				}
 				return null;
 			}
-			active = new Player(container, src, alt);
+			active = new Player(container, src, alt, audioUrl);
 			return active;
 		}
 	};

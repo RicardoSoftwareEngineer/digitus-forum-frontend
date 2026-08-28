@@ -371,8 +371,19 @@ $(document).ready(function () {
 		}
 	}
 
+	function lessonMediaPath(videoId, ext) {
+		var id = String(videoId || "");
+		if (!id || /\.\.|[\\/]/.test(id)) {
+			return "";
+		}
+		return "buckets/digitus-forum-media/videos/" + id + "." + ext;
+	}
+
 	function gifSrc(video) {
-		var path = video.gif || "";
+		var path = (video && video.gif) || "";
+		if (!path && video && video.videoId) {
+			path = lessonMediaPath(video.videoId, "gif");
+		}
 		if (!path) {
 			return "";
 		}
@@ -387,6 +398,17 @@ $(document).ready(function () {
 			return "";
 		}
 		return new URL(rel, MEDIA_BASE).href + "?v=" + Date.now();
+	}
+
+	function audioSrc(video) {
+		if (!video || !video.videoId) {
+			return "";
+		}
+		var rel = lessonMediaPath(video.videoId, "m4a");
+		if (!rel) {
+			return "";
+		}
+		return new URL(rel, MEDIA_BASE).href;
 	}
 
 	function renderLesson(video) {
@@ -409,16 +431,17 @@ $(document).ready(function () {
 		}
 		$("#links").html(links);
 		var src = gifSrc(video);
+		var m4a = audioSrc(video);
 		if (src) {
 			var title = escapeHtml(video.name || "");
 			if (window.GifPlayer) {
-				window.GifPlayer.mount(document.getElementById("video"), src, title);
+				window.GifPlayer.mount(document.getElementById("video"), src, title, m4a);
 			} else {
 				$("#video").html("<img alt=\"" + title + "\" src=\"" + src + "\" />");
 			}
 		} else {
 			if (window.GifPlayer) {
-				window.GifPlayer.mount(document.getElementById("video"), "");
+				window.GifPlayer.mount(document.getElementById("video"), "", "", m4a);
 			} else {
 				$("#video").empty();
 			}
