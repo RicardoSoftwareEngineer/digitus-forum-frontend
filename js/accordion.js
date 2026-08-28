@@ -295,9 +295,7 @@ $(document).ready(function () {
 	}
 
 	function loadTrainings() {
-		return firewall("/training/v1/retrieveByLocale", {
-			locale: localStorage.getItem("language")
-		});
+		return firewall("/training/v1/retrieveAll", {});
 	}
 
 	function applyTrainingMeta(training) {

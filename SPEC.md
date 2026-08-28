@@ -1,7 +1,7 @@
 <!-- para IA. não é README de humano. -->
 # SPEC — frontend (vitrine)
 
-status: v0.5
+status: v0.6
 sha: `dc2e038`
 data: 2026-08-28
 
@@ -57,7 +57,8 @@ localStorage também: token (UUID cru ou `Bearer <uuid>` — prefixar no header)
 Chaves i18 que a vitrine lê (39): labels `welcome_title` `continue_training` `database_indexes` `internationalization` `scalability` `manutenability` `documentation` `tests` `requirement` `free_training` `free_training_description` `simplicity` `module` `previous_video` `next_video`; ids de vídeo `welcome_video` `continue_training_video` `start_training_video` `frontend_video` `backend_video` `database_indexes_video` `internationalization_video` `scalability_video` `manutenability_video` `documentation_video` `tests_video` `requirement_video`; ids de módulo `general_module` `continue_training_module` `start_training_module` `frontend_module` `backend_module` `database_indexes_module` `internationalization_module` `scalability_module` `manutenability_module` `documentation_module` `tests_module` `requirement_module`. “Frontend”/“Backend” e “Módulos/Idioma” estão hardcoded.
 
 ## CONTRATO que a vitrine deve chamar
-- i18: `POST /firewall/internationalization/v1/i18` (público). Bundle `/frontend` **não** existe — GAP-FRONT-BUNDLE.
+- i18: `POST /firewall/internationalization/v1/i18` (público, uma chave).
+- CONTRATO-FRONT-BUNDLE `POST /firewall/internationalization/v1/frontend` `{locale}` — dump de todas as i18 do locale (público). JSON array `{keyy, message}`.
 - **Revogado** (2026-08-28): prefixo `/course/v1` e `retrieveByCourseIdWithVideos` body `{courseId}`.
 - training: `retrieveAll` / `retrieveById` (público se gratuito). **Não** `retrieveByLocale`. JSON `trainingId`.
 - module: `retrieveByTrainingIdWithVideos` body `{trainingId}`.
@@ -76,6 +77,6 @@ Não chama: `createToken` com senha, reset password, 8081–8088, login do bkp, 
 - GAP-FAMILY: **revogado**. Idioma = i18n.
 - GAP-BASE: `localhost:8080` vs same-origin `/firewall`.
 - GAP-AUDIO: **revogado** como path. Path = `videos/{videoId}.m4a`. Player ainda não implementa (código ≠ spec).
-- GAP-FRONT-BUNDLE: dump de i18 por locale. Borda só tem `/i18` por chave.
+- GAP-FRONT-BUNDLE: **revogado** (2026-08-28). CONTRATO-FRONT-BUNDLE.
 - GAP-EMAIL-REAL: SES; não pré-preencher código; recaptcha. Cookie `HttpOnly` no lugar de `localStorage` fica pra essa fatia, se a gente quiser.
 - GAP-GURU-NAV: como o front escolhe o guru na UI (path, query, seletor). Não é site separado. Lançamento = só `java`, então não bloqueia.
