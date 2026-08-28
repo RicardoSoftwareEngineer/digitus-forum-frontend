@@ -7,9 +7,11 @@
 	  <meta http-equiv="Expires" content="0">
 	  <meta name="referrer" content="no-referrer">
 	  <link rel="icon" type="image/svg+xml" href="./../img/favicon.svg">
+		  <title>Digitus Forum · Cinema</title>
 	  <link rel="stylesheet" href="./../css/layout.css?v=20260826-radius3">
+	  <link rel="stylesheet" href="./../css/video.css?v=20260828-cinema">
 	</head>
-	<body class="lesson-page">
+	<body class="lesson-page layout-cinema">
 		<div id="backgroundBlur"></div>
 
 		<div class="lesson-shell">
@@ -21,16 +23,24 @@
 
 			<div class="center-col">
 				<div class="lesson-align">
-					<button type="button" class="lesson-align-btn" id="toggleNav" aria-expanded="true" aria-label="Colapsar menu">&lt;&lt;</button>
 					<button type="button" class="lesson-align-btn idioma-toggle" aria-controls="lessonFlip">Idioma</button>
-					<button type="button" class="lesson-align-btn" id="toggleModules" aria-expanded="true" aria-label="Colapsar módulos">&gt;&gt;</button>
 					<div id="previousAndNextVideo"></div>
 					<main class="stage">
 					<div class="flip-scene">
 						<div class="flip-card" id="lessonFlip">
 							<div class="flip-face flip-front glass" id="box">
 							<div id="name" class="text"></div>
+							<div class="player-frame">
 							<div id="video"></div>
+							<div class="player-tools">
+								<button type="button" class="player-tool glass" id="toggleFullscreen" title="Tela cheia" aria-label="Tela cheia">
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 9V4h5v2H6v3H4zm10-5h5v5h-2V6h-3V4zM4 15h2v3h3v2H4v-5zm16 0v5h-5v-2h3v-3h2z"/></svg>
+								</button>
+								<button type="button" class="player-tool glass" id="toggleCinema" title="Modo cinema" aria-label="Modo cinema" aria-pressed="false">
+									<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5h4v14H3V5zm14 0h4v14h-4V5zM9 7h6v10H9V7z"/></svg>
+								</button>
+							</div>
+							</div>
 							<div id="description" class="text"></div>
 							<div id="links" class="text"></div>
 						</div>
@@ -75,5 +85,5 @@
 	<script src="./../js/menu-from-bg.js?v=20260826-accentover"></script>
 	<script src="./../js/gif-sprites.js?v=20260826-sprite"></script>
 	<script src="./../js/gif-player.js?v=20260826-sprite"></script>
-	<script src="./../js/accordion.js?v=20260828-layout"></script>
+	<script src="./../js/accordion.js?v=20260828-cinema"></script>
 </html>
