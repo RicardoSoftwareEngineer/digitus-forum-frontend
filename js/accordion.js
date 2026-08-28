@@ -473,120 +473,76 @@ $(document).ready(function () {
 		switchLanguage("pt_BR");
 	});
 
-	var paneMs = 450;
-	var paneEase = $.easing.easeInOutQuad ? "easeInOutQuad" : "swing";
-
-	function paneOpenWidth($pane) {
-		return $pane.data("openWidth") || Math.max(240, Math.round($(window).width() * 0.22));
+	function fsElement() {
+		return document.fullscreenElement || document.webkitFullscreenElement || null;
 	}
 
-	function isStripNav($pane) {
-		return $("body").hasClass("layout-strip") && $pane.hasClass("sidebar");
-	}
-
-	function collapsePane($pane, shellClass) {
-		if (isStripNav($pane)) {
-			var h = $pane.outerHeight();
-			$pane.data("openHeight", h);
-			$pane.css({ overflow: "hidden" });
-			$pane.stop(true, false).animate({
-				height: 0,
-				paddingTop: 0,
-				paddingBottom: 0,
-				opacity: 0
-			}, paneMs, paneEase, function () {
-				$pane.hide().addClass("collapsed");
-				$(".lesson-shell").addClass(shellClass);
-				$pane.css({ height: "", paddingTop: "", paddingBottom: "", opacity: "", overflow: "" });
-			});
+	function requestFs(el) {
+		if (!el) {
 			return;
 		}
-		var w = $pane.outerWidth();
-		$pane.data("openWidth", w);
-		$pane.css({ minWidth: 0, overflow: "hidden" });
-		$pane.stop(true, false).animate({
-			width: 0,
-			paddingLeft: 0,
-			paddingRight: 0,
-			opacity: 0
-		}, paneMs, paneEase, function () {
-			$pane.hide().addClass("collapsed");
-			$(".lesson-shell").addClass(shellClass);
-			$pane.css({ width: "", minWidth: "", paddingLeft: "", paddingRight: "", opacity: "", overflow: "" });
-		});
-	}
-
-	function expandPane($pane, shellClass) {
-		if (isStripNav($pane)) {
-			var h = $pane.data("openHeight") || 56;
-			$(".lesson-shell").removeClass(shellClass);
-			$pane.removeClass("collapsed").css({
-				display: "flex",
-				height: 0,
-				paddingTop: 0,
-				paddingBottom: 0,
-				opacity: 0,
-				overflow: "hidden"
-			});
-			$pane.stop(true, false).animate({
-				height: h,
-				paddingTop: 10,
-				paddingBottom: 10,
-				opacity: 1
-			}, paneMs, paneEase, function () {
-				$pane.css({ height: "", paddingTop: "", paddingBottom: "", opacity: "", overflow: "" });
-			});
-			return;
+		if (el.requestFullscreen) {
+			el.requestFullscreen();
+		} else if (el.webkitRequestFullscreen) {
+			el.webkitRequestFullscreen();
 		}
-		var w = paneOpenWidth($pane);
-		$(".lesson-shell").removeClass(shellClass);
-		$pane.removeClass("collapsed").css({
-			display: "flex",
-			width: 0,
-			paddingLeft: 0,
-			paddingRight: 0,
-			opacity: 0,
-			overflow: "hidden"
-		});
-		$pane.stop(true, false).animate({
-			width: w,
-			paddingLeft: 16,
-			paddingRight: 16,
-			opacity: 1
-		}, paneMs, paneEase, function () {
-			$pane.css({ width: "", paddingLeft: "", paddingRight: "", opacity: "", overflow: "" });
-		});
 	}
 
-	$(document).on("click", "#toggleNav", function (e) {
+	function exitFs() {
+		if (document.exitFullscreen) {
+			document.exitFullscreen();
+		} else if (document.webkitExitFullscreen) {
+			document.webkitExitFullscreen();
+		}
+	}
+
+	function syncFullscreenBtn() {
+		var on = !!fsElement();
+		$("#toggleFullscreen").attr("aria-pressed", on ? "true" : "false");
+	}
+
+	function lockCenterSquare() {
+		var $col = $(".center-col");
+		var $box = $("#box");
+		var $frame = $(".player-frame");
+		$col.css({ width: $col.outerWidth() + "px" });
+		$box.css({ width: $box.outerWidth() + "px", height: $box.outerHeight() + "px" });
+		$frame.css({ width: $frame.outerWidth() + "px", height: $frame.outerHeight() + "px", flex: "0 0 auto" });
+	}
+
+	function unlockCenterSquare() {
+		$(".center-col, #box, .player-frame").css({ width: "", height: "", flex: "" });
+	}
+
+	$(document).on("click", "#toggleFullscreen", function (e) {
 		e.preventDefault();
-		var collapsed = !$(".sidebar").hasClass("collapsed") && $(".sidebar").is(":visible") && $(".sidebar").width() > 8;
-		if ($(".sidebar").is(":animated")) {
-			return;
-		}
-		if (collapsed) {
-			collapsePane($(".sidebar"), "nav-collapsed");
-			$(this).text(">>").attr("aria-expanded", "false");
+		e.stopPropagation();
+		var frame = document.querySelector(".player-frame");
+		if (fsElement()) {
+			exitFs();
 		} else {
-			expandPane($(".sidebar"), "nav-collapsed");
-			$(this).text("<<").attr("aria-expanded", "true");
+			requestFs(frame);
 		}
 	});
 
-	$(document).on("click", "#toggleModules", function (e) {
+	$(document).on("fullscreenchange webkitfullscreenchange", syncFullscreenBtn);
+
+	$(document).on("click", "#toggleCinema", function (e) {
 		e.preventDefault();
-		if ($(".modules").is(":animated")) {
-			return;
-		}
-		var collapsed = !$(".modules").hasClass("collapsed") && $(".modules").is(":visible") && $(".modules").width() > 8;
-		if (collapsed) {
-			collapsePane($(".modules"), "mod-collapsed");
-			$(this).text("<<").attr("aria-expanded", "false");
+		e.stopPropagation();
+		var $body = $("body");
+		var on = $body.hasClass("is-cinema-mode");
+		if (on) {
+			$body.removeClass("is-cinema-mode");
+			unlockCenterSquare();
+			$(this).attr("aria-pressed", "false");
 		} else {
-			expandPane($(".modules"), "mod-collapsed");
-			$(this).text(">>").attr("aria-expanded", "true");
+			lockCenterSquare();
+			$body.addClass("is-cinema-mode");
+			$(this).attr("aria-pressed", "true");
 		}
 	});
+
 
 	$(document).on("click", "#trainingPickerBtn", function (e) {
 		e.stopPropagation();
