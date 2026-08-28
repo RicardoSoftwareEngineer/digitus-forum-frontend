@@ -27,9 +27,11 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
 - NÃO-BACKOFFICE: admin UI. Páginas HTML e gurus entram por arquivo local + SQL local.
 - NÃO-EMAIL-REAL: SES de verdade (continua mock).
 - NÃO-COOKIE: cookie HttpOnly.
+- NÃO-STRIPE-LIVE: chaves live (`sk_live_` / `pk_live_`) **proibidas** até Ricardo pedir.
 
 ## REGRA
 - REGRA-MVP1-PAY: provedor = Stripe **Embedded** Checkout (`ui_mode=embedded`). Avulso `mode=payment` (`card` + `pix`). Mensalidade `mode=subscription` (`card` só). Sem redirect pra stripe.com.
+- REGRA-MVP1-STRIPE-TEST: só `sk_test_` / `pk_test_` (e webhook secret de test) no env. Dashboard em Test mode. Cartão `4242…`. Sem dinheiro real. Live só quando Ricardo pedir.
 - REGRA-MVP1-SUB-JAVA: assinatura ativa → acesso a trainings **pagos** do guru `java`. Gratuitos continuam públicos.
 - REGRA-MVP1-AVULSO: compra avulsa → acesso àquele `trainingId` (pago). Independente da mensalidade.
 - REGRA-MVP1-LISTA: aluno logado vê lista dos trainings que comprou avulso + flag da assinatura java.
