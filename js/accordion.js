@@ -542,14 +542,14 @@ $(document).ready(function () {
 		if (on) {
 			$body.removeClass("is-cinema-mode");
 			$btn.attr("aria-pressed", "false").html(CINEMA_ICON_OFF);
-			$panes.stop(true, true).show("puff", { percent: 150 }, 400, function () {
+			$panes.stop(true, true).fadeIn(400, function () {
 				unlockCenterSquare();
 			});
 		} else {
 			lockCenterSquare();
 			$body.addClass("is-cinema-mode");
 			$btn.attr("aria-pressed", "true").html(CINEMA_ICON_ON);
-			$panes.stop(true, true).hide("puff", { percent: 150 }, 400);
+			$panes.stop(true, true).fadeOut(400);
 		}
 	});
 
