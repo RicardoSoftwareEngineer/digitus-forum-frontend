@@ -536,15 +536,20 @@ $(document).ready(function () {
 		e.preventDefault();
 		e.stopPropagation();
 		var $body = $("body");
+		var $btn = $(this);
+		var $panes = $(".sidebar, .modules");
 		var on = $body.hasClass("is-cinema-mode");
 		if (on) {
 			$body.removeClass("is-cinema-mode");
-			unlockCenterSquare();
-			$(this).attr("aria-pressed", "false").html(CINEMA_ICON_OFF);
+			$btn.attr("aria-pressed", "false").html(CINEMA_ICON_OFF);
+			$panes.stop(true, true).show("scale", { origin: ["middle", "center"] }, 400, function () {
+				unlockCenterSquare();
+			});
 		} else {
 			lockCenterSquare();
 			$body.addClass("is-cinema-mode");
-			$(this).attr("aria-pressed", "true").html(CINEMA_ICON_ON);
+			$btn.attr("aria-pressed", "true").html(CINEMA_ICON_ON);
+			$panes.stop(true, true).hide("puff", { percent: 150 }, 400);
 		}
 	});
 
