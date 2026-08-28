@@ -39,6 +39,7 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
 - REGRA-MVP1-OPEN: ao abrir o guru: último vídeo assistido daquele guru (client) **ou**, se não houver, a primeira página da esquerda.
 - REGRA-MVP1-AUDIO: aula = `gif` + áudio. Path áudio: `buckets/digitus-forum-media/videos/{videoId}.m4a`. Front baixa o arquivo **inteiro** antes de tocar. Gzip na hora **não**. Compactar = encode em disco (m4a/opus), não no request.
 - REGRA-MVP1-WEBHOOK: liberar acesso **só** depois do webhook Stripe verificado (não confiar no redirect de sucesso).
+- REGRA-MVP1-UX: um botão (Assinar ou Comprar). Stripe Checkout com **email preenchido** da conta. Sem form nosso, sem senha, sem conta Stripe. Cartão / Apple Pay / Google Pay / Link; PIX só no avulso (QR). Volta pra aula.
 
 ## DADOS (MVP1)
 | id | onde | campos |
