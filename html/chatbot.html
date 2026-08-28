@@ -16,7 +16,7 @@
 			  
 	</body>
 	
-	<script>document.body.setAttribute('style', 'background-image: '+localStorage.getItem("backgroundUrl"));</script>	
+	<script>(function(){var u=localStorage.getItem("backgroundUrl")||"";if(!/^data:image\//i.test(u)&&!/^url\(\s*["']?data:image\//i.test(u))return;document.body.style.backgroundImage=/^url\(/i.test(u)?u:'url("'+u.replace(/"/g,"")+'")';})();</script>	
 	<script  src="./../js/jquery.js"></script>
 	<script  src="./../js/background1.js"></script>
 	<script  src="./../js/background2.js"></script>
