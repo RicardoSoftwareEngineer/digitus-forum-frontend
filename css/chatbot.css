@@ -82,7 +82,6 @@
 	border: 2px solid green;
 }
 
-
 .container {
     display: flex;
     flex-wrap: wrap;
@@ -197,11 +196,6 @@
     user-select: none;
 }
 
-
-
-
-
-
 #chatIcon{
 	position: absolute;
 	width: 9vh;
@@ -231,50 +225,6 @@
 	right: 3vh;
 	bottom: 3vh;
 	transition: all 0.5s ease-in-out;
-}
-
-#BKPchatBackgroundBlur{
-	width:100%;
-	height: 100%;
-	position: fixed;
-	top: 0px;
-	left: 0px;
-	display: none;
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-	background: rgba(255, 255, 255, 0.6);
-	border-radius: 0px;
-}
-
-#BKPchatWindow{
-	width: 80%;
-	height: 400px;
-	position: absolute;
-	left: 10%;
-	top: 100px;
-	display: inline;
-}
-
-#BKPchatWindowTitle{
-	position: absolute;
-	left: calc(50% - 42px);
-	font-size: 35px;
-}
-
-#BKPchatWindowSearch{
-	position: absolute;
-	top: 40px;
-	width: 100%;
-	font-size: 21px;
-	padding: 0px;
-}
-
-#BKPchatWindowList{
-	position: absolute;
-	top: 70px;
-	width: 100%;
-	height: 100%;
-	font-size: 21px;
 }
 
 #newChatWindow{
@@ -323,82 +273,6 @@
 	font-size: 35px;
 	transition: all 0.2s ease-in-out;
 	opacity: 1;
-}
-
-#BKPchataaaaaaaaaaaaaa{
-	width: 60px;
-	height: 60px;
-	position: absolute;
-	top: 32px;
-	right: 40px;
-}
-
-#BKPchatsFilter{
-	width: 280px;
-    height: 81px;
-    top: -100px;
-    left: 198px;
-    position: absolute;
-	border: 3px solid green;
-}
-
-#BKPchatsFilter p{
-	margin-bottom: 5px;
-}
-
-#BKPchatProperties{
-	border: 3px solid blue;
-}
-
-
-#BKPchatLabel{
-	position: absolute;
-	left: calc(50% - 10px);
-	top: 10px;
-}
-
-#BKPchatMessagesSubjectName{
-	text-align:center;
-}
-
-#BKPchatMessagesSubjectName{
-	
-}
-
-#BKPchatMessagesRadioButtons p{
-	margin-bottom: 5px;
-}
-
-#BKPchatMessagesRadioButtons{
-	width: 280px;
-    height: 60px;
-    top: 302px;
-    left: 327px;
-    position: absolute;
-}
-
-
-
-#BKPchatSubjectsTitle{
-	top: 5px;
-	left: 35px;
-	position: absolute;
-}
-
-#BKPchatMessagesBKP{
-	width: 589px;
-    height: 283px;
-    top: 13px;
-    left: 194px;
-    position: absolute;
-}
-
-#BKPchatSubjects{
-	width: 160px;
-    height: 368px;
-    top: 14px;
-    left: 15px;
-    position: absolute;
 }
 
 #box{
@@ -461,5 +335,4 @@
 	left: calc(50% - 5px);
 	position: absolute;
 }
-
 
