@@ -480,7 +480,27 @@ $(document).ready(function () {
 		return $pane.data("openWidth") || Math.max(240, Math.round($(window).width() * 0.22));
 	}
 
+	function isStripNav($pane) {
+		return $("body").hasClass("layout-strip") && $pane.hasClass("sidebar");
+	}
+
 	function collapsePane($pane, shellClass) {
+		if (isStripNav($pane)) {
+			var h = $pane.outerHeight();
+			$pane.data("openHeight", h);
+			$pane.css({ overflow: "hidden" });
+			$pane.stop(true, false).animate({
+				height: 0,
+				paddingTop: 0,
+				paddingBottom: 0,
+				opacity: 0
+			}, paneMs, paneEase, function () {
+				$pane.hide().addClass("collapsed");
+				$(".lesson-shell").addClass(shellClass);
+				$pane.css({ height: "", paddingTop: "", paddingBottom: "", opacity: "", overflow: "" });
+			});
+			return;
+		}
 		var w = $pane.outerWidth();
 		$pane.data("openWidth", w);
 		$pane.css({ minWidth: 0, overflow: "hidden" });
@@ -497,6 +517,27 @@ $(document).ready(function () {
 	}
 
 	function expandPane($pane, shellClass) {
+		if (isStripNav($pane)) {
+			var h = $pane.data("openHeight") || 56;
+			$(".lesson-shell").removeClass(shellClass);
+			$pane.removeClass("collapsed").css({
+				display: "flex",
+				height: 0,
+				paddingTop: 0,
+				paddingBottom: 0,
+				opacity: 0,
+				overflow: "hidden"
+			});
+			$pane.stop(true, false).animate({
+				height: h,
+				paddingTop: 10,
+				paddingBottom: 10,
+				opacity: 1
+			}, paneMs, paneEase, function () {
+				$pane.css({ height: "", paddingTop: "", paddingBottom: "", opacity: "", overflow: "" });
+			});
+			return;
+		}
 		var w = paneOpenWidth($pane);
 		$(".lesson-shell").removeClass(shellClass);
 		$pane.removeClass("collapsed").css({

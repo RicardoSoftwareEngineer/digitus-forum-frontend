@@ -19,6 +19,7 @@ Vitrine estática (jQuery) **de todos os gurus** no mesmo domínio / mesmo front
 ## REGRA
 - REGRA-LIVE-1: produto vivo = `index.html` → `html/video.html` + `js/accordion.js` + UI de conta (email → código). Backups (`index bkp*`, `bkp/`) **não** são produto.
 - REGRA-LANDING-2: `index2.html` é **proposta** de home (confiança/venda). Não substitui `index.html` até Ricardo fechar. Não é bkp.
+- REGRA-VIDEO-LAYOUT: `html/video2.html` (cinema / gavetas), `html/video3.html` (três colunas arrumadas), `html/video4.html` (faixa de chips + palco) são **propostas do layout inteiro** do produto. Não substituem `html/video.html` até Ricardo fechar. Fundo Trianglify + `.glass`. Não são bkp.
 - REGRA-API-1: único host de API = firewall. Base no código hoje: `http://localhost:8080/firewall` (ver GAP-BASE).
 - REGRA-I18-1: locale em `localStorage.language` (`pt_BR` / `en_US`). Textos de UI vêm do i18n (via borda).
 - REGRA-MEDIA-1: gif da aula é estático sob `buckets/digitus-forum-media/` (stand-in de S3). Não buscar origem arbitrária.
