@@ -496,9 +496,14 @@ $(document).ready(function () {
 		}
 	}
 
+	var CINEMA_ICON_OFF = '<svg viewBox="0 0 36 36" aria-hidden="true"><path fill="#fff" fill-rule="evenodd" d="m 28,11 0,14 -20,0 0,-14 z m -18,2 16,0 0,10 -16,0 0,-10 z"/></svg>';
+	var CINEMA_ICON_ON = '<svg viewBox="0 0 36 36" aria-hidden="true"><path fill="#fff" fill-rule="evenodd" d="m 26,13 0,10 -16,0 0,-10 z m -14,2 12,0 0,6 -12,0 0,-6 z"/></svg>';
+	var FS_ICON_OFF = '<svg viewBox="0 0 36 36" aria-hidden="true"><path fill="#fff" fill-rule="evenodd" d="m 10,16 2,0 0,-4 4,0 0,-2 L 10,10 l 0,6 0,0 z"/><path fill="#fff" fill-rule="evenodd" d="m 20,10 0,2 4,0 0,4 2,0 L 26,10 l -6,0 0,0 z"/><path fill="#fff" fill-rule="evenodd" d="m 24,24 -4,0 0,2 L 26,26 l 0,-6 -2,0 0,4 0,0 z"/><path fill="#fff" fill-rule="evenodd" d="M 12,20 10,20 10,26 l 6,0 0,-2 -4,0 0,-4 0,0 z"/></svg>';
+	var FS_ICON_ON = '<svg viewBox="0 0 36 36" aria-hidden="true"><path fill="#fff" fill-rule="evenodd" d="m 14,14 -4,0 0,2 6,0 0,-6 -2,0 0,4 0,0 z"/><path fill="#fff" fill-rule="evenodd" d="m 22,14 0,-4 -2,0 0,6 6,0 0,-2 -4,0 0,0 z"/><path fill="#fff" fill-rule="evenodd" d="m 20,26 2,0 0,-4 4,0 0,-2 -6,0 0,6 0,0 z"/><path fill="#fff" fill-rule="evenodd" d="m 10,22 4,0 0,4 2,0 0,-6 -6,0 0,2 0,0 z"/></svg>';
+
 	function syncFullscreenBtn() {
 		var on = !!fsElement();
-		$("#toggleFullscreen").attr("aria-pressed", on ? "true" : "false");
+		$("#toggleFullscreen").attr("aria-pressed", on ? "true" : "false").html(on ? FS_ICON_ON : FS_ICON_OFF);
 	}
 
 	function lockCenterSquare() {
@@ -535,11 +540,11 @@ $(document).ready(function () {
 		if (on) {
 			$body.removeClass("is-cinema-mode");
 			unlockCenterSquare();
-			$(this).attr("aria-pressed", "false");
+			$(this).attr("aria-pressed", "false").html(CINEMA_ICON_OFF);
 		} else {
 			lockCenterSquare();
 			$body.addClass("is-cinema-mode");
-			$(this).attr("aria-pressed", "true");
+			$(this).attr("aria-pressed", "true").html(CINEMA_ICON_ON);
 		}
 	});
 
