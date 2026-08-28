@@ -410,16 +410,134 @@ $(document).ready(function () {
 		return null;
 	}
 
+	var billingMeCache = null;
+	var DEFAULT_TRUST = "O Digitus Forum não salva nem recebe o número do cartão. O pagamento vai direto para a Stripe, uma das maiores processadoras de cartões do mundo.";
+
+	function trustLine() {
+		return i18("billing_trust_line") || DEFAULT_TRUST;
+	}
+
+	function formatBrl(cents) {
+		var n = Number(cents || 0) / 100;
+		if (isNaN(n)) {
+			n = 0;
+		}
+		return "R$ " + n.toFixed(2).replace(".", ",");
+	}
+
+	function ownsTraining(training, me) {
+		if (!training) {
+			return false;
+		}
+		if (!training.paid) {
+			return true;
+		}
+		if (!me) {
+			return false;
+		}
+		if (me.javaSubscriptionActive && String(training.guruId || "java") === "java") {
+			return true;
+		}
+		var ids = me.purchasedTrainingIds || [];
+		for (var i = 0; i < ids.length; i++) {
+			if (String(ids[i]) === String(training.trainingId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	function loadBillingMe() {
+		if (!tokenUuid()) {
+			billingMeCache = null;
+			return $.Deferred().resolve(null).promise();
+		}
+		return firewall("/billing/v1/me", {}).then(function (me) {
+			billingMeCache = me || { purchasedTrainingIds: [], javaSubscriptionActive: false };
+			return billingMeCache;
+		});
+	}
+
+	function clearModules() {
+		var $acc = $("#accordion");
+		if ($acc.hasClass("ui-accordion")) {
+			$acc.accordion("destroy");
+		}
+		trainingGifOrder = [];
+		$acc.empty();
+	}
+
+	function hidePaidLock() {
+		$("#paidLock").remove();
+	}
+
+	function showPaidLock(training, reason) {
+		hidePaidLock();
+		if (window.GifPlayer) {
+			window.GifPlayer.mount(document.getElementById("video"), "", "", "");
+		} else {
+			$("#video").empty();
+		}
+		$("#previousAndNextVideo").empty();
+		$("#description").empty();
+		$("#links").empty();
+		$("#name").text((training && training.name) || "");
+		clearModules();
+		var en = localStorage.getItem("language") === "en_US";
+		var priceLabel = formatBrl(training && training.price);
+		var title = en ? "This training is paid" : "Este treinamento é pago";
+		var needLogin = !tokenUuid();
+		var btn = needLogin ? (en ? "Sign in to buy" : "Entre para comprar") : (en ? "Buy (" + priceLabel + ")" : "Comprar (" + priceLabel + ")");
+		var html = "<div class='paid-lock glass' id='paidLock'>";
+		html += "<p class='paid-lock-title'>" + escapeHtml(title) + "</p>";
+		html += "<button type='button' class='account-btn' id='paidBuyBtn' data-training='" + escapeHtml((training && training.trainingId) || "") + "'>" + escapeHtml(btn) + "</button>";
+		html += "<p class='paid-lock-trust'>" + escapeHtml(trustLine()) + "</p>";
+		html += "<p class='paid-lock-msg' id='paidLockMsg'></p>";
+		html += "</div>";
+		$("#video").html(html);
+		if (reason === "503") {
+			$("#paidLockMsg").text(en ? "Stripe test is not on yet." : "Stripe test ainda não está ligado.");
+		}
+	}
+
+	function ensureTrainingAccess(training) {
+		if (!training || !training.paid) {
+			hidePaidLock();
+			return $.Deferred().resolve(true).promise();
+		}
+		if (!tokenUuid()) {
+			showPaidLock(training, "login");
+			return $.Deferred().resolve(false).promise();
+		}
+		return loadBillingMe().then(function (me) {
+			if (ownsTraining(training, me)) {
+				hidePaidLock();
+				return true;
+			}
+			showPaidLock(training, "buy");
+			return false;
+		}, function (xhr) {
+			showPaidLock(training, xhr && xhr.status === 503 ? "503" : "buy");
+			return false;
+		});
+	}
+
 	function openTraining(training, goToFirst) {
 		applyTrainingMeta(training);
 		fillTrainingPicker(trainingsForLocale, training.trainingId);
-		return loadModules().done(function (modules) {
-			if (goToFirst) {
-				var first = firstLesson(modules);
-				if (first) {
-					goToLesson(first.videoId, first.moduleId, true, "training");
-				}
+		return ensureTrainingAccess(training).done(function (owned) {
+			if (!owned) {
+				return;
 			}
+			hidePaidLock();
+			return loadModules().done(function (modules) {
+				if (goToFirst) {
+					var first = firstLesson(modules);
+					if (first) {
+						goToLesson(first.videoId, first.moduleId, true, "training");
+					}
+				}
+			});
 		});
 	}
 
@@ -762,6 +880,40 @@ $(document).ready(function () {
 		closeTrainingPicker();
 	});
 
+
+	$(document).on("click", "#paidBuyBtn", function (e) {
+		e.preventDefault();
+		var training = trainingById($(this).attr("data-training")) || trainingById(localStorage.getItem("internationalization.training_id"));
+		if (!training) {
+			return;
+		}
+		if (!tokenUuid()) {
+			$("#accountEmail").trigger("focus");
+			return;
+		}
+		firewall("/billing/v1/checkout/training", { trainingId: training.trainingId }).done(function () {
+			billingMeCache = null;
+			openTraining(training, true);
+		}).fail(function (xhr) {
+			if (xhr.status === 409) {
+				billingMeCache = null;
+				openTraining(training, true);
+				return;
+			}
+			if (xhr.status === 503) {
+				showPaidLock(training, "503");
+				var en = localStorage.getItem("language") === "en_US";
+				var msg = "";
+				try {
+					msg = JSON.parse(xhr.responseText).message || "";
+				} catch (err) {}
+				$("#paidLockMsg").text(msg || (en ? "Stripe test is not on yet." : "Stripe test ainda não está ligado."));
+				return;
+			}
+			ajaxFailed(xhr);
+		});
+	});
+
 	$(document).on("click", "#accountSend", function (e) {
 		e.preventDefault();
 		var email = $.trim($("#accountEmail").val() || "");
@@ -797,6 +949,11 @@ $(document).ready(function () {
 			accountStep = "in";
 			accountCodePrefill = "";
 			renderAccount();
+			billingMeCache = null;
+			var current = trainingById(localStorage.getItem("internationalization.training_id"));
+			if (current) {
+				openTraining(current, true);
+			}
 		}).fail(ajaxFailed);
 	});
 
@@ -804,7 +961,12 @@ $(document).ready(function () {
 		e.preventDefault();
 		accountStep = "email";
 		accountCodePrefill = "";
+		billingMeCache = null;
 		renderAccount();
+		var current = trainingById(localStorage.getItem("internationalization.training_id"));
+		if (current && current.paid) {
+			showPaidLock(current, "login");
+		}
 	});
 
 	$(document).on("click", "#accountLogout", function (e) {
@@ -830,21 +992,26 @@ $(document).ready(function () {
 					applyTrainingMeta(training);
 					fillTrainingPicker(trainings, training.trainingId);
 				}
-				loadModules().done(function (modules) {
-					var lastVideo = localStorage.getItem(lastVideoKey());
-					if (lastVideo) {
-						goToLesson(lastVideo, localStorage.getItem(lastModuleKey()) || "", false, "training");
+				ensureTrainingAccess(training).done(function (owned) {
+					if (!owned) {
 						return;
 					}
-					if (pages && pages.length) {
-						openGuruPage(pages[0], false);
-						return;
-					}
-					var first = firstLesson(modules);
-					if (first) {
-						goToLesson(first.videoId, first.moduleId, false, "training");
-					}
-				}).fail(ajaxFailed);
+					loadModules().done(function (modules) {
+						var lastVideo = localStorage.getItem(lastVideoKey());
+						if (lastVideo) {
+							goToLesson(lastVideo, localStorage.getItem(lastModuleKey()) || "", false, "training");
+							return;
+						}
+						if (pages && pages.length) {
+							openGuruPage(pages[0], false);
+							return;
+						}
+						var first = firstLesson(modules);
+						if (first) {
+							goToLesson(first.videoId, first.moduleId, false, "training");
+						}
+					}).fail(ajaxFailed);
+				});
 			}).fail(ajaxFailed);
 		}).fail(ajaxFailed);
 	}).fail(ajaxFailed);

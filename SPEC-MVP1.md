@@ -60,7 +60,7 @@ Chaves i18 sugeridas (comentário; **não** gravadas no i18 MS neste PR). Se a k
 - CONTRATO-STRIPE-SUB `POST /firewall/billing/v1/checkout/subscription` (token) → Session mensalidade java, `card`, `ui_mode=embedded`. Response: `clientSecret` (não `url`).
 - CONTRATO-STRIPE-BUY `POST /firewall/billing/v1/checkout/training` (token) body `{trainingId}` → Session avulsa, `card`+`pix`, embedded. Response: `clientSecret`.
 - CONTRATO-STRIPE-HOOK `POST /firewall/billing/v1/stripe/webhook` (público, assinado `Stripe-Signature`). `checkout.session.completed` / `invoice.paid` / `customer.subscription.deleted` → user MS grava DADOS-ASSINATURA / DADOS-COMPRA.
-- CONTRATO-ME `GET /firewall/billing/v1/me` (token) → assinatura java + lista `trainingId` comprados.
+- CONTRATO-ME `POST /firewall/billing/v1/me` (token) → assinatura java + lista `trainingId` comprados.
 - CONTRATO-GURU-PAGES `GET/POST /firewall/guru/v1/{guruId}/pages` (público no MVP1, só leitura) → páginas do menu esquerdo. Código da borda: POST (resto da borda é POST).
 
 Quem grava página/guru: operador, SQL **local**. Sem CONTRATO de escrita pública.
