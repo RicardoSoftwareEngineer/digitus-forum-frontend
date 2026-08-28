@@ -11,7 +11,7 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
 
 ## No MVP1
 1. Conta: email + código, sem senha. Mock SES (código volta na API, front pré-preenche). Token em `localStorage`.
-2. Pagamento **Stripe Checkout** (página hospedada, sem form de cartão nosso).
+2. Pagamento **Stripe Embedded Checkout** (iframe na nossa página, sem redirecionar, sem form de cartão nosso).
    - Mensalidade: **só cartão** (crédito ou débito que o Checkout aceitar). **PIX não paga mensalidade.**
    - MVP1: mensalidade libera **só o guru `java`** (todos os trainings pagos daquele guru).
    - Depois (fora do MVP1): mensalidade todos os gurus + mensalidade por guru.
@@ -29,7 +29,7 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
 - NÃO-COOKIE: cookie HttpOnly.
 
 ## REGRA
-- REGRA-MVP1-PAY: provedor = Stripe Checkout. Avulso `mode=payment` (`card` + `pix`). Mensalidade `mode=subscription` (`card` só).
+- REGRA-MVP1-PAY: provedor = Stripe **Embedded** Checkout (`ui_mode=embedded`). Avulso `mode=payment` (`card` + `pix`). Mensalidade `mode=subscription` (`card` só). Sem redirect pra stripe.com.
 - REGRA-MVP1-SUB-JAVA: assinatura ativa → acesso a trainings **pagos** do guru `java`. Gratuitos continuam públicos.
 - REGRA-MVP1-AVULSO: compra avulsa → acesso àquele `trainingId` (pago). Independente da mensalidade.
 - REGRA-MVP1-LISTA: aluno logado vê lista dos trainings que comprou avulso + flag da assinatura java.
@@ -39,7 +39,8 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
 - REGRA-MVP1-OPEN: ao abrir o guru: último vídeo assistido daquele guru (client) **ou**, se não houver, a primeira página da esquerda.
 - REGRA-MVP1-AUDIO: aula = `gif` + áudio. Path áudio: `buckets/digitus-forum-media/videos/{videoId}.m4a`. Front baixa o arquivo **inteiro** antes de tocar. Gzip na hora **não**. Compactar = encode em disco (m4a/opus), não no request.
 - REGRA-MVP1-WEBHOOK: liberar acesso **só** depois do webhook Stripe verificado (não confiar no redirect de sucesso).
-- REGRA-MVP1-UX: um botão (Assinar ou Comprar). Stripe Checkout com **email preenchido** da conta. Sem form nosso, sem senha, sem conta Stripe. Cartão / Apple Pay / Google Pay / Link; PIX só no avulso (QR). Volta pra aula.
+- REGRA-MVP1-UX: um botão (Assinar ou Comprar). Abre o Embedded Checkout **na nossa página**, email preenchido. Sem form nosso, sem senha, sem conta Stripe, sem sair do Digitus. Cartão / Apple Pay / Google Pay / Link; PIX só no avulso (QR).
+- REGRA-MVP1-TRUST: aviso pequeno acima do embed (i18n `billing_trust_line`): «O Digitus Forum não salva nem recebe o número do cartão. O pagamento vai direto para a Stripe, uma das maiores processadoras de cartões do mundo.» Marca: **Stripe** (não “Strype”).
 
 ## DADOS (MVP1)
 | id | onde | campos |
@@ -52,8 +53,8 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
 HTML da página do guru **não** está no banco. Arquivo: `buckets/digitus-forum-media/gurus/{guruId}/{pageId}.html` (outro host no prod).
 
 ## CONTRATO (borda, firewall)
-- CONTRATO-STRIPE-SUB `POST /firewall/billing/v1/checkout/subscription` (token) → Stripe Checkout Session mensalidade java, `card`. Response: `url` pra redirecionar.
-- CONTRATO-STRIPE-BUY `POST /firewall/billing/v1/checkout/training` (token) body `{trainingId}` → Session avulsa, `card`+`pix`. Response: `url`.
+- CONTRATO-STRIPE-SUB `POST /firewall/billing/v1/checkout/subscription` (token) → Session mensalidade java, `card`, `ui_mode=embedded`. Response: `clientSecret` (não `url`).
+- CONTRATO-STRIPE-BUY `POST /firewall/billing/v1/checkout/training` (token) body `{trainingId}` → Session avulsa, `card`+`pix`, embedded. Response: `clientSecret`.
 - CONTRATO-STRIPE-HOOK `POST /firewall/billing/v1/stripe/webhook` (público, assinado `Stripe-Signature`). `checkout.session.completed` / `invoice.paid` / `customer.subscription.deleted` → user MS grava DADOS-ASSINATURA / DADOS-COMPRA.
 - CONTRATO-ME `GET /firewall/billing/v1/me` (token) → assinatura java + lista `trainingId` comprados.
 - CONTRATO-GURU-PAGES `GET/POST /firewall/guru/v1/{guruId}/pages` (público no MVP1, só leitura) → páginas do menu esquerdo.

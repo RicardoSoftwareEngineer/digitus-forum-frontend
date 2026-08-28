@@ -33,7 +33,7 @@ Vitrine estática (jQuery) **de todos os gurus** no mesmo domínio / mesmo front
 - REGRA-MVP1-MENU-R: menu direito = módulos/aulas do Training.
 - REGRA-MVP1-AUDIO: baixar `videos/{videoId}.m4a` **inteiro** e sincronizar com o gif. Seek imediato.
 - REGRA-MVP1-OPEN: último vídeo daquele guru (client) ou primeira página da esquerda.
-- REGRA-MVP1-PAY: Stripe Checkout. Mensalidade = cartão (guru java). Avulso = PIX+cartão por training.
+- REGRA-MVP1-PAY: Stripe **Embedded** Checkout na nossa página. Mensalidade = cartão (guru java). Avulso = PIX+cartão por training. Aviso `billing_trust_line` (não salvamos o cartão; vai pra Stripe).
 
 ## NÃO
 - NÃO-LOGIN-BKP: não religar o **form** do bkp (pedia senha e gravava senha+token). UI nova = REGRA-CONTA-*. Token UUID em `localStorage` é produto; senha no storage **não**.
