@@ -1,8 +1,8 @@
 <!-- para IA. não é README de humano. -->
 # SPEC — frontend (vitrine)
 
-status: v0.3
-sha: `f0e611d`
+status: v0.4
+sha: `dc2e038`
 data: 2026-08-28
 
 ## Como usar
@@ -22,8 +22,8 @@ Vitrine estática (jQuery) **de todos os gurus** no mesmo domínio / mesmo front
 - REGRA-I18-1: locale em `localStorage.language` (`pt_BR` / `en_US`). Textos de UI vêm do i18n (via borda).
 - REGRA-MEDIA-1: gif da aula é estático sob `buckets/digitus-forum-media/` (stand-in de S3). Não buscar origem arbitrária.
 - REGRA-XSS-1: strings da API/i18 são texto, não HTML. (PRs #1–#3 pendentes alinham o código.)
-- REGRA-AUTH-1: vitrine de **curso gratuito** é pública (sem token). Login + compra só para **curso pago** (REGRA-AUTH-PAID no firewall). Conta existe mesmo assim (testar cadastro/login).
-- REGRA-IDIOMA-1: troca pt/en = i18n (`localStorage.language`). **Não** troca `courseId` nem usa `familyId`.
+- REGRA-AUTH-1: vitrine de **treinamento gratuito** é pública (sem token). Login + compra só para **treinamento pago** (REGRA-AUTH-PAID no firewall). Conta existe mesmo assim (testar cadastro/login).
+- REGRA-IDIOMA-1: troca pt/en = i18n (`localStorage.language`). **Não** troca `trainingId` nem usa `familyId`.
 - REGRA-CONTA-1: UI = email → CONTRATO-EV-SEND → tela de código. **Mock:** campos do código já vêm populados com `readableNumber` da API. Usuário confirma. CONTRATO-EV-OK → token.
 - REGRA-CONTA-2: sem campos de senha. Cadastro não pede nome (nome depois no perfil/user update).
 - REGRA-CONTA-3: um fluxo só. Email novo cria conta; existente entra.
@@ -41,7 +41,7 @@ Vitrine estática (jQuery) **de todos os gurus** no mesmo domínio / mesmo front
 - NÃO-GURU-HOST: sem site/front por guru.
 
 ## DADOS (só client)
-localStorage de produto: `language`, `internationalization.*`, `internationalization.training_id` (courseId), `courseName`, `courseSinopse`, `videoId`/`moduleId`/`lessonSource`, `nav*`/`course*`, `isTraining`/`isCourse`, `backgroundUrl` (data:image). Sem `courseFamilyId`.
+localStorage de produto: `language`, `internationalization.*`, `internationalization.training_id` (trainingId), `trainingName`, `trainingSinopse`, `videoId`/`moduleId`/`lessonSource`, `nav*`/`training*`, `isTraining`, `backgroundUrl` (data:image). Sem `trainingFamilyId`/`familyId`. **Revogado:** `courseName`/`courseSinopse`/`isCourse`/`course*`.
 localStorage também: token (UUID cru ou `Bearer <uuid>` — prefixar no header). **Não** senha. **Não** o código depois de validar.
 **Não** é fonte de verdade. Servidor não lê isso.
 
@@ -49,9 +49,10 @@ Chaves i18 que a vitrine lê (39): labels `welcome_title` `continue_training` `d
 
 ## CONTRATO que a vitrine deve chamar
 - i18: `POST /firewall/internationalization/v1/i18` (público). Bundle `/frontend` **não** existe — GAP-FRONT-BUNDLE.
-- course: `retrieveAll` / `retrieveById` (público se gratuito). **Não** `retrieveByLocale`.
-- module: `retrieveByCourseIdWithVideos` body `{courseId}` (não `retrieveByTrainingIdWithVideos`).
-- video: `retrieveById` body `{videoId}` — campo de mídia `gif`. Público se o curso for gratuito.
+- **Revogado** (2026-08-28): prefixo `/course/v1` e `retrieveByCourseIdWithVideos` body `{courseId}`.
+- training: `retrieveAll` / `retrieveById` (público se gratuito). **Não** `retrieveByLocale`. JSON `trainingId`.
+- module: `retrieveByTrainingIdWithVideos` body `{trainingId}`.
+- video: `retrieveById` body `{videoId}` — campo de mídia `gif`. Público se o treinamento for gratuito.
 - CONTRATO-CONTA-SEND `POST /firewall/emailVerification/v1/sendValidationEmail` `{email}` — mock: usa `readableNumber` da response para popular a tela.
 - CONTRATO-CONTA-OK `POST /firewall/emailVerification/v1/validateEmail` `{email, readableNumber}` — guarda token em `localStorage`, prefixa `Bearer` no header.
 

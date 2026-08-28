@@ -65,8 +65,8 @@ $(document).ready(function () {
 		return $("#name, #description, #links, #video");
 	}
 
-	var coursesForLocale = [];
-	var courseGifOrder = [];
+	var trainingsForLocale = [];
+	var trainingGifOrder = [];
 
 	function navItem(selected, video, moduleId, label, icon) {
 		var cls = selected ? "selectedNav" : "";
@@ -99,8 +99,8 @@ $(document).ready(function () {
 	function renderSidebar() {
 		var navVideoId = localStorage.getItem("navVideoId");
 		var items = leftNavItems();
-		var title = localStorage.getItem("courseName") || i18("free_training");
-		var desc = localStorage.getItem("courseSinopse") || i18("free_training_description");
+		var title = localStorage.getItem("trainingName") || i18("free_training");
+		var desc = localStorage.getItem("trainingSinopse") || i18("free_training_description");
 		var html = "<div class='sidebar-head brand-head'>";
 		html += "<div class='sidebar-icon'>🎓</div>";
 		html += "<div><h2>" + escapeHtml(title) + "</h2><p>" + escapeHtml(desc) + "</p></div>";
@@ -119,9 +119,9 @@ $(document).ready(function () {
 		if ($acc.hasClass("ui-accordion")) {
 			$acc.accordion("destroy");
 		}
-		courseGifOrder = [];
-		var videoId = localStorage.getItem("courseVideoId");
-		var moduleId = localStorage.getItem("courseModuleId");
+		trainingGifOrder = [];
+		var videoId = localStorage.getItem("trainingVideoId");
+		var moduleId = localStorage.getItem("trainingModuleId");
 		var active = 0;
 		var html = "";
 		for (var i = 0; i < modules.length; i++) {
@@ -134,9 +134,9 @@ $(document).ready(function () {
 			var videos = m.videos || [];
 			for (var j = 0; j < videos.length; j++) {
 				var v = videos[j];
-				courseGifOrder.push({ videoId: v.videoId, moduleId: m.moduleId });
+				trainingGifOrder.push({ videoId: v.videoId, moduleId: m.moduleId });
 				html += "<li class='" + (String(v.videoId) === String(videoId) ? "selectedGif" : "") + "'>";
-				html += "<a href='#' data-course-video='" + escapeHtml(v.videoId) + "' data-course-module='" + escapeHtml(m.moduleId) + "' class='courseGifClick'>" + escapeHtml(v.name) + "</a></li>";
+				html += "<a href='#' data-training-video='" + escapeHtml(v.videoId) + "' data-training-module='" + escapeHtml(m.moduleId) + "' class='trainingGifClick'>" + escapeHtml(v.name) + "</a></li>";
 			}
 			html += "</ul></div>";
 		}
@@ -146,23 +146,23 @@ $(document).ready(function () {
 		}
 	}
 
-	function courseGifIndex(videoId) {
-		for (var i = 0; i < courseGifOrder.length; i++) {
-			if (String(courseGifOrder[i].videoId) === String(videoId)) {
+	function trainingGifIndex(videoId) {
+		for (var i = 0; i < trainingGifOrder.length; i++) {
+			if (String(trainingGifOrder[i].videoId) === String(videoId)) {
 				return i;
 			}
 		}
 		return -1;
 	}
 
-	function courseGifAt(offsetFromCurrent) {
-		var n = courseGifOrder.length;
+	function trainingGifAt(offsetFromCurrent) {
+		var n = trainingGifOrder.length;
 		if (!n) {
 			return null;
 		}
-		var idx = courseGifIndex(localStorage.getItem("videoId"));
+		var idx = trainingGifIndex(localStorage.getItem("videoId"));
 		if (idx < 0) {
-			idx = courseGifIndex(localStorage.getItem("courseVideoId"));
+			idx = trainingGifIndex(localStorage.getItem("trainingVideoId"));
 		}
 		if (idx < 0) {
 			idx = 0;
@@ -171,17 +171,17 @@ $(document).ready(function () {
 		if (next < 0) {
 			next += n;
 		}
-		return courseGifOrder[next];
+		return trainingGifOrder[next];
 	}
 
 	function loadModules() {
-		var courseId = localStorage.getItem("internationalization.training_id");
+		var trainingId = localStorage.getItem("internationalization.training_id");
 		renderSidebar();
-		if (!courseId) {
+		if (!trainingId) {
 			return $.Deferred().resolve([]).promise();
 		}
 		return firewall("/module/v1/retrieveByTrainingIdWithVideos", {
-			trainingId: courseId,
+			trainingId: trainingId,
 			language: localStorage.getItem("language")
 		}).done(renderModules);
 	}
@@ -199,77 +199,76 @@ $(document).ready(function () {
 		return null;
 	}
 
-	function closeCoursePicker() {
-		$("#coursePickerList").attr("hidden", true);
-		$("#coursePickerBtn").attr("aria-expanded", "false");
+	function closeTrainingPicker() {
+		$("#trainingPickerList").attr("hidden", true);
+		$("#trainingPickerBtn").attr("aria-expanded", "false");
 	}
 
-	function fillCoursePicker(courses, selectedId) {
-		coursesForLocale = courses || [];
-		var selected = courseById(selectedId) || coursesForLocale[0];
+	function fillTrainingPicker(trainings, selectedId) {
+		trainingsForLocale = trainings || [];
+		var selected = trainingById(selectedId) || trainingsForLocale[0];
 		if (selected) {
-			$("#coursePickerName").text(selected.name || "");
-			$("#coursePickerSinopse").text(selected.sinopse || "");
+			$("#trainingPickerName").text(selected.name || "");
+			$("#trainingPickerSinopse").text(selected.sinopse || "");
 		}
 		var html = "";
-		for (var i = 0; i < coursesForLocale.length; i++) {
-			var c = coursesForLocale[i];
-			var current = String(c.courseId) === String(selected && selected.courseId) ? " is-current" : "";
-			html += "<li><button type='button' class='" + current.trim() + "' data-course='" + escapeHtml(c.courseId) + "'>";
+		for (var i = 0; i < trainingsForLocale.length; i++) {
+			var c = trainingsForLocale[i];
+			var current = String(c.trainingId) === String(selected && selected.trainingId) ? " is-current" : "";
+			html += "<li><button type='button' class='" + current.trim() + "' data-training='" + escapeHtml(c.trainingId) + "'>";
 			html += "<div class='sidebar-icon'>🎓</div><div><h2>" + escapeHtml(c.name || "") + "</h2><p>" + escapeHtml(c.sinopse || "") + "</p></div>";
 			html += "</button></li>";
 		}
-		$("#coursePickerList").html(html);
-		closeCoursePicker();
+		$("#trainingPickerList").html(html);
+		closeTrainingPicker();
 	}
 
-	function loadCourses() {
-		return firewall("/course/v1/retrieveByLocale", {
+	function loadTrainings() {
+		return firewall("/training/v1/retrieveByLocale", {
 			locale: localStorage.getItem("language")
 		});
 	}
 
-	function applyCourseMeta(course) {
-		if (!course) {
+	function applyTrainingMeta(training) {
+		if (!training) {
 			return;
 		}
-		localStorage.setItem("internationalization.training_id", course.courseId);
-		localStorage.setItem("courseFamilyId", course.familyId || "");
-		localStorage.setItem("courseName", course.name || "");
-		localStorage.setItem("courseSinopse", course.sinopse || "");
+		localStorage.setItem("internationalization.training_id", training.trainingId);
+		localStorage.setItem("trainingFamilyId", training.familyId || "");
+		localStorage.setItem("trainingName", training.name || "");
+		localStorage.setItem("trainingSinopse", training.sinopse || "");
 		localStorage.setItem("isTraining", "true");
-		localStorage.setItem("isCourse", "true");
 	}
 
-	function courseById(id) {
-		for (var i = 0; i < coursesForLocale.length; i++) {
-			if (String(coursesForLocale[i].courseId) === String(id)) {
-				return coursesForLocale[i];
+	function trainingById(id) {
+		for (var i = 0; i < trainingsForLocale.length; i++) {
+			if (String(trainingsForLocale[i].trainingId) === String(id)) {
+				return trainingsForLocale[i];
 			}
 		}
 		return null;
 	}
 
-	function courseByFamily(familyId) {
+	function trainingByFamily(familyId) {
 		if (!familyId) {
 			return null;
 		}
-		for (var i = 0; i < coursesForLocale.length; i++) {
-			if (String(coursesForLocale[i].familyId) === String(familyId)) {
-				return coursesForLocale[i];
+		for (var i = 0; i < trainingsForLocale.length; i++) {
+			if (String(trainingsForLocale[i].familyId) === String(familyId)) {
+				return trainingsForLocale[i];
 			}
 		}
 		return null;
 	}
 
-	function openCourse(course, goToFirst) {
-		applyCourseMeta(course);
-		fillCoursePicker(coursesForLocale, course.courseId);
+	function openTraining(training, goToFirst) {
+		applyTrainingMeta(training);
+		fillTrainingPicker(trainingsForLocale, training.trainingId);
 		return loadModules().done(function (modules) {
 			if (goToFirst) {
 				var first = firstLesson(modules);
 				if (first) {
-					goToLesson(first.videoId, first.moduleId, true, "course");
+					goToLesson(first.videoId, first.moduleId, true, "training");
 				}
 			}
 		});
@@ -284,14 +283,14 @@ $(document).ready(function () {
 			}).parent("li").addClass("selectedNav");
 			return;
 		}
-		var videoId = localStorage.getItem("courseVideoId");
+		var videoId = localStorage.getItem("trainingVideoId");
 		$("#accordion li").removeClass("selectedGif");
-		$("#accordion a.courseGifClick").filter(function () {
-			return String($(this).attr("data-course-video")) === String(videoId);
+		$("#accordion a.trainingGifClick").filter(function () {
+			return String($(this).attr("data-training-video")) === String(videoId);
 		}).parent("li").addClass("selectedGif");
 		$("#accordion h3").removeClass("selectedModule");
-		var $match = $("#accordion a.courseGifClick").filter(function () {
-			return String($(this).attr("data-course-video")) === String(videoId);
+		var $match = $("#accordion a.trainingGifClick").filter(function () {
+			return String($(this).attr("data-training-video")) === String(videoId);
 		}).first();
 		var $h3 = $match.closest("div").prev("h3");
 		$h3.addClass("selectedModule");
@@ -323,7 +322,7 @@ $(document).ready(function () {
 
 	function renderLesson(video) {
 		var nav = "";
-		if (courseGifOrder.length) {
+		if (trainingGifOrder.length) {
 			nav += "<a id='previousVideo' href='#'>" + escapeHtml(i18("previous_video") || "Previous") + "</a>";
 			nav += "<a id='nextVideo' href='#'>" + escapeHtml(i18("next_video") || "Next") + "</a>";
 		}
@@ -355,7 +354,7 @@ $(document).ready(function () {
 				$("#video").empty();
 			}
 		}
-		markSelected(localStorage.getItem("lessonSource") || "course");
+		markSelected(localStorage.getItem("lessonSource") || "training");
 	}
 
 	function loadLesson(animate) {
@@ -385,7 +384,7 @@ $(document).ready(function () {
 		if (!videoId) {
 			return;
 		}
-		source = source || "course";
+		source = source || "training";
 		var changed = String(videoId) !== String(localStorage.getItem("videoId"));
 		localStorage.setItem("videoId", videoId);
 		localStorage.setItem("moduleId", moduleId || "");
@@ -394,11 +393,10 @@ $(document).ready(function () {
 			localStorage.setItem("navVideoId", videoId);
 			localStorage.setItem("navModuleId", moduleId || "");
 		} else {
-			localStorage.setItem("courseVideoId", videoId);
-			localStorage.setItem("courseModuleId", moduleId || "");
+			localStorage.setItem("trainingVideoId", videoId);
+			localStorage.setItem("trainingModuleId", moduleId || "");
 		}
 		localStorage.setItem("isTraining", "true");
-		localStorage.setItem("isCourse", "true");
 		if (changed && typeof window.advanceBackground === "function") {
 			window.advanceBackground();
 		}
@@ -420,15 +418,15 @@ $(document).ready(function () {
 	}
 
 	function switchLanguage(locale) {
-		var familyId = localStorage.getItem("courseFamilyId");
+		var familyId = localStorage.getItem("trainingFamilyId");
 		localStorage.setItem("language", locale);
 		loadI18n().done(function () {
 			updateChrome();
-			loadCourses().done(function (courses) {
-				fillCoursePicker(courses);
-				var course = courseByFamily(familyId) || courses[0];
-				if (course) {
-					openCourse(course, true);
+			loadTrainings().done(function (trainings) {
+				fillTrainingPicker(trainings);
+				var training = trainingByFamily(familyId) || trainings[0];
+				if (training) {
+					openTraining(training, true);
 				}
 			}).fail(ajaxFailed);
 		}).fail(ajaxFailed);
@@ -439,24 +437,24 @@ $(document).ready(function () {
 		goToLesson($(this).attr("data-nav-video"), $(this).attr("data-nav-module"), true, "nav");
 	});
 
-	$(document).on("click", ".courseGifClick", function (e) {
+	$(document).on("click", ".trainingGifClick", function (e) {
 		e.preventDefault();
-		goToLesson($(this).attr("data-course-video"), $(this).attr("data-course-module"), true, "course");
+		goToLesson($(this).attr("data-training-video"), $(this).attr("data-training-module"), true, "training");
 	});
 
 	$(document).on("click", "#nextVideo", function (e) {
 		e.preventDefault();
-		var next = courseGifAt(1);
+		var next = trainingGifAt(1);
 		if (next) {
-			goToLesson(next.videoId, next.moduleId, true, "course");
+			goToLesson(next.videoId, next.moduleId, true, "training");
 		}
 	});
 
 	$(document).on("click", "#previousVideo", function (e) {
 		e.preventDefault();
-		var previous = courseGifAt(-1);
+		var previous = trainingGifAt(-1);
 		if (previous) {
-			goToLesson(previous.videoId, previous.moduleId, true, "course");
+			goToLesson(previous.videoId, previous.moduleId, true, "training");
 		}
 	});
 
@@ -549,47 +547,47 @@ $(document).ready(function () {
 		}
 	});
 
-	$(document).on("click", "#coursePickerBtn", function (e) {
+	$(document).on("click", "#trainingPickerBtn", function (e) {
 		e.stopPropagation();
-		var $list = $("#coursePickerList");
+		var $list = $("#trainingPickerList");
 		var open = !$list.attr("hidden");
 		if (open) {
-			closeCoursePicker();
+			closeTrainingPicker();
 		} else {
 			$list.removeAttr("hidden");
-			$("#coursePickerBtn").attr("aria-expanded", "true");
+			$("#trainingPickerBtn").attr("aria-expanded", "true");
 		}
 	});
 
-	$(document).on("click", "#coursePickerList button", function (e) {
+	$(document).on("click", "#trainingPickerList button", function (e) {
 		e.stopPropagation();
-		var course = courseById($(this).data("course"));
-		closeCoursePicker();
-		if (course) {
-			openCourse(course, true);
+		var training = trainingById($(this).data("training"));
+		closeTrainingPicker();
+		if (training) {
+			openTraining(training, true);
 		}
 	});
 
 	$(document).on("click", function () {
-		closeCoursePicker();
+		closeTrainingPicker();
 	});
 
 	loadI18n().done(function () {
 		updateChrome();
-		loadCourses().done(function (courses) {
-			fillCoursePicker(courses);
+		loadTrainings().done(function (trainings) {
+			fillTrainingPicker(trainings);
 			var currentId = localStorage.getItem("internationalization.training_id");
-			var course = courseById(currentId) || courseByFamily(localStorage.getItem("courseFamilyId")) || courses[0];
-			if (course) {
-				applyCourseMeta(course);
-				fillCoursePicker(courses, course.courseId);
+			var training = trainingById(currentId) || trainingByFamily(localStorage.getItem("trainingFamilyId")) || trainings[0];
+			if (training) {
+				applyTrainingMeta(training);
+				fillTrainingPicker(trainings, training.trainingId);
 			}
 			loadModules().done(function (modules) {
 				var videoId = localStorage.getItem("videoId");
 				if (!videoId) {
 					var first = firstLesson(modules);
 					if (first) {
-						goToLesson(first.videoId, first.moduleId, false, "course");
+						goToLesson(first.videoId, first.moduleId, false, "training");
 						return;
 					}
 				}
