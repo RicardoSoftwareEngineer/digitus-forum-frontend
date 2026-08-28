@@ -54,13 +54,14 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
 | DADOS-VID.audio | convenção | `buckets/digitus-forum-media/videos/{videoId}.m4a` (não coluna obrigatória se o path for fixo) |
 
 HTML da página do guru **não** está no banco. Arquivo: `buckets/digitus-forum-media/gurus/{guruId}/{pageId}.html` (outro host no prod).
+Chaves i18 sugeridas (comentário; **não** gravadas no i18 MS neste PR). Se a key faltar, o front usa o filename: `guru_page_sobre` `guru_page_como_funciona` `guru_java`.
 
 ## CONTRATO (borda, firewall)
 - CONTRATO-STRIPE-SUB `POST /firewall/billing/v1/checkout/subscription` (token) → Session mensalidade java, `card`, `ui_mode=embedded`. Response: `clientSecret` (não `url`).
 - CONTRATO-STRIPE-BUY `POST /firewall/billing/v1/checkout/training` (token) body `{trainingId}` → Session avulsa, `card`+`pix`, embedded. Response: `clientSecret`.
 - CONTRATO-STRIPE-HOOK `POST /firewall/billing/v1/stripe/webhook` (público, assinado `Stripe-Signature`). `checkout.session.completed` / `invoice.paid` / `customer.subscription.deleted` → user MS grava DADOS-ASSINATURA / DADOS-COMPRA.
 - CONTRATO-ME `GET /firewall/billing/v1/me` (token) → assinatura java + lista `trainingId` comprados.
-- CONTRATO-GURU-PAGES `GET/POST /firewall/guru/v1/{guruId}/pages` (público no MVP1, só leitura) → páginas do menu esquerdo.
+- CONTRATO-GURU-PAGES `GET/POST /firewall/guru/v1/{guruId}/pages` (público no MVP1, só leitura) → páginas do menu esquerdo. Código da borda: POST (resto da borda é POST).
 
 Quem grava página/guru: operador, SQL **local**. Sem CONTRATO de escrita pública.
 

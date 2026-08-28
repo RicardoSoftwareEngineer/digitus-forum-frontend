@@ -68,6 +68,7 @@ Chaves i18 que a vitrine lê (39): labels `welcome_title` `continue_training` `d
 
 - CONTRATO-STRIPE-SUB / CONTRATO-STRIPE-BUY / CONTRATO-ME / CONTRATO-GURU-PAGES — ver SPEC-MVP1.md.
 - CONTRATO-GURU-PAGE-SRC: iframe `src` = host de mídia (`buckets/.../gurus/{guruId}/{pageId}.html`), **não** o origin da vitrine.
+Chaves i18 sugeridas (comentário; **não** gravadas no i18 MS neste PR). Se a key faltar, o front usa o filename: `guru_page_sobre` `guru_page_como_funciona` `guru_java` `guru_java_sinopse`.
 
 Não chama: `createToken` com senha, reset password, 8081–8088, login do bkp, Stripe.js com secret.
 

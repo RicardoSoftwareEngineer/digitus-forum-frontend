@@ -265,3 +265,17 @@ body.layout-cinema .yt-player.is-loading-audio .yt-play {
 	opacity: 0.4;
 	pointer-events: none;
 }
+
+body.layout-cinema .guru-page-frame {
+	width: 100%;
+	height: 100%;
+	border: 0;
+	display: block;
+	background: transparent;
+}
+
+body.layout-cinema .player-frame:fullscreen .guru-page-frame,
+body.layout-cinema .player-frame:-webkit-full-screen .guru-page-frame {
+	width: 100%;
+	height: 100%;
+}
