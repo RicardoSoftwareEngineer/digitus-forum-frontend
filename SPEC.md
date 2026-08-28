@@ -1,7 +1,7 @@
 <!-- para IA. não é README de humano. -->
 # SPEC — frontend (vitrine)
 
-status: v0.4
+status: v0.5
 sha: `dc2e038`
 data: 2026-08-28
 
@@ -29,6 +29,11 @@ Vitrine estática (jQuery) **de todos os gurus** no mesmo domínio / mesmo front
 - REGRA-CONTA-3: um fluxo só. Email novo cria conta; existente entra.
 - REGRA-TOKEN-STORE: token (só o UUID) em `localStorage`. **Não** senha. **Não** cookie. Persiste entre dias e abas até logout explícito ou o cache da borda expirar (~4 dias). Header `Authorization: Bearer <uuid>`. Cookie `HttpOnly` é upgrade futuro (GAP-EMAIL-REAL), não agora.
 - REGRA-GURU-FRONT: um domínio, um front, vários gurus. Lançamento: guru `java`. Aluno global (mesmo user em qualquer guru).
+- REGRA-MVP1-MENU-L: menu esquerdo = páginas do guru (`titleKey` i18n + `src` HTML estático noutro host, iframe). Ver SPEC-MVP1.md.
+- REGRA-MVP1-MENU-R: menu direito = módulos/aulas do Training.
+- REGRA-MVP1-AUDIO: baixar `videos/{videoId}.m4a` **inteiro** e sincronizar com o gif. Seek imediato.
+- REGRA-MVP1-OPEN: último vídeo daquele guru (client) ou primeira página da esquerda.
+- REGRA-MVP1-PAY: Stripe Checkout. Mensalidade = cartão (guru java). Avulso = PIX+cartão por training.
 
 ## NÃO
 - NÃO-LOGIN-BKP: não religar o **form** do bkp (pedia senha e gravava senha+token). UI nova = REGRA-CONTA-*. Token UUID em `localStorage` é produto; senha no storage **não**.
@@ -39,6 +44,8 @@ Vitrine estática (jQuery) **de todos os gurus** no mesmo domínio / mesmo front
 - NÃO-BKP: não commitar backups; não republicar `debugToken`.
 - NÃO-PASSWORD: sem input de senha.
 - NÃO-GURU-HOST: sem site/front por guru.
+- NÃO-HTML-DB: HTML do guru não vai no banco; arquivo estático noutro origin.
+- NÃO-PIX-SUB: PIX não paga mensalidade.
 
 ## DADOS (só client)
 localStorage de produto: `language`, `internationalization.*`, `internationalization.training_id` (trainingId), `trainingName`, `trainingSinopse`, `videoId`/`moduleId`/`lessonSource`, `nav*`/`training*`, `isTraining`, `backgroundUrl` (data:image). Sem `trainingFamilyId`/`familyId`. **Revogado:** `courseName`/`courseSinopse`/`isCourse`/`course*`.
@@ -56,14 +63,17 @@ Chaves i18 que a vitrine lê (39): labels `welcome_title` `continue_training` `d
 - CONTRATO-CONTA-SEND `POST /firewall/emailVerification/v1/sendValidationEmail` `{email}` — mock: usa `readableNumber` da response para popular a tela.
 - CONTRATO-CONTA-OK `POST /firewall/emailVerification/v1/validateEmail` `{email, readableNumber}` — guarda token em `localStorage`, prefixa `Bearer` no header.
 
-Não chama: `createToken` com senha, reset password, 8081–8088, login do bkp.
+- CONTRATO-STRIPE-SUB / CONTRATO-STRIPE-BUY / CONTRATO-ME / CONTRATO-GURU-PAGES — ver SPEC-MVP1.md.
+- CONTRATO-GURU-PAGE-SRC: iframe `src` = host de mídia (`buckets/.../gurus/{guruId}/{pageId}.html`), **não** o origin da vitrine.
+
+Não chama: `createToken` com senha, reset password, 8081–8088, login do bkp, Stripe.js com secret.
 
 ## GAP
 - GAP-VITRINE: **revogado** (2026-08-28). Gratuito público; pago = token + compra.
 - GAP-GIF: **revogado**. Campo `gif`.
 - GAP-FAMILY: **revogado**. Idioma = i18n.
 - GAP-BASE: `localhost:8080` vs same-origin `/firewall`.
-- GAP-AUDIO: player ainda não toca áudio da aula.
+- GAP-AUDIO: **revogado** como path. Path = `videos/{videoId}.m4a`. Player ainda não implementa (código ≠ spec).
 - GAP-FRONT-BUNDLE: dump de i18 por locale. Borda só tem `/i18` por chave.
 - GAP-EMAIL-REAL: SES; não pré-preencher código; recaptcha. Cookie `HttpOnly` no lugar de `localStorage` fica pra essa fatia, se a gente quiser.
 - GAP-GURU-NAV: como o front escolhe o guru na UI (path, query, seletor). Não é site separado. Lançamento = só `java`, então não bloqueia.
