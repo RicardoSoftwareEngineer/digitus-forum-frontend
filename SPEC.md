@@ -1,8 +1,8 @@
 <!-- para IA. não é README de humano. -->
 # SPEC — frontend (vitrine)
 
-status: v0.6
-sha: `dc2e038`
+status: v0.7
+sha: `3a63ab4`
 data: 2026-08-28
 
 ## Como usar
@@ -67,6 +67,7 @@ Chaves i18 que a vitrine lê (39): labels `welcome_title` `continue_training` `d
 - CONTRATO-CONTA-OK `POST /firewall/emailVerification/v1/validateEmail` `{email, readableNumber}` — guarda token em `localStorage`, prefixa `Bearer` no header. código alinhado.
 
 - CONTRATO-STRIPE-SUB / CONTRATO-STRIPE-BUY / CONTRATO-ME / CONTRATO-GURU-PAGES — ver SPEC-MVP1.md.
+- Vitrine: se `training.paid===true`, exige token, chama CONTRATO-ME; sem compra/assinatura java não carrega módulos/player — vidro + Comprar (R$ price/100) + `billing_trust_line`. 409 = já tem. 503 = Stripe test ainda não está ligado. Gratuito = player público.
 - CONTRATO-GURU-PAGE-SRC: iframe `src` = host de mídia (`buckets/.../gurus/{guruId}/{pageId}.html`), **não** o origin da vitrine.
 Chaves i18 sugeridas (comentário; **não** gravadas no i18 MS neste PR). Se a key faltar, o front usa o filename: `guru_page_sobre` `guru_page_como_funciona` `guru_java` `guru_java_sinopse`.
 
