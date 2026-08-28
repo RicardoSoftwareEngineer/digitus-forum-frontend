@@ -166,11 +166,6 @@ body.layout-cinema .player-tool[aria-pressed="true"] {
 	background: transparent;
 }
 
-body.layout-cinema.is-cinema-mode .sidebar,
-body.layout-cinema.is-cinema-mode .modules {
-	display: none !important;
-}
-
 body.layout-cinema.is-cinema-mode .center-col {
 	margin-left: auto;
 	margin-right: auto;
