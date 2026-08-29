@@ -15,7 +15,7 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
    - Mensalidade: **só cartão** (crédito ou débito que o Checkout aceitar). **PIX não paga mensalidade.**
    - MVP1: mensalidade libera **só o guru `java`** (todos os trainings pagos daquele guru).
    - Depois (fora do MVP1): mensalidade todos os gurus + mensalidade por guru.
-   - Avulso: **PIX e cartão**, por `trainingId`.
+   - Avulso: **card-only** por `trainingId` até Dashboard PIX (GAP-STRIPE-PIX no firewall). Não inventar PIX.
    - Lista de trainings comprados (avulso) + se a mensalidade java está ativa.
 3. Gurus prontos (tabela + `guruId` no Training + páginas do menu). MVP1 **mostra** só `java`.
 4. Player: gif + áudio sincronizados. Áudio é arquivo inteiro no front (seek em qualquer segundo).
@@ -30,7 +30,7 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
 - NÃO-STRIPE-LIVE: chaves live (`sk_live_` / `pk_live_`) **proibidas** até Ricardo pedir.
 
 ## REGRA
-- REGRA-MVP1-PAY: provedor = Stripe **Embedded** Checkout (`ui_mode=embedded`). Avulso `mode=payment` (`card` + `pix`). Mensalidade `mode=subscription` (`card` só). Sem redirect pra stripe.com.
+- REGRA-MVP1-PAY: provedor = Stripe **Embedded** Checkout (`ui_mode=embedded`). Avulso `mode=payment` (`card` só até PIX no Dashboard). Mensalidade `mode=subscription` (`card` só). Sem redirect pra stripe.com. `pk_test_` só via CONTRATO-STRIPE-PK.
 - REGRA-MVP1-STRIPE-TEST: só `sk_test_` / `pk_test_` (e webhook secret de test) no env. Dashboard em Test mode. Cartão `4242…`. Sem dinheiro real. Live só quando Ricardo pedir.
 - REGRA-MVP1-SUB-JAVA: assinatura ativa (mensalidade Java R$ 59; Stripe `price_` depois) → acesso a trainings **pagos** do guru `java`. Gratuitos continuam públicos.
 - REGRA-MVP1-AVULSO: compra avulsa → acesso àquele `trainingId` (pago). Preço avulso = `DADOS-TRAINING.price` daquele training (centavos BRL). Independente da mensalidade.
@@ -40,8 +40,8 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
 - REGRA-MVP1-MENU-R: direita = módulos/aulas do Training selecionado.
 - REGRA-MVP1-OPEN: ao abrir o guru: último vídeo assistido daquele guru (client) **ou**, se não houver, a primeira página da esquerda.
 - REGRA-MVP1-AUDIO: aula = `gif` + áudio. Path áudio: `buckets/digitus-forum-media/videos/{videoId}.m4a`. Front baixa o arquivo **inteiro** antes de tocar. Gzip na hora **não**. Compactar = encode em disco (m4a/opus), não no request.
-- REGRA-MVP1-WEBHOOK: liberar acesso **só** depois do webhook Stripe verificado (não confiar no redirect de sucesso).
-- REGRA-MVP1-UX: um botão (Assinar ou Comprar). Abre o Embedded Checkout **na nossa página**, email preenchido. Sem form nosso, sem senha, sem conta Stripe, sem sair do Digitus. Cartão / Apple Pay / Google Pay / Link; PIX só no avulso (QR).
+- REGRA-MVP1-WEBHOOK: webhook verificado se `STRIPE_WEBHOOK_SECRET` (senão 503). Confirmação local = CONTRATO-STRIPE-CONFIRM (retrieve session) para não depender de URL pública.
+- REGRA-MVP1-UX: Comprar (avulso) e Assinar (R$ 59, mensalidade java) no vidro do pago. Abre Embedded Checkout **na nossa página** (overlay de vidro no centro; não estica o cinema). Sem form nosso, sem senha, sem conta Stripe, sem `pk_test_` no repo. PIX off até Dashboard.
 - REGRA-MVP1-TRUST: aviso pequeno acima do embed (i18n `billing_trust_line`): «O Digitus Forum não salva nem recebe o número do cartão. O pagamento vai direto para a Stripe, uma das maiores processadoras de cartões do mundo.» Marca: **Stripe** (não “Strype”).
 
 ## DADOS (MVP1)
@@ -58,8 +58,10 @@ Chaves i18 sugeridas (comentário; **não** gravadas no i18 MS neste PR). Se a k
 
 ## CONTRATO (borda, firewall)
 - CONTRATO-STRIPE-SUB `POST /firewall/billing/v1/checkout/subscription` (token) → Session mensalidade java, `card`, `ui_mode=embedded`. Response: `clientSecret` (não `url`).
-- CONTRATO-STRIPE-BUY `POST /firewall/billing/v1/checkout/training` (token) body `{trainingId}` → Session avulsa, `card`+`pix`, embedded. Response: `clientSecret`.
-- CONTRATO-STRIPE-HOOK `POST /firewall/billing/v1/stripe/webhook` (público, assinado `Stripe-Signature`). `checkout.session.completed` / `invoice.paid` / `customer.subscription.deleted` → user MS grava DADOS-ASSINATURA / DADOS-COMPRA.
+- CONTRATO-STRIPE-BUY `POST /firewall/billing/v1/checkout/training` (token) body `{trainingId}` → Session avulsa, **card-only**, embedded. Response: `clientSecret`.
+- CONTRATO-STRIPE-PK `POST /firewall/billing/v1/publishable-key` (token) → `{publishableKey}` `pk_test_` (503 se ausente/live).
+- CONTRATO-STRIPE-CONFIRM `POST /firewall/billing/v1/checkout/confirm` `{sessionId}` (token) → retrieve + upsert + payload de CONTRATO-ME.
+- CONTRATO-STRIPE-HOOK `POST /firewall/billing/v1/stripe/webhook` (público, assinado `Stripe-Signature`; 503 se secret ausente). `checkout.session.completed` / `invoice.paid` / `customer.subscription.deleted` → user MS grava DADOS-ASSINATURA / DADOS-COMPRA.
 - CONTRATO-ME `POST /firewall/billing/v1/me` (token) → assinatura java + lista `trainingId` comprados.
 - CONTRATO-GURU-PAGES `GET/POST /firewall/guru/v1/{guruId}/pages` (público no MVP1, só leitura) → páginas do menu esquerdo. Código da borda: POST (resto da borda é POST).
 

@@ -1,8 +1,8 @@
 <!-- para IA. não é README de humano. -->
 # SPEC — frontend (vitrine)
 
-status: v0.7
-sha: `3a63ab4`
+status: v0.8
+sha: `350d076`
 data: 2026-08-28
 
 ## Como usar
@@ -35,7 +35,7 @@ Vitrine estática (jQuery) **de todos os gurus** no mesmo domínio / mesmo front
 - REGRA-MVP1-MENU-R: menu direito = módulos/aulas do Training.
 - REGRA-MVP1-AUDIO: baixar `videos/{videoId}.m4a` **inteiro** e sincronizar com o gif. Seek imediato.
 - REGRA-MVP1-OPEN: último vídeo daquele guru (client) ou primeira página da esquerda.
-- REGRA-MVP1-PAY: Stripe **Embedded** Checkout na nossa página. Mensalidade = cartão (guru java). Avulso = PIX+cartão por training. Aviso `billing_trust_line` (não salvamos o cartão; vai pra Stripe).
+- REGRA-MVP1-PAY: Stripe **Embedded** Checkout na nossa página. Mensalidade = cartão (guru java). Avulso = **card-only** até Dashboard PIX (não inventar PIX). Aviso `billing_trust_line` (não salvamos o cartão; vai pra Stripe). `pk_test_` vem da borda (CONTRATO-STRIPE-PK); nunca no repo.
 
 ## NÃO
 - NÃO-LOGIN-BKP: não religar o **form** do bkp (pedia senha e gravava senha+token). UI nova = REGRA-CONTA-*. Token UUID em `localStorage` é produto; senha no storage **não**.
@@ -67,7 +67,7 @@ Chaves i18 que a vitrine lê (39): labels `welcome_title` `continue_training` `d
 - CONTRATO-CONTA-OK `POST /firewall/emailVerification/v1/validateEmail` `{email, readableNumber}` — guarda token em `localStorage`, prefixa `Bearer` no header. código alinhado.
 
 - CONTRATO-STRIPE-SUB / CONTRATO-STRIPE-BUY / CONTRATO-ME / CONTRATO-GURU-PAGES — ver SPEC-MVP1.md.
-- Vitrine: se `training.paid===true`, exige token, chama CONTRATO-ME; sem compra/assinatura java não carrega módulos/player — vidro + Comprar (R$ price/100) + `billing_trust_line`. 409 = já tem. 503 = Stripe test ainda não está ligado. Gratuito = player público.
+- Vitrine: se `training.paid===true`, exige token, chama CONTRATO-ME; sem compra/assinatura java não carrega módulos/player — vidro + Comprar (R$ price/100) + Assinar (R$ 59) + `billing_trust_line`. Comprar/Assinar (logado): publishable-key → checkout → Stripe.js `initEmbeddedCheckout` num overlay de vidro no centro (não estica o cinema) → confirm → `/me` e destrava se owned. 409 = já tem. 503 = Stripe test ainda não está ligado. Gratuito = player público.
 - CONTRATO-GURU-PAGE-SRC: iframe `src` = host de mídia (`buckets/.../gurus/{guruId}/{pageId}.html`), **não** o origin da vitrine.
 Chaves i18 sugeridas (comentário; **não** gravadas no i18 MS neste PR). Se a key faltar, o front usa o filename: `guru_page_sobre` `guru_page_como_funciona` `guru_java` `guru_java_sinopse`.
 

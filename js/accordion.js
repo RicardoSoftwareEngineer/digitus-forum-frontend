@@ -488,9 +488,11 @@ $(document).ready(function () {
 		var title = en ? "This training is paid" : "Este treinamento é pago";
 		var needLogin = !tokenUuid();
 		var btn = needLogin ? (en ? "Sign in to buy" : "Entre para comprar") : (en ? "Buy (" + priceLabel + ")" : "Comprar (" + priceLabel + ")");
+		var subBtn = needLogin ? (en ? "Sign in to subscribe" : "Entre para assinar") : (en ? "Subscribe (R$ 59)" : "Assinar (R$ 59)");
 		var html = "<div class='paid-lock glass' id='paidLock'>";
 		html += "<p class='paid-lock-title'>" + escapeHtml(title) + "</p>";
 		html += "<button type='button' class='account-btn' id='paidBuyBtn' data-training='" + escapeHtml((training && training.trainingId) || "") + "'>" + escapeHtml(btn) + "</button>";
+		html += "<button type='button' class='account-btn account-btn-ghost' id='paidSubBtn' data-training='" + escapeHtml((training && training.trainingId) || "") + "'>" + escapeHtml(subBtn) + "</button>";
 		html += "<p class='paid-lock-trust'>" + escapeHtml(trustLine()) + "</p>";
 		html += "<p class='paid-lock-msg' id='paidLockMsg'></p>";
 		html += "</div>";
@@ -881,9 +883,106 @@ $(document).ready(function () {
 	});
 
 
-	$(document).on("click", "#paidBuyBtn", function (e) {
-		e.preventDefault();
-		var training = trainingById($(this).attr("data-training")) || trainingById(localStorage.getItem("internationalization.training_id"));
+	var stripeCheckout = null;
+
+	function checkoutReturnUrl() {
+		var origin = window.location.origin || "";
+		if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin) || /eusouprogramadorjunior\.com|digitusforum\.com/i.test(origin)) {
+			return window.location.href.split("#")[0];
+		}
+		return "";
+	}
+
+	function loadStripeJs() {
+		if (window.Stripe) {
+			return $.Deferred().resolve().promise();
+		}
+		var d = $.Deferred();
+		var s = document.createElement("script");
+		s.src = "https://js.stripe.com/v3/";
+		s.async = true;
+		s.onload = function () { d.resolve(); };
+		s.onerror = function () { d.reject(); };
+		document.head.appendChild(s);
+		return d.promise();
+	}
+
+	function closeStripeOverlay() {
+		if (stripeCheckout && stripeCheckout.destroy) {
+			try { stripeCheckout.destroy(); } catch (err) {}
+		}
+		stripeCheckout = null;
+		$("#stripeOverlay").remove();
+	}
+
+	function xhrMessage(xhr) {
+		try {
+			return JSON.parse(xhr.responseText).message || "";
+		} catch (err) {
+			return "";
+		}
+	}
+
+	function showStripeFail(training, xhr) {
+		if (xhr && xhr.status === 409) {
+			billingMeCache = null;
+			closeStripeOverlay();
+			openTraining(training, true);
+			return;
+		}
+		if (xhr && xhr.status === 503) {
+			showPaidLock(training, "503");
+			var en = localStorage.getItem("language") === "en_US";
+			$("#paidLockMsg").text(xhrMessage(xhr) || (en ? "Stripe test is not on yet." : "Stripe test ainda não está ligado."));
+			return;
+		}
+		ajaxFailed(xhr);
+	}
+
+	function confirmThenUnlock(sessionId, training) {
+		firewall("/billing/v1/checkout/confirm", { sessionId: sessionId }).done(function () {
+			billingMeCache = null;
+			loadBillingMe().then(function (me) {
+				closeStripeOverlay();
+				if (ownsTraining(training, me)) {
+					openTraining(training, true);
+				}
+			}, function (xhr) {
+				showStripeFail(training, xhr);
+			});
+		}).fail(function (xhr) {
+			showStripeFail(training, xhr);
+		});
+	}
+
+	function openStripeOverlay(clientSecret, publishableKey, sessionId, training) {
+		closeStripeOverlay();
+		var html = "<div class='stripe-overlay glass' id='stripeOverlay'>";
+		html += "<button type='button' class='stripe-overlay-close' id='stripeOverlayClose' aria-label='Fechar'>×</button>";
+		html += "<p class='paid-lock-trust'>" + escapeHtml(trustLine()) + "</p>";
+		html += "<div id='stripeCheckoutMount'></div>";
+		html += "<p class='paid-lock-msg' id='stripeOverlayMsg'></p>";
+		html += "</div>";
+		$(".center-col").append(html);
+		return loadStripeJs().then(function () {
+			var d = $.Deferred();
+			window.Stripe(publishableKey).initEmbeddedCheckout({
+				clientSecret: clientSecret,
+				onComplete: function () {
+					confirmThenUnlock(sessionId, training);
+				}
+			}).then(function (checkout) {
+				stripeCheckout = checkout;
+				checkout.mount("#stripeCheckoutMount");
+				d.resolve();
+			}).catch(function () {
+				d.reject();
+			});
+			return d.promise();
+		});
+	}
+
+	function startEmbeddedCheckout(training, kind) {
 		if (!training) {
 			return;
 		}
@@ -891,27 +990,55 @@ $(document).ready(function () {
 			$("#accountEmail").trigger("focus");
 			return;
 		}
-		firewall("/billing/v1/checkout/training", { trainingId: training.trainingId }).done(function () {
-			billingMeCache = null;
-			openTraining(training, true);
-		}).fail(function (xhr) {
-			if (xhr.status === 409) {
-				billingMeCache = null;
-				openTraining(training, true);
-				return;
-			}
-			if (xhr.status === 503) {
+		var path = kind === "sub" ? "/billing/v1/checkout/subscription" : "/billing/v1/checkout/training";
+		var body = kind === "sub" ? {} : { trainingId: training.trainingId };
+		var ret = checkoutReturnUrl();
+		if (ret) {
+			body.returnUrl = ret;
+		}
+		firewall("/billing/v1/publishable-key", {}).done(function (pk) {
+			var key = pk && pk.publishableKey;
+			if (!key || key.indexOf("pk_test_") !== 0) {
 				showPaidLock(training, "503");
-				var en = localStorage.getItem("language") === "en_US";
-				var msg = "";
-				try {
-					msg = JSON.parse(xhr.responseText).message || "";
-				} catch (err) {}
-				$("#paidLockMsg").text(msg || (en ? "Stripe test is not on yet." : "Stripe test ainda não está ligado."));
 				return;
 			}
-			ajaxFailed(xhr);
+			firewall(path, body).done(function (res) {
+				var secret = res && res.clientSecret;
+				if (!secret || String(secret).indexOf("sk_") === 0) {
+					showPaidLock(training, "503");
+					return;
+				}
+				var sessionId = (res && res.sessionId) || "";
+				if (!sessionId && String(secret).indexOf("_secret_") > 0) {
+					sessionId = String(secret).split("_secret_")[0];
+				}
+				openStripeOverlay(secret, key, sessionId, training).fail(function () {
+					var en = localStorage.getItem("language") === "en_US";
+					$("#paidLockMsg").text(en ? "Could not load Stripe Checkout." : "Não foi possível abrir o checkout Stripe.");
+				});
+			}).fail(function (xhr) {
+				showStripeFail(training, xhr);
+			});
+		}).fail(function (xhr) {
+			showStripeFail(training, xhr);
 		});
+	}
+
+	$(document).on("click", "#paidBuyBtn", function (e) {
+		e.preventDefault();
+		var training = trainingById($(this).attr("data-training")) || trainingById(localStorage.getItem("internationalization.training_id"));
+		startEmbeddedCheckout(training, "buy");
+	});
+
+	$(document).on("click", "#paidSubBtn", function (e) {
+		e.preventDefault();
+		var training = trainingById($(this).attr("data-training")) || trainingById(localStorage.getItem("internationalization.training_id"));
+		startEmbeddedCheckout(training, "sub");
+	});
+
+	$(document).on("click", "#stripeOverlayClose", function (e) {
+		e.preventDefault();
+		closeStripeOverlay();
 	});
 
 	$(document).on("click", "#accountSend", function (e) {
