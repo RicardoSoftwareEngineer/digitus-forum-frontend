@@ -81,27 +81,59 @@ $(document).ready(function () {
 			send: en ? "Sign in / create account" : "Entrar com/criar conta",
 			code: en ? "Code" : "Código",
 			confirm: en ? "Send code" : "Enviar código",
-			out: en ? "Sign out" : "Sair",
+			out: en ? "Sign out" : "Deslogar",
 			signed: en ? "Signed in" : "Entrou",
-			back: en ? "Change email" : "Trocar email"
+			back: en ? "Change email" : "Trocar email",
+			settings: en ? "Settings" : "Configurações",
+			wrongCode: en ? "Wrong code. Try again." : "Código errado. Tenta de novo.",
+			emptyCode: en ? "Enter the code" : "Informe o código"
 		};
+	}
+
+	function emailFrontHtml(c) {
+		var html = "";
+		html += "<label class='account-label' for='accountEmail'>" + escapeHtml(c.email) + "</label>";
+		html += "<input id='accountEmail' class='account-input' type='email' autocomplete='email' value='" + escapeHtml(accountEmail) + "' />";
+		html += "<button type='button' class='account-btn' id='accountSend'>" + escapeHtml(c.send) + "</button>";
+		return html;
+	}
+
+	function signedFrontHtml(c, shown) {
+		var html = "";
+		html += "<p class='account-signed-email'>" + escapeHtml(shown) + "</p>";
+		html += "<button type='button' class='account-btn' id='accountSettings'>" + escapeHtml(c.settings) + "</button>";
+		return html;
+	}
+
+	function codeBackHtml(c) {
+		var html = "";
+		html += "<label class='account-label' for='accountCode'>" + escapeHtml(c.code) + "</label>";
+		html += "<input id='accountCode' class='account-input' type='text' inputmode='numeric' maxlength='6' autocomplete='one-time-code' value='" + escapeHtml(accountCodePrefill) + "' />";
+		html += "<p class='account-msg' id='accountCodeMsg'></p>";
+		html += "<button type='button' class='account-btn' id='accountConfirm'>" + escapeHtml(c.confirm) + "</button>";
+		html += "<button type='button' class='account-btn account-btn-ghost' id='accountBack'>" + escapeHtml(c.back) + "</button>";
+		return html;
+	}
+
+	function settingsBackHtml(c) {
+		return "<button type='button' class='account-btn' id='accountLogout'>" + escapeHtml(c.out) + "</button>";
+	}
+
+	function showCodeMsg(text) {
+		var $msg = $("#accountCodeMsg");
+		if (!$msg.length) {
+			return;
+		}
+		$msg.text(text || "").toggleClass("is-on", !!(text && String(text)));
+	}
+
+	function clearCodeMsg() {
+		showCodeMsg("");
 	}
 
 	function renderAccount() {
 		var c = accountCopy();
-		var html = "";
-		if (tokenUuid()) {
-			accountStep = "in";
-			var shown = accountEmail || localStorage.getItem("email") || "";
-			var initial = shown ? shown.charAt(0).toUpperCase() : "?";
-			html += "<div class='sidebar-profile'>";
-			html += "<div class='avatar'>" + escapeHtml(initial) + "</div>";
-			html += "<div><strong>" + escapeHtml(shown || c.signed) + "</strong><span>" + escapeHtml(c.signed) + "</span></div>";
-			html += "</div>";
-			html += "<button type='button' class='account-btn' id='accountLogout'>" + escapeHtml(c.out) + "</button>";
-			$("#accountBox").html(html);
-			return;
-		}
+		var logged = !!tokenUuid();
 		var liveEmail = $("#accountEmail").val();
 		if (liveEmail != null && $.trim(liveEmail)) {
 			accountEmail = $.trim(liveEmail);
@@ -111,21 +143,35 @@ $(document).ready(function () {
 			if (liveCode != null && String(liveCode) !== "") {
 				accountCodePrefill = String(liveCode);
 			}
-		} else {
+		}
+		if (logged) {
+			if (accountStep !== "settings") {
+				accountStep = "in";
+			}
+		} else if (accountStep !== "code") {
 			accountStep = "email";
 		}
+		var shown = accountEmail || localStorage.getItem("email") || "";
+		var frontHtml = logged ? signedFrontHtml(c, shown) : emailFrontHtml(c);
+		var innerFlipped = !logged && accountStep === "code";
+		var outerFlipped = logged && accountStep === "settings";
+		var html = "";
+		html += "<div class='account-outer-scene'>";
+		html += "<div class='account-outer-card" + (outerFlipped ? " is-flipped" : "") + "'>";
+		html += "<div class='account-outer-face account-outer-front'>";
 		html += "<div class='account-flip-scene'>";
-		html += "<div class='account-flip-card" + (accountStep === "code" ? " is-flipped" : "") + "'>";
+		html += "<div class='account-flip-card" + (innerFlipped ? " is-flipped" : "") + "'>";
 		html += "<div class='account-flip-face account-flip-front'>";
-		html += "<label class='account-label' for='accountEmail'>" + escapeHtml(c.email) + "</label>";
-		html += "<input id='accountEmail' class='account-input' type='email' autocomplete='email' value='" + escapeHtml(accountEmail) + "' />";
-		html += "<button type='button' class='account-btn' id='accountSend'>" + escapeHtml(c.send) + "</button>";
+		html += frontHtml;
 		html += "</div>";
 		html += "<div class='account-flip-face account-flip-back'>";
-		html += "<label class='account-label' for='accountCode'>" + escapeHtml(c.code) + "</label>";
-		html += "<input id='accountCode' class='account-input' type='text' inputmode='numeric' maxlength='6' autocomplete='one-time-code' value='" + escapeHtml(accountCodePrefill) + "' />";
-		html += "<button type='button' class='account-btn' id='accountConfirm'>" + escapeHtml(c.confirm) + "</button>";
-		html += "<button type='button' class='account-btn account-btn-ghost' id='accountBack'>" + escapeHtml(c.back) + "</button>";
+		html += codeBackHtml(c);
+		html += "</div>";
+		html += "</div>";
+		html += "</div>";
+		html += "</div>";
+		html += "<div class='account-outer-face account-outer-back'>";
+		html += settingsBackHtml(c);
 		html += "</div>";
 		html += "</div>";
 		html += "</div>";
@@ -138,6 +184,7 @@ $(document).ready(function () {
 			renderAccount();
 			return;
 		}
+		clearCodeMsg();
 		if (toCode) {
 			$("#accountCode").val(accountCodePrefill);
 			$card.addClass("is-flipped");
@@ -145,6 +192,38 @@ $(document).ready(function () {
 			$("#accountCode").val("");
 			$card.removeClass("is-flipped");
 		}
+	}
+
+	function rollInnerToSigned() {
+		var c = accountCopy();
+		var shown = accountEmail || localStorage.getItem("email") || "";
+		var $card = $("#accountBox .account-flip-card");
+		if (!$card.length) {
+			renderAccount();
+			return;
+		}
+		$("#accountBox .account-flip-front").html(signedFrontHtml(c, shown));
+		requestAnimationFrame(function () {
+			$card.removeClass("is-flipped");
+		});
+	}
+
+	function rollOuterToEmail() {
+		var c = accountCopy();
+		var $outer = $("#accountBox .account-outer-card");
+		var $inner = $("#accountBox .account-flip-card");
+		if (!$outer.length) {
+			renderAccount();
+			return;
+		}
+		$("#accountBox .account-flip-front").html(emailFrontHtml(c));
+		if ($inner.length) {
+			$inner.removeClass("is-flipped");
+		}
+		clearCodeMsg();
+		requestAnimationFrame(function () {
+			$outer.removeClass("is-flipped");
+		});
 	}
 
 	function ajaxFailed(xhr) {
@@ -1095,7 +1174,7 @@ $(document).ready(function () {
 		var raw = $.trim($("#accountCode").val() || "");
 		var code = parseInt(raw, 10);
 		if (!raw || isNaN(code)) {
-			alert(localStorage.getItem("language") === "en_US" ? "Code is required" : "Informe o código");
+			showCodeMsg(accountCopy().emptyCode);
 			return;
 		}
 		firewall("/emailVerification/v1/validateEmail", {
@@ -1109,13 +1188,24 @@ $(document).ready(function () {
 			localStorage.setItem("email", accountEmail);
 			accountStep = "in";
 			accountCodePrefill = "";
-			renderAccount();
+			clearCodeMsg();
+			rollInnerToSigned();
 			billingMeCache = null;
 			var current = trainingById(localStorage.getItem("internationalization.training_id"));
 			if (current) {
 				openTraining(current, true);
 			}
-		}).fail(ajaxFailed);
+		}).fail(function (xhr) {
+			if (xhr && xhr.status >= 400 && xhr.status < 500) {
+				showCodeMsg(accountCopy().wrongCode);
+				return;
+			}
+			ajaxFailed(xhr);
+		});
+	});
+
+	$(document).on("input", "#accountCode", function () {
+		clearCodeMsg();
 	});
 
 	$(document).on("click", "#accountBack", function (e) {
@@ -1123,10 +1213,22 @@ $(document).ready(function () {
 		accountStep = "email";
 		accountCodePrefill = "";
 		billingMeCache = null;
+		clearCodeMsg();
 		flipAccountCard(false);
 		var current = trainingById(localStorage.getItem("internationalization.training_id"));
 		if (current && current.paid) {
 			showPaidLock(current, "login");
+		}
+	});
+
+	$(document).on("click", "#accountSettings", function (e) {
+		e.preventDefault();
+		accountStep = "settings";
+		var $outer = $("#accountBox .account-outer-card");
+		if ($outer.length) {
+			$outer.addClass("is-flipped");
+		} else {
+			renderAccount();
 		}
 	});
 
@@ -1137,7 +1239,8 @@ $(document).ready(function () {
 		accountStep = "email";
 		accountEmail = "";
 		accountCodePrefill = "";
-		renderAccount();
+		billingMeCache = null;
+		rollOuterToEmail();
 	});
 
 	renderAccount();
