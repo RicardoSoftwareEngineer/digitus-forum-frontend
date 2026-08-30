@@ -78,9 +78,9 @@ $(document).ready(function () {
 		var en = localStorage.getItem("language") === "en_US";
 		return {
 			email: "Email",
-			send: en ? "Send code" : "Enviar código",
+			send: en ? "Sign in / create account" : "Entrar com/criar conta",
 			code: en ? "Code" : "Código",
-			confirm: en ? "Confirm" : "Confirmar",
+			confirm: en ? "Send code" : "Enviar código",
 			out: en ? "Sign out" : "Sair",
 			signed: en ? "Signed in" : "Entrou",
 			back: en ? "Change email" : "Trocar email"
@@ -99,18 +99,52 @@ $(document).ready(function () {
 			html += "<div><strong>" + escapeHtml(shown || c.signed) + "</strong><span>" + escapeHtml(c.signed) + "</span></div>";
 			html += "</div>";
 			html += "<button type='button' class='account-btn' id='accountLogout'>" + escapeHtml(c.out) + "</button>";
-		} else if (accountStep === "code") {
-			html += "<label class='account-label' for='accountCode'>" + escapeHtml(c.code) + "</label>";
-			html += "<input id='accountCode' class='account-input' type='text' inputmode='numeric' maxlength='6' autocomplete='one-time-code' value='" + escapeHtml(accountCodePrefill) + "' />";
-			html += "<button type='button' class='account-btn' id='accountConfirm'>" + escapeHtml(c.confirm) + "</button>";
-			html += "<button type='button' class='account-btn account-btn-ghost' id='accountBack'>" + escapeHtml(c.back) + "</button>";
+			$("#accountBox").html(html);
+			return;
+		}
+		var liveEmail = $("#accountEmail").val();
+		if (liveEmail != null && $.trim(liveEmail)) {
+			accountEmail = $.trim(liveEmail);
+		}
+		if (accountStep === "code") {
+			var liveCode = $("#accountCode").val();
+			if (liveCode != null && String(liveCode) !== "") {
+				accountCodePrefill = String(liveCode);
+			}
 		} else {
 			accountStep = "email";
-			html += "<label class='account-label' for='accountEmail'>" + escapeHtml(c.email) + "</label>";
-			html += "<input id='accountEmail' class='account-input' type='email' autocomplete='email' value='" + escapeHtml(accountEmail) + "' />";
-			html += "<button type='button' class='account-btn' id='accountSend'>" + escapeHtml(c.send) + "</button>";
 		}
+		html += "<div class='account-flip-scene'>";
+		html += "<div class='account-flip-card" + (accountStep === "code" ? " is-flipped" : "") + "'>";
+		html += "<div class='account-flip-face account-flip-front'>";
+		html += "<label class='account-label' for='accountEmail'>" + escapeHtml(c.email) + "</label>";
+		html += "<input id='accountEmail' class='account-input' type='email' autocomplete='email' value='" + escapeHtml(accountEmail) + "' />";
+		html += "<button type='button' class='account-btn' id='accountSend'>" + escapeHtml(c.send) + "</button>";
+		html += "</div>";
+		html += "<div class='account-flip-face account-flip-back'>";
+		html += "<label class='account-label' for='accountCode'>" + escapeHtml(c.code) + "</label>";
+		html += "<input id='accountCode' class='account-input' type='text' inputmode='numeric' maxlength='6' autocomplete='one-time-code' value='" + escapeHtml(accountCodePrefill) + "' />";
+		html += "<button type='button' class='account-btn' id='accountConfirm'>" + escapeHtml(c.confirm) + "</button>";
+		html += "<button type='button' class='account-btn account-btn-ghost' id='accountBack'>" + escapeHtml(c.back) + "</button>";
+		html += "</div>";
+		html += "</div>";
+		html += "</div>";
 		$("#accountBox").html(html);
+	}
+
+	function flipAccountCard(toCode) {
+		var $card = $("#accountBox .account-flip-card");
+		if (!$card.length) {
+			renderAccount();
+			return;
+		}
+		if (toCode) {
+			$("#accountCode").val(accountCodePrefill);
+			$card.addClass("is-flipped");
+		} else {
+			$("#accountCode").val("");
+			$card.removeClass("is-flipped");
+		}
 	}
 
 	function ajaxFailed(xhr) {
@@ -1052,7 +1086,7 @@ $(document).ready(function () {
 			accountEmail = email;
 			accountCodePrefill = res && res.readableNumber != null ? String(res.readableNumber) : "";
 			accountStep = "code";
-			renderAccount();
+			flipAccountCard(true);
 		}).fail(ajaxFailed);
 	});
 
@@ -1089,7 +1123,7 @@ $(document).ready(function () {
 		accountStep = "email";
 		accountCodePrefill = "";
 		billingMeCache = null;
-		renderAccount();
+		flipAccountCard(false);
 		var current = trainingById(localStorage.getItem("internationalization.training_id"));
 		if (current && current.paid) {
 			showPaidLock(current, "login");
