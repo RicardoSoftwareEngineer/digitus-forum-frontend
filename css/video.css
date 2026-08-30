@@ -248,6 +248,48 @@ body.layout-cinema .account-box .sidebar-profile {
 	border-top: none;
 }
 
+body.layout-cinema .account-flip-scene {
+	perspective: 900px;
+	perspective-origin: 50% 50%;
+}
+
+body.layout-cinema .account-flip-card {
+	position: relative;
+	min-height: 138px;
+	transform-style: preserve-3d;
+	transform-origin: 50% 50%;
+	transition: transform 500ms ease-in-out;
+}
+
+body.layout-cinema .account-flip-card.is-flipped {
+	transform: rotateX(180deg);
+}
+
+body.layout-cinema .account-flip-face {
+	box-sizing: border-box;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+	min-height: 138px;
+}
+
+body.layout-cinema .account-flip-front {
+	position: relative;
+}
+
+body.layout-cinema .account-flip-back {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	transform: rotateX(180deg);
+}
+
+body.layout-cinema .account-flip-card:not(.is-flipped) .account-flip-back,
+body.layout-cinema .account-flip-card.is-flipped .account-flip-front {
+	pointer-events: none;
+}
+
 body.layout-cinema .yt-player-audio {
 	position: absolute;
 	width: 0;
