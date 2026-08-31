@@ -135,8 +135,8 @@ $(document).ready(function () {
 		var c = accountCopy();
 		var logged = !!tokenUuid();
 		var liveEmail = $("#accountEmail").val();
-		if (liveEmail != null && $.trim(liveEmail)) {
-			accountEmail = $.trim(liveEmail);
+		if (liveEmail != null && String(liveEmail).trim()) {
+			accountEmail = String(liveEmail).trim();
 		}
 		if (accountStep === "code") {
 			var liveCode = $("#accountCode").val();
@@ -1156,7 +1156,7 @@ $(document).ready(function () {
 
 	$(document).on("click", "#accountSend", function (e) {
 		e.preventDefault();
-		var email = $.trim($("#accountEmail").val() || "");
+		var email = String($("#accountEmail").val() || "").trim();
 		if (!email) {
 			alert(localStorage.getItem("language") === "en_US" ? "Email is required" : "Informe o email");
 			return;
@@ -1171,7 +1171,7 @@ $(document).ready(function () {
 
 	$(document).on("click", "#accountConfirm", function (e) {
 		e.preventDefault();
-		var raw = $.trim($("#accountCode").val() || "");
+		var raw = String($("#accountCode").val() || "").trim();
 		var code = parseInt(raw, 10);
 		if (!raw || isNaN(code)) {
 			showCodeMsg(accountCopy().emptyCode);
