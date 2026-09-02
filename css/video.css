@@ -265,7 +265,7 @@ body.layout-cinema .account-flip-card {
 
 body.layout-cinema .account-outer-card.is-flipped,
 body.layout-cinema .account-flip-card.is-flipped {
-	transform: rotateX(180deg);
+	transform: rotateY(180deg);
 }
 
 body.layout-cinema .account-outer-face,
@@ -292,7 +292,7 @@ body.layout-cinema .account-flip-back {
 	right: 0;
 	top: 0;
 	bottom: 0;
-	transform: rotateX(180deg);
+	transform: rotateY(180deg);
 }
 
 body.layout-cinema .account-outer-back {
