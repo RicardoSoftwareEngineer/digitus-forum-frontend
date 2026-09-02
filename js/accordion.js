@@ -85,6 +85,9 @@ $(document).ready(function () {
 			signed: en ? "Signed in" : "Entrou",
 			back: en ? "Change email" : "Trocar email",
 			settings: en ? "Settings" : "Configurações",
+			settingsBack: en ? "Back" : "Voltar",
+			myData: en ? "My details" : "Meus dados",
+			myPurchases: en ? "My purchases" : "Minhas compras",
 			wrongCode: en ? "Wrong code. Try again." : "Código errado. Tenta de novo.",
 			emptyCode: en ? "Enter the code" : "Informe o código"
 		};
@@ -113,10 +116,6 @@ $(document).ready(function () {
 		html += "<button type='button' class='account-btn' id='accountConfirm'>" + escapeHtml(c.confirm) + "</button>";
 		html += "<button type='button' class='account-btn account-btn-ghost' id='accountBack'>" + escapeHtml(c.back) + "</button>";
 		return html;
-	}
-
-	function settingsBackHtml(c) {
-		return "<button type='button' class='account-btn' id='accountLogout'>" + escapeHtml(c.out) + "</button>";
 	}
 
 	function showCodeMsg(text) {
@@ -150,15 +149,12 @@ $(document).ready(function () {
 			}
 		} else if (accountStep !== "code") {
 			accountStep = "email";
+			flipSidebar(false);
 		}
 		var shown = accountEmail || localStorage.getItem("email") || "";
 		var frontHtml = logged ? signedFrontHtml(c, shown) : emailFrontHtml(c);
 		var innerFlipped = !logged && accountStep === "code";
-		var outerFlipped = logged && accountStep === "settings";
 		var html = "";
-		html += "<div class='account-outer-scene'>";
-		html += "<div class='account-outer-card" + (outerFlipped ? " is-flipped" : "") + "'>";
-		html += "<div class='account-outer-face account-outer-front'>";
 		html += "<div class='account-flip-scene'>";
 		html += "<div class='account-flip-card" + (innerFlipped ? " is-flipped" : "") + "'>";
 		html += "<div class='account-flip-face account-flip-front'>";
@@ -169,13 +165,11 @@ $(document).ready(function () {
 		html += "</div>";
 		html += "</div>";
 		html += "</div>";
-		html += "</div>";
-		html += "<div class='account-outer-face account-outer-back'>";
-		html += settingsBackHtml(c);
-		html += "</div>";
-		html += "</div>";
-		html += "</div>";
 		$("#accountBox").html(html);
+		fillSettingsLabels();
+		if (logged && accountStep === "settings") {
+			flipSidebar(true);
+		}
 	}
 
 	function flipAccountCard(toCode) {
@@ -227,22 +221,31 @@ $(document).ready(function () {
 		setTimeout(snapFront, 650);
 	}
 
-	function rollOuterToEmail() {
+	function fillSettingsLabels() {
 		var c = accountCopy();
-		var $outer = $("#accountBox .account-outer-card");
-		var $inner = $("#accountBox .account-flip-card");
-		if (!$outer.length) {
-			renderAccount();
+		$("#settingsTitle").text(c.settings);
+		$("#accountLogout").text(c.out);
+		$("#accountSettingsBack").text(c.settingsBack);
+		$(".settings-link-label[data-k='myData']").text(c.myData);
+		$(".settings-link-label[data-k='myPurchases']").text(c.myPurchases);
+	}
+
+	function flipSidebar(toSettings) {
+		var $card = $("#sidebarFlip");
+		if (!$card.length) {
 			return;
 		}
-		$("#accountBox .account-flip-front").html(emailFrontHtml(c));
-		if ($inner.length) {
-			$inner.removeClass("is-flipped");
+		if (toSettings) {
+			fillSettingsLabels();
+			$card.addClass("is-flipped");
+		} else {
+			$card.removeClass("is-flipped");
 		}
-		clearCodeMsg();
-		requestAnimationFrame(function () {
-			$outer.removeClass("is-flipped");
-		});
+	}
+
+	function rollOuterToEmail() {
+		flipSidebar(false);
+		renderAccount();
 	}
 
 	function ajaxFailed(xhr) {
@@ -1243,12 +1246,17 @@ $(document).ready(function () {
 	$(document).on("click", "#accountSettings", function (e) {
 		e.preventDefault();
 		accountStep = "settings";
-		var $outer = $("#accountBox .account-outer-card");
-		if ($outer.length) {
-			$outer.addClass("is-flipped");
-		} else {
-			renderAccount();
-		}
+		flipSidebar(true);
+	});
+
+	$(document).on("click", "#accountSettingsBack", function (e) {
+		e.preventDefault();
+		accountStep = "in";
+		flipSidebar(false);
+	});
+
+	$(document).on("click", ".settingsNavClick", function (e) {
+		e.preventDefault();
 	});
 
 	$(document).on("click", "#accountLogout", function (e) {

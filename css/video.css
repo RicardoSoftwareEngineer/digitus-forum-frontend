@@ -249,9 +249,88 @@ body.layout-cinema .account-box .sidebar-profile {
 }
 
 body.layout-cinema .account-outer-scene,
-body.layout-cinema .account-flip-scene {
+body.layout-cinema .account-flip-scene,
+body.layout-cinema .sidebar-flip-scene {
 	perspective: 900px;
 	perspective-origin: 50% 50%;
+}
+
+body.layout-cinema .sidebar .pane-body.sidebar-flip-scene {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	overflow: visible;
+}
+
+body.layout-cinema .sidebar-flip-card {
+	position: relative;
+	flex: 1 1 auto;
+	min-height: 100%;
+	transform-style: preserve-3d;
+	transform-origin: 50% 50%;
+	transition: transform 500ms ease-in-out;
+}
+
+body.layout-cinema .sidebar-flip-card.is-flipped {
+	transform: rotateY(-180deg);
+}
+
+body.layout-cinema .sidebar-flip-face {
+	box-sizing: border-box;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+	min-height: 100%;
+}
+
+body.layout-cinema .sidebar-flip-front {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
+}
+
+body.layout-cinema .sidebar-flip-front #leftAccordion {
+	flex: 1 1 auto;
+}
+
+body.layout-cinema .sidebar-flip-back {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	transform: rotateY(180deg);
+}
+
+body.layout-cinema .sidebar-flip-card:not(.is-flipped) .sidebar-flip-back,
+body.layout-cinema .sidebar-flip-card.is-flipped .sidebar-flip-front {
+	pointer-events: none;
+}
+
+body.layout-cinema .settings-pane {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 100%;
+}
+
+body.layout-cinema .settings-pane-main {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+}
+
+body.layout-cinema .settings-logout {
+	margin-top: auto;
+	margin-bottom: 0;
+}
+
+body.layout-cinema .settings-footer {
+	flex: 0 0 auto;
+}
+
+body.layout-cinema .settings-footer .account-btn {
+	margin-top: 0;
 }
 
 body.layout-cinema .account-outer-card,
