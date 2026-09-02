@@ -203,9 +203,28 @@ $(document).ready(function () {
 			return;
 		}
 		$("#accountBox .account-flip-front").html(signedFrontHtml(c, shown));
-		requestAnimationFrame(function () {
-			$card.removeClass("is-flipped");
+		var finished = false;
+		function snapFront() {
+			if (finished) {
+				return;
+			}
+			finished = true;
+			$card.off("transitionend.accountSpin");
+			$card.addClass("no-transition");
+			$card.removeClass("is-flipped is-spinning-left");
+			void $card[0].offsetWidth;
+			$card.removeClass("no-transition");
+		}
+		$card.off("transitionend.accountSpin").on("transitionend.accountSpin", function (e) {
+			if (e.target !== $card[0]) {
+				return;
+			}
+			snapFront();
 		});
+		requestAnimationFrame(function () {
+			$card.addClass("is-spinning-left");
+		});
+		setTimeout(snapFront, 650);
 	}
 
 	function rollOuterToEmail() {

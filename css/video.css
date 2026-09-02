@@ -265,7 +265,19 @@ body.layout-cinema .account-flip-card {
 
 body.layout-cinema .account-outer-card.is-flipped,
 body.layout-cinema .account-flip-card.is-flipped {
-	transform: rotateY(180deg);
+	/* avançar = esquerda */
+	transform: rotateY(-180deg);
+}
+
+body.layout-cinema .account-flip-card.is-flipped.is-spinning-left,
+body.layout-cinema .account-flip-card.is-spinning-left {
+	/* código → logado: continua meia volta pra esquerda */
+	transform: rotateY(-360deg);
+}
+
+body.layout-cinema .account-outer-card.no-transition,
+body.layout-cinema .account-flip-card.no-transition {
+	transition: none !important;
 }
 
 body.layout-cinema .account-outer-face,
