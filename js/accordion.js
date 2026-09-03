@@ -108,6 +108,11 @@ $(document).ready(function () {
 			swapFav: en ? "Favorites" : "Favoritos",
 			swapBuy: en ? "Purchases" : "Compras",
 			swapOrders: en ? "Order list" : "Lista de pedidos",
+			listTrainingsSearch: en ? "Search" : "Buscar",
+			listTrainingsFree: en ? "Free" : "Gratuito",
+			listTrainingsPaid: en ? "Paid" : "Pago",
+			listTrainingsEmpty: en ? "No trainings found" : "Nenhum treinamento encontrado",
+			listTrainingsLoading: en ? "Loading…" : "Carregando…",
 			wrongCode: en ? "Wrong code. Try again." : "Código errado. Tenta de novo.",
 			emptyCode: en ? "Enter the code" : "Informe o código"
 		};
@@ -302,7 +307,7 @@ $(document).ready(function () {
 	}
 
 	function clearMyDataChrome() {
-		$("body").removeClass("my-data-open my-purchases-open my-backgrounds-open");
+		$("body").removeClass("my-data-open my-purchases-open my-backgrounds-open list-trainings-open");
 	}
 
 	function showMyDataMsg(text) {
@@ -349,7 +354,7 @@ $(document).ready(function () {
 		$("#name").text(c.myDataTitle);
 		$("#description").empty();
 		$("#links").empty();
-		$("body").removeClass("my-purchases-open my-backgrounds-open").addClass("my-data-open");
+		$("body").removeClass("my-purchases-open my-backgrounds-open list-trainings-open").addClass("my-data-open");
 		requestAnimationFrame(function () {
 			if (seq !== lessonSeq) {
 				return;
@@ -414,7 +419,7 @@ $(document).ready(function () {
 		$("#name").text(c.myPurchases);
 		$("#description").empty();
 		$("#links").empty();
-		$("body").removeClass("my-data-open my-backgrounds-open").addClass("my-purchases-open");
+		$("body").removeClass("my-data-open my-backgrounds-open list-trainings-open").addClass("my-purchases-open");
 		requestAnimationFrame(function () {
 			if (seq !== lessonSeq) {
 				return;
@@ -472,6 +477,116 @@ $(document).ready(function () {
 		});
 	}
 
+	function openListTrainingsScreen(animate) {
+		flipLanguagePanel(false);
+		localStorage.setItem("lessonSource", "list-trainings");
+		var c = accountCopy();
+		var seq = ++lessonSeq;
+		var $fields = lessonFields();
+		if (animate) {
+			$fields.addClass("lesson-swap");
+		}
+		var videoEl = document.getElementById("video");
+		if (window.GifPlayer) {
+			window.GifPlayer.mount(videoEl, "", "", "");
+		} else if (videoEl) {
+			videoEl.innerHTML = "";
+		}
+		var html = "";
+		html += "<div class='list-trainings-panel'>";
+		html += "<input id='listTrainingsSearch' class='list-trainings-search' type='search' autocomplete='off' placeholder='" + escapeHtml(c.listTrainingsSearch) + "' />";
+		html += "<div class='list-trainings-list'><p class='list-trainings-status'>" + escapeHtml(c.listTrainingsLoading) + "</p></div>";
+		html += "</div>";
+		if (videoEl) {
+			videoEl.innerHTML = html;
+		}
+		$("#previousAndNextVideo").empty();
+		$("#name").text(c.swapList);
+		$("#description").empty();
+		$("#links").empty();
+		$("body").removeClass("my-data-open my-purchases-open my-backgrounds-open").addClass("list-trainings-open");
+		requestAnimationFrame(function () {
+			if (seq !== lessonSeq) {
+				return;
+			}
+			$fields.removeClass("lesson-swap");
+		});
+		function badgeHtml(training, c2) {
+			if (training && training.paid) {
+				var price = formatBrl(training.price);
+				return "<span class='list-trainings-badge list-trainings-badge-paid'>" + escapeHtml(c2.listTrainingsPaid + " · " + price) + "</span>";
+			}
+			return "<span class='list-trainings-badge list-trainings-badge-free'>" + escapeHtml(c2.listTrainingsFree) + "</span>";
+		}
+		function shortSinopse(text) {
+			var s = String(text || "").trim();
+			if (s.length <= 120) {
+				return s;
+			}
+			return s.slice(0, 117).replace(/\s+\S*$/, "") + "…";
+		}
+		function renderList(trainings, query) {
+			if (seq !== lessonSeq) {
+				return;
+			}
+			var wrap = document.querySelector("#video .list-trainings-list");
+			if (!wrap) {
+				return;
+			}
+			var c2 = accountCopy();
+			var q = String(query || "").trim().toLowerCase();
+			var parts = [];
+			for (var i = 0; i < trainings.length; i++) {
+				var t = trainings[i] || {};
+				var name = t.name || String(t.trainingId || "");
+				var sinopse = t.sinopse || "";
+				if (q) {
+					var hay = (name + " " + sinopse).toLowerCase();
+					if (hay.indexOf(q) === -1) {
+						continue;
+					}
+				}
+				var tid = t.trainingId;
+				parts.push("<button type='button' class='list-trainings-item' data-training-id='" + escapeHtml(String(tid)) + "'>");
+				parts.push("<span class='list-trainings-item-top'>");
+				parts.push("<span class='list-trainings-item-name'>" + escapeHtml(name) + "</span>");
+				parts.push(badgeHtml(t, c2));
+				parts.push("</span>");
+				var short = shortSinopse(sinopse);
+				if (short) {
+					parts.push("<span class='list-trainings-item-sinopse'>" + escapeHtml(short) + "</span>");
+				}
+				parts.push("</button>");
+			}
+			if (!parts.length) {
+				wrap.innerHTML = "<p class='list-trainings-empty'>" + escapeHtml(c2.listTrainingsEmpty) + "</p>";
+			} else {
+				wrap.innerHTML = parts.join("");
+			}
+		}
+		function paint(trainings) {
+			renderList(trainings, $("#listTrainingsSearch").val());
+			$("#listTrainingsSearch").off("input.listTrainings").on("input.listTrainings", function () {
+				renderList(trainings, $(this).val());
+			});
+		}
+		if (trainingsForLocale && trainingsForLocale.length) {
+			paint(trainingsForLocale);
+			return;
+		}
+		loadTrainings().done(function (trainings) {
+			trainingsForLocale = trainings || [];
+			if (seq !== lessonSeq) {
+				return;
+			}
+			paint(trainingsForLocale);
+		}).fail(function () {
+			if (seq !== lessonSeq) {
+				return;
+			}
+			paint([]);
+		});
+	}
 
 	function syncSaveBackgroundBtn() {
 		var c = accountCopy();
@@ -619,7 +734,7 @@ $(document).ready(function () {
 		$("#name").text(c.backgrounds);
 		$("#description").empty();
 		$("#links").empty();
-		$("body").removeClass("my-data-open my-purchases-open").addClass("my-backgrounds-open");
+		$("body").removeClass("my-data-open my-purchases-open list-trainings-open").addClass("my-backgrounds-open");
 		requestAnimationFrame(function () {
 			if (seq !== lessonSeq) {
 				return;
@@ -1492,9 +1607,8 @@ $(document).ready(function () {
 			return;
 		}
 		if (id === "swapListTrainings") {
+			openListTrainingsScreen(true);
 			flipModules(false);
-			$("#trainingPickerList").removeAttr("hidden");
-			$("#trainingPickerBtn").attr("aria-expanded", "true");
 			return;
 		}
 	});
@@ -1821,6 +1935,16 @@ $(document).ready(function () {
 	});
 
 	$(document).on("click", ".my-purchases-item", function (e) {
+		e.preventDefault();
+		var tid = $(this).attr("data-training-id");
+		if (!tid) {
+			return;
+		}
+		var training = trainingById(tid) || { trainingId: tid, name: String(tid) };
+		openTraining(training, true);
+	});
+
+	$(document).on("click", ".list-trainings-item", function (e) {
 		e.preventDefault();
 		var tid = $(this).attr("data-training-id");
 		if (!tid) {
