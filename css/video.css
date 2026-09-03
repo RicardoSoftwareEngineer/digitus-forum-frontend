@@ -225,9 +225,10 @@ body.layout-cinema .account-input {
 
 body.layout-cinema .account-btn {
 	width: 100%;
+	box-sizing: border-box;
 	margin-top: 4px;
 	padding: 8px 10px;
-	border: none;
+	border: 1px solid transparent;
 	border-radius: 8px;
 	background: var(--accent-show);
 	color: #fff;
