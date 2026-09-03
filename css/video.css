@@ -928,6 +928,11 @@ body.layout-cinema.list-trainings-open .player-tools {
 	display: none;
 }
 
+body.layout-cinema.list-trainings-open #video {
+	background: transparent;
+	border: none;
+}
+
 body.layout-cinema #video .list-trainings-panel {
 	width: 100%;
 	height: 100%;
@@ -949,7 +954,7 @@ body.layout-cinema #video .list-trainings-panel .list-trainings-search {
 	padding: 8px 10px;
 	border-radius: 8px;
 	border: 1px solid var(--glass-border);
-	background: rgba(0, 0, 0, 0.25);
+	background: rgba(255, 255, 255, 0.10);
 	color: inherit;
 	font: inherit;
 	font-size: 13px;
@@ -982,7 +987,7 @@ body.layout-cinema #video .list-trainings-panel .list-trainings-item {
 	padding: 10px 12px;
 	border-radius: 8px;
 	border: 1px solid var(--glass-border);
-	background: rgba(0, 0, 0, 0.25);
+	background: rgba(255, 255, 255, 0.10);
 	color: inherit;
 	font: inherit;
 	text-align: left;
