@@ -242,9 +242,23 @@ body.layout-cinema .account-input {
 	padding: 8px 10px;
 	border-radius: 8px;
 	border: 1px solid var(--glass-border);
-	background: rgba(0, 0, 0, 0.25);
+	background: rgba(0, 0, 0, 0.12);
+	background-clip: padding-box;
+	-webkit-appearance: none;
+	appearance: none;
+	outline: none;
 	color: inherit;
 	font: inherit;
+}
+
+body.layout-cinema .account-input:-webkit-autofill,
+body.layout-cinema .account-input:-webkit-autofill:hover,
+body.layout-cinema .account-input:-webkit-autofill:focus {
+	-webkit-text-fill-color: inherit;
+	caret-color: inherit;
+	-webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.12) inset;
+	box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.12) inset;
+	background-clip: padding-box;
 }
 
 body.layout-cinema .account-btn {
