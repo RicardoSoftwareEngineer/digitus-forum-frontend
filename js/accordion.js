@@ -321,6 +321,8 @@ $(document).ready(function () {
 	function openMyDataScreen(animate) {
 		flipLanguagePanel(false);
 		localStorage.setItem("lessonSource", "my-data");
+		$(".topic-nav li").removeClass("selectedNav");
+		clearAccordionSelection();
 		var c = accountCopy();
 		var seq = ++lessonSeq;
 		var $fields = lessonFields();
@@ -396,6 +398,8 @@ $(document).ready(function () {
 	function openMyPurchasesScreen(animate) {
 		flipLanguagePanel(false);
 		localStorage.setItem("lessonSource", "my-purchases");
+		$(".topic-nav li").removeClass("selectedNav");
+		clearAccordionSelection();
 		var c = accountCopy();
 		var seq = ++lessonSeq;
 		var $fields = lessonFields();
@@ -480,6 +484,8 @@ $(document).ready(function () {
 	function openListTrainingsScreen(animate) {
 		flipLanguagePanel(false);
 		localStorage.setItem("lessonSource", "list-trainings");
+		$(".topic-nav li").removeClass("selectedNav");
+		clearAccordionSelection();
 		var c = accountCopy();
 		var seq = ++lessonSeq;
 		var $fields = lessonFields();
@@ -711,6 +717,8 @@ $(document).ready(function () {
 	function openBackgroundsScreen(animate) {
 		flipLanguagePanel(false);
 		localStorage.setItem("lessonSource", "my-backgrounds");
+		$(".topic-nav li").removeClass("selectedNav");
+		clearAccordionSelection();
 		var c = accountCopy();
 		var seq = ++lessonSeq;
 		var $fields = lessonFields();
@@ -925,11 +933,17 @@ $(document).ready(function () {
 		return firewall("/guru/v1/" + GURU_ID + "/pages", {}).done(renderGuruPages);
 	}
 
+	function clearAccordionSelection() {
+		$("#accordion li.selectedGif").removeClass("selectedGif");
+		$("#accordion h3.selectedModule").removeClass("selectedModule");
+	}
+
 	function markGuruPage(src) {
 		$(".topic-nav li").removeClass("selectedNav");
 		$(".guruPageClick").filter(function () {
 			return String($(this).attr("data-guru-src")) === String(src);
 		}).parent("li").addClass("selectedNav");
+		clearAccordionSelection();
 	}
 
 	function openGuruPage(page, animate) {
