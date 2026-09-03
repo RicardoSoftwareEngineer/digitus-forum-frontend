@@ -1620,6 +1620,22 @@ $(document).ready(function () {
 		closeStripeOverlay();
 	});
 
+	$(document).on("keydown", "#accountEmail", function (e) {
+		if (e.key !== "Enter") {
+			return;
+		}
+		e.preventDefault();
+		$("#accountSend").trigger("click");
+	});
+
+	$(document).on("keydown", "#accountCode", function (e) {
+		if (e.key !== "Enter") {
+			return;
+		}
+		e.preventDefault();
+		$("#accountConfirm").trigger("click");
+	});
+
 	$(document).on("click", "#accountSend", function (e) {
 		e.preventDefault();
 		var email = String($("#accountEmail").val() || "").trim();
@@ -1637,12 +1653,17 @@ $(document).ready(function () {
 
 	$(document).on("click", "#accountConfirm", function (e) {
 		e.preventDefault();
+		var $btn = $("#accountConfirm");
+		if ($btn.data("busy")) {
+			return;
+		}
 		var raw = String($("#accountCode").val() || "").trim();
 		var code = parseInt(raw, 10);
 		if (!raw || isNaN(code)) {
 			showCodeMsg(accountCopy().emptyCode);
 			return;
 		}
+		$btn.data("busy", true).prop("disabled", true);
 		firewall("/emailVerification/v1/validateEmail", {
 			email: accountEmail,
 			readableNumber: code
@@ -1669,6 +1690,7 @@ $(document).ready(function () {
 				openTraining(current, true);
 			}
 		}).fail(function (xhr) {
+			$btn.data("busy", false).prop("disabled", false);
 			if (xhr && xhr.status >= 400 && xhr.status < 500) {
 				showCodeMsg(accountCopy().wrongCode);
 				return;
