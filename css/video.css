@@ -31,6 +31,9 @@ body.layout-cinema .stage {
 	min-height: 0;
 	height: auto;
 	align-self: stretch;
+	/* sidebars: top/bottom 16px; center glass visibly shorter (~44px more inset) */
+	margin-top: 44px;
+	margin-bottom: 44px;
 }
 
 body.layout-cinema #previousVideo,
