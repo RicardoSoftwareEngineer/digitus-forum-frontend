@@ -254,8 +254,6 @@ $(document).ready(function () {
 	}
 
 	function openMyDataScreen(animate) {
-		flipSidebar(false);
-		accountStep = "in";
 		flipLanguagePanel(false);
 		localStorage.setItem("lessonSource", "my-data");
 		var c = accountCopy();
@@ -1372,8 +1370,6 @@ $(document).ready(function () {
 			return;
 		}
 		if (id === "settingsIdioma") {
-			flipSidebar(false);
-			accountStep = "in";
 			flipLanguagePanel(true);
 			return;
 		}
