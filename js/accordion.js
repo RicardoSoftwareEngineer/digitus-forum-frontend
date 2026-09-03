@@ -97,6 +97,11 @@ $(document).ready(function () {
 			purchasesEmpty: en ? "No purchases yet" : "Nenhuma compra ainda",
 			purchasesSubActive: en ? "Java subscription active" : "Mensalidade Java ativa",
 			purchasesLoading: en ? "Loading…" : "Carregando…",
+			swapTraining: en ? "Switch training" : "Trocar treinamento",
+			swapList: en ? "List trainings" : "Listar treinamentos",
+			swapFav: en ? "Favorites" : "Favoritos",
+			swapBuy: en ? "Purchases" : "Compras",
+			swapOrders: en ? "Order list" : "Lista de pedidos",
 			wrongCode: en ? "Wrong code. Try again." : "Código errado. Tenta de novo.",
 			emptyCode: en ? "Enter the code" : "Informe o código"
 		};
@@ -428,6 +433,30 @@ $(document).ready(function () {
 		}
 	}
 
+	function fillSwapLabels() {
+		var c = accountCopy();
+		$("#swapTrainingTitle").text(c.swapTraining);
+		$("#swapTrainingBtn").text(c.swapTraining);
+		$("#swapTrainingBack").text(c.settingsBack);
+		$(".swap-link-label[data-k='list']").text(c.swapList);
+		$(".swap-link-label[data-k='fav']").text(c.swapFav);
+		$(".swap-link-label[data-k='buy']").text(c.swapBuy);
+		$(".swap-link-label[data-k='orders']").text(c.swapOrders);
+	}
+
+	function flipModules(toSwap) {
+		var $card = $("#modulesFlip");
+		if (!$card.length) {
+			return;
+		}
+		if (toSwap) {
+			fillSwapLabels();
+			$card.addClass("is-flipped");
+		} else {
+			$card.removeClass("is-flipped");
+		}
+	}
+
 	function rollOuterToEmail() {
 		flipSidebar(false);
 		renderAccount();
@@ -517,8 +546,8 @@ $(document).ready(function () {
 
 	function renderGuruPages(pages) {
 		guruPages = pages || [];
-		var title = i18("guru_java") || "Java";
-		var desc = i18("guru_java_sinopse") || "";
+		var title = (i18("guru_java") || "Java") + " — linha dois do título pra ver o wrap do cabeçalho esquerdo e linha três ainda aqui";
+		var desc = (i18("guru_java_sinopse") || "Vitrine") + " com texto longo de teste: segunda linha da sinopse do guru e uma terceira linha pra estressar o layout";
 		var selectedSrc = localStorage.getItem("guruPageSrc") || "";
 		var html = "<div class='sidebar-head brand-head'>";
 		html += "<div class='sidebar-icon'>☕</div>";
@@ -680,8 +709,8 @@ $(document).ready(function () {
 		trainingsForLocale = trainings || [];
 		var selected = trainingById(selectedId) || trainingsForLocale[0];
 		if (selected) {
-			$("#trainingPickerName").text(selected.name || "");
-			$("#trainingPickerSinopse").text(selected.sinopse || "");
+			$("#trainingPickerName").text((selected.name || "") + " — segunda linha do nome do treinamento e terceira linha de teste");
+			$("#trainingPickerSinopse").text((selected.sinopse || "") + " Texto longo de teste: segunda linha da vitrine e terceira linha pra ver o wrap");
 		}
 		var html = "";
 		for (var i = 0; i < trainingsForLocale.length; i++) {
@@ -1020,6 +1049,7 @@ $(document).ready(function () {
 	function updateChrome() {
 		var en = localStorage.getItem("language") === "en_US";
 		$(".modules-title").text(en ? "Modules" : "Módulos");
+		fillSwapLabels();
 		$(".idioma-title").text(en ? "Language" : "Idioma");
 		$(".idioma-hint").text(en ? "Choose the showcase language" : "Escolha o idioma da vitrine");
 		$("#englishVersion").toggleClass("is-current", en);
@@ -1197,6 +1227,32 @@ $(document).ready(function () {
 		closeTrainingPicker();
 		if (training) {
 			openTraining(training, true);
+		}
+	});
+
+	$(document).on("click", "#swapTrainingBtn", function (e) {
+		e.preventDefault();
+		closeTrainingPicker();
+		flipModules(true);
+	});
+
+	$(document).on("click", "#swapTrainingBack", function (e) {
+		e.preventDefault();
+		flipModules(false);
+	});
+
+	$(document).on("click", ".swapNavClick", function (e) {
+		e.preventDefault();
+		var id = this.id;
+		if (id === "swapPurchases") {
+			openMyPurchasesScreen(true);
+			return;
+		}
+		if (id === "swapListTrainings") {
+			flipModules(false);
+			$("#trainingPickerList").removeAttr("hidden");
+			$("#trainingPickerBtn").attr("aria-expanded", "true");
+			return;
 		}
 	});
 
