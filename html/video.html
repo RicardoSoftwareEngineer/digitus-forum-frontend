@@ -9,7 +9,7 @@
 	  <link rel="icon" type="image/svg+xml" href="./../img/favicon.svg">
 		  <title>Digitus Forum · Cinema</title>
 	  <link rel="stylesheet" href="./../css/layout.css?v=20260826-radius3">
-	  <link rel="stylesheet" href="./../css/video.css?v=20260903-account-code-flush">
+	  <link rel="stylesheet" href="./../css/video.css?v=20260903-modules-flip">
 	</head>
 	<body class="lesson-page layout-cinema">
 		<div id="backgroundBlur"></div>
@@ -87,20 +87,50 @@
 				</div>
 			</div>
 
-			<aside class="modules glass">
-				<div class="pane-body">
-				<div class="training-switcher">
-					<button type="button" id="trainingPickerBtn" class="sidebar-head brand-head" aria-haspopup="listbox" aria-expanded="false">
-						<div class="sidebar-icon">🎓</div>
-						<div>
-							<h2 id="trainingPickerName"></h2>
-							<p id="trainingPickerSinopse"></p>
+			<aside class="modules">
+				<div class="modules-flip-scene">
+					<div class="modules-flip-card" id="modulesFlip">
+						<div class="modules-flip-face modules-flip-front glass">
+							<div class="pane-body">
+								<div class="training-switcher">
+									<button type="button" id="trainingPickerBtn" class="sidebar-head brand-head" aria-haspopup="listbox" aria-expanded="false">
+										<div class="sidebar-icon">🎓</div>
+										<div>
+											<h2 id="trainingPickerName"></h2>
+											<p id="trainingPickerSinopse"></p>
+										</div>
+									</button>
+									<ul id="trainingPickerList" class="training-picker-list" hidden></ul>
+								</div>
+								<div class="modules-title">Módulos</div>
+								<div id="accordion"></div>
+								<div class="account-box settings-footer">
+									<button type="button" class="account-btn" id="swapTrainingBtn">Trocar treinamento</button>
+								</div>
+							</div>
 						</div>
-					</button>
-					<ul id="trainingPickerList" class="training-picker-list" hidden></ul>
-				</div>
-				<div class="modules-title">Módulos</div>
-				<div id="accordion"></div>
+						<div class="modules-flip-face modules-flip-back glass">
+							<div class="pane-body">
+								<div class="settings-pane">
+									<div class="settings-pane-main">
+										<div class="sidebar-head brand-head settings-head">
+											<div class="sidebar-icon">🎓</div>
+											<div><h2 id="swapTrainingTitle">Trocar treinamento</h2></div>
+										</div>
+										<ul class="topic-nav">
+											<li><a href="#" id="swapListTrainings" class="swapNavClick"><span class="nav-ico">●</span><span class="swap-link-label" data-k="list">Listar treinamentos</span></a></li>
+											<li><a href="#" id="swapFavorites" class="swapNavClick"><span class="nav-ico">●</span><span class="swap-link-label" data-k="fav">Favoritos</span></a></li>
+											<li><a href="#" id="swapPurchases" class="swapNavClick"><span class="nav-ico">●</span><span class="swap-link-label" data-k="buy">Compras</span></a></li>
+											<li><a href="#" id="swapOrders" class="swapNavClick"><span class="nav-ico">●</span><span class="swap-link-label" data-k="orders">Lista de pedidos</span></a></li>
+										</ul>
+									</div>
+									<div class="account-box settings-footer">
+										<button type="button" class="account-btn" id="swapTrainingBack">Voltar</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</aside>
 		</div>
@@ -114,5 +144,5 @@
 	<script src="./../js/menu-from-bg.js?v=20260826-accentover"></script>
 	<script src="./../js/gif-sprites.js?v=20260826-sprite"></script>
 	<script src="./../js/gif-player.js?v=20260828-player-m4a"></script>
-	<script src="./../js/accordion.js?v=20260903-account-code-flush"></script>
+	<script src="./../js/accordion.js?v=20260903-modules-flip"></script>
 </html>

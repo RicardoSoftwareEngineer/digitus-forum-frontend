@@ -20,13 +20,20 @@ body.layout-cinema .center-col {
 }
 
 body.layout-cinema .lesson-align {
-	min-height: calc(100vh - 36px);
-	/* idioma-toggle removed: collapse empty toolbar row so prev/next stay tight */
-	grid-template-rows: 0 auto;
+	min-height: calc(100vh - 32px);
+	grid-template-rows: minmax(0, 1fr) 38px;
 }
 
 body.layout-cinema .stage {
-	min-height: calc(100vh - 110px);
+	grid-row: 1;
+	min-height: 0;
+}
+
+body.layout-cinema #previousVideo,
+body.layout-cinema #nextVideo {
+	grid-row: 2;
+	margin-top: 0;
+	align-self: end;
 }
 
 body.layout-cinema .flip-scene,
@@ -35,9 +42,9 @@ body.layout-cinema .flip-card {
 }
 
 body.layout-cinema #box {
-	min-height: calc(100vh - 110px);
+	min-height: 0;
 	height: 100%;
-	padding: 52px 28px 22px;
+	padding: 18px 28px 18px;
 	display: flex;
 	flex-direction: column;
 }
@@ -109,6 +116,9 @@ body.layout-cinema #video {
 	min-height: 0;
 	aspect-ratio: auto;
 	margin-top: 0;
+	background: rgba(8, 10, 14, 0.55);
+	border: 1px solid var(--glass-border);
+	box-sizing: border-box;
 }
 
 body.layout-cinema .player-tools {
@@ -257,9 +267,100 @@ body.layout-cinema .sidebar {
 	box-shadow: none;
 }
 
+body.layout-cinema .modules {
+	padding: 0;
+	background: transparent;
+	border: none;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	overflow: visible;
+	box-shadow: none;
+}
+
+body.layout-cinema .modules-flip-scene {
+	perspective: 900px;
+	perspective-origin: 50% 50%;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+body.layout-cinema .modules-flip-card {
+	position: relative;
+	flex: 1 1 auto;
+	height: 100%;
+	width: 100%;
+	min-height: 0;
+	transform-style: preserve-3d;
+	transform-origin: 50% 50%;
+	transition: transform 500ms ease-in-out;
+}
+
+body.layout-cinema .modules-flip-card.is-flipped {
+	transform: rotateY(-180deg);
+}
+
+body.layout-cinema .modules-flip-face {
+	box-sizing: border-box;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+	height: 100%;
+	min-height: 100%;
+	width: 100%;
+	padding: 18px 16px;
+	border-radius: var(--radius);
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 0 22px 48px -10px rgba(0, 0, 0, 0.45);
+}
+
+body.layout-cinema .modules-flip-front {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+body.layout-cinema .modules-flip-front .pane-body,
+body.layout-cinema .modules-flip-back .pane-body {
+	flex: 1 1 auto;
+	min-height: 0;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+body.layout-cinema .modules-flip-front #accordion {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: auto;
+}
+
+body.layout-cinema .modules-flip-front .settings-footer {
+	margin-top: auto;
+}
+
+body.layout-cinema .modules-flip-back {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	transform: rotateY(180deg);
+}
+
+body.layout-cinema .modules-flip-card:not(.is-flipped) .modules-flip-back,
+body.layout-cinema .modules-flip-card.is-flipped .modules-flip-front {
+	pointer-events: none;
+}
+
 body.layout-cinema .account-outer-scene,
 body.layout-cinema .account-flip-scene,
-body.layout-cinema .sidebar-flip-scene {
+body.layout-cinema .sidebar-flip-scene,
+body.layout-cinema .modules-flip-scene {
 	perspective: 900px;
 	perspective-origin: 50% 50%;
 }
