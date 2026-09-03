@@ -384,7 +384,7 @@ body.layout-cinema .settings-footer .account-btn {
 body.layout-cinema .account-outer-card,
 body.layout-cinema .account-flip-card {
 	position: relative;
-	min-height: 176px;
+	min-height: 0;
 	transform-style: preserve-3d;
 	transform-origin: 50% 50%;
 	transition: transform 500ms ease-in-out;
@@ -394,6 +394,7 @@ body.layout-cinema .account-outer-card.is-flipped,
 body.layout-cinema .account-flip-card.is-flipped {
 	/* avançar = esquerda */
 	transform: rotateY(-180deg);
+	min-height: 220px;
 }
 
 body.layout-cinema .account-flip-card.is-flipped.is-spinning-left,
@@ -412,7 +413,7 @@ body.layout-cinema .account-flip-face {
 	box-sizing: border-box;
 	backface-visibility: hidden;
 	-webkit-backface-visibility: hidden;
-	min-height: 176px;
+	min-height: 0;
 }
 
 body.layout-cinema .account-outer-front,
