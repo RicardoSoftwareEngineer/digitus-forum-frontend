@@ -9,7 +9,7 @@
 	  <link rel="icon" type="image/svg+xml" href="./../img/favicon.svg">
 		  <title>Digitus Forum · Cinema</title>
 	  <link rel="stylesheet" href="./../css/layout.css?v=20260826-radius3">
-	  <link rel="stylesheet" href="./../css/video.css?v=20260902-account-btn-align">
+	  <link rel="stylesheet" href="./../css/video.css?v=20260902-settings-mydata">
 	</head>
 	<body class="lesson-page layout-cinema">
 		<div id="backgroundBlur"></div>
@@ -28,15 +28,30 @@
 							<div class="pane-body">
 								<div class="settings-pane">
 									<div class="settings-pane-main">
-										<div class="sidebar-head brand-head settings-head">
-											<div class="sidebar-icon">⚙️</div>
-											<div><h2 id="settingsTitle">Configurações</h2></div>
+										<div id="settingsHomeView">
+											<div class="sidebar-head brand-head settings-head">
+												<div class="sidebar-icon">⚙️</div>
+												<div><h2 id="settingsTitle">Configurações</h2></div>
+											</div>
+											<ul class="topic-nav">
+												<li><a href="#" id="settingsMyData" class="settingsNavClick"><span class="nav-ico">●</span><span class="settings-link-label" data-k="myData">Meus dados</span></a></li>
+												<li><a href="#" id="settingsMyPurchases" class="settingsNavClick"><span class="nav-ico">●</span><span class="settings-link-label" data-k="myPurchases">Minhas compras</span></a></li>
+												<li><a href="#" id="settingsIdioma" class="settingsNavClick"><span class="nav-ico">●</span><span class="settings-link-label" data-k="idioma">Idioma</span></a></li>
+											</ul>
+											<button type="button" class="account-btn account-btn-ghost settings-logout" id="accountLogout">Deslogar</button>
 										</div>
-										<ul class="topic-nav">
-											<li><a href="#" id="settingsMyData" class="settingsNavClick"><span class="nav-ico">●</span><span class="settings-link-label" data-k="myData">Meus dados</span></a></li>
-											<li><a href="#" id="settingsMyPurchases" class="settingsNavClick"><span class="nav-ico">●</span><span class="settings-link-label" data-k="myPurchases">Minhas compras</span></a></li>
-										</ul>
-										<button type="button" class="account-btn account-btn-ghost settings-logout" id="accountLogout">Deslogar</button>
+										<div id="settingsMyDataView" hidden>
+											<div class="sidebar-head brand-head settings-head">
+												<div class="sidebar-icon">👤</div>
+												<div><h2 id="settingsMyDataTitle">Meus dados</h2></div>
+											</div>
+											<label class="account-label" for="myDataEmail" id="myDataEmailLabel">Email</label>
+											<input id="myDataEmail" class="account-input" type="email" readonly autocomplete="email" />
+											<label class="account-label" for="myDataName" id="myDataNameLabel">Nome</label>
+											<input id="myDataName" class="account-input" type="text" autocomplete="name" />
+											<p class="account-msg" id="myDataMsg"></p>
+											<button type="button" class="account-btn" id="myDataSave">Salvar</button>
+										</div>
 									</div>
 									<div class="account-box settings-footer">
 										<button type="button" class="account-btn" id="accountSettingsBack">Voltar</button>
@@ -50,7 +65,6 @@
 
 			<div class="center-col">
 				<div class="lesson-align">
-					<button type="button" class="lesson-align-btn idioma-toggle" aria-controls="lessonFlip">Idioma</button>
 					<div id="previousAndNextVideo"></div>
 					<main class="stage">
 					<div class="flip-scene">
@@ -112,5 +126,5 @@
 	<script src="./../js/menu-from-bg.js?v=20260826-accentover"></script>
 	<script src="./../js/gif-sprites.js?v=20260826-sprite"></script>
 	<script src="./../js/gif-player.js?v=20260828-player-m4a"></script>
-	<script src="./../js/accordion.js?v=20260902-settings-flip-green"></script>
+	<script src="./../js/accordion.js?v=20260902-settings-mydata"></script>
 </html>

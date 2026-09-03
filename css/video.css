@@ -21,6 +21,8 @@ body.layout-cinema .center-col {
 
 body.layout-cinema .lesson-align {
 	min-height: calc(100vh - 36px);
+	/* idioma-toggle removed: collapse empty toolbar row so prev/next stay tight */
+	grid-template-rows: 0 auto;
 }
 
 body.layout-cinema .stage {
@@ -89,11 +91,6 @@ body.layout-cinema .lesson-shell.nav-collapsed.mod-collapsed {
 		width: auto;
 		margin: 0 0 14px;
 	}
-}
-
-body.layout-cinema .lesson-align-btn.idioma-toggle {
-	grid-column: 1 / -1;
-	justify-self: center;
 }
 
 body.layout-cinema .player-frame {
@@ -587,4 +584,16 @@ body.layout-cinema .paid-lock .account-btn-ghost {
 	background: transparent;
 	color: inherit;
 	border: 1px solid var(--glass-border);
+}
+
+body.layout-cinema #settingsMyDataView .settings-head {
+	margin-bottom: 12px;
+}
+
+body.layout-cinema #settingsMyDataView .account-btn {
+	margin-top: 8px;
+}
+
+body.layout-cinema #settingsMyDataView .account-msg {
+	min-height: 1.2em;
 }
