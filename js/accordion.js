@@ -88,6 +88,11 @@ $(document).ready(function () {
 			settingsBack: en ? "Back" : "Voltar",
 			myData: en ? "My details" : "Meus dados",
 			myPurchases: en ? "My purchases" : "Minhas compras",
+			idioma: en ? "Language" : "Idioma",
+			myDataTitle: en ? "My details" : "Meus dados",
+			nameLabel: en ? "Name" : "Nome",
+			save: en ? "Save" : "Salvar",
+			savedOk: en ? "Saved." : "Salvo.",
 			wrongCode: en ? "Wrong code. Try again." : "Código errado. Tenta de novo.",
 			emptyCode: en ? "Enter the code" : "Informe o código"
 		};
@@ -228,6 +233,57 @@ $(document).ready(function () {
 		$("#accountSettingsBack").text(c.settingsBack);
 		$(".settings-link-label[data-k='myData']").text(c.myData);
 		$(".settings-link-label[data-k='myPurchases']").text(c.myPurchases);
+		$(".settings-link-label[data-k='idioma']").text(c.idioma);
+		$("#settingsMyDataTitle").text(c.myDataTitle);
+		$("#myDataEmailLabel").text(c.email);
+		$("#myDataNameLabel").text(c.nameLabel);
+		$("#myDataSave").text(c.save);
+	}
+
+	function showSettingsHome() {
+		$("#settingsMyDataView").prop("hidden", true);
+		$("#settingsHomeView").prop("hidden", false);
+	}
+
+	function showMyDataMsg(text) {
+		var $msg = $("#myDataMsg");
+		if (!$msg.length) {
+			return;
+		}
+		$msg.text(text || "").toggleClass("is-on", !!(text && String(text)));
+	}
+
+	function openMyDataView() {
+		fillSettingsLabels();
+		$("#settingsHomeView").prop("hidden", true);
+		$("#settingsMyDataView").prop("hidden", false);
+		showMyDataMsg("");
+		var email = accountEmail || localStorage.getItem("email") || "";
+		$("#myDataEmail").val(email);
+		$("#myDataName").val(localStorage.getItem("userName") || "");
+		var userId = localStorage.getItem("userId");
+		if (!userId) {
+			return;
+		}
+		var headers = {};
+		var auth = bearerToken();
+		if (auth) {
+			headers.Authorization = auth;
+		}
+		$.ajax({
+			url: FIREWALL + "/user/v1/" + encodeURIComponent(userId) + "/retrieve",
+			type: "GET",
+			dataType: "json",
+			headers: headers
+		}).done(function (user) {
+			if (user && user.name != null) {
+				$("#myDataName").val(String(user.name));
+				localStorage.setItem("userName", String(user.name));
+			}
+			if (user && user.email) {
+				$("#myDataEmail").val(String(user.email));
+			}
+		});
 	}
 
 	function flipSidebar(toSettings) {
@@ -832,7 +888,6 @@ $(document).ready(function () {
 	function updateChrome() {
 		var en = localStorage.getItem("language") === "en_US";
 		$(".modules-title").text(en ? "Modules" : "Módulos");
-		$(".idioma-toggle").text(en ? "Language" : "Idioma");
 		$(".idioma-title").text(en ? "Language" : "Idioma");
 		$(".idioma-hint").text(en ? "Choose the showcase language" : "Escolha o idioma da vitrine");
 		$("#englishVersion").toggleClass("is-current", en);
@@ -1208,6 +1263,12 @@ $(document).ready(function () {
 				accountEmail = tokenVO.email;
 			}
 			localStorage.setItem("email", accountEmail);
+			if (tokenVO && tokenVO.userId) {
+				localStorage.setItem("userId", String(tokenVO.userId));
+			}
+			if (tokenVO && tokenVO.userName) {
+				localStorage.setItem("userName", String(tokenVO.userName));
+			}
 			accountStep = "in";
 			accountCodePrefill = "";
 			clearCodeMsg();
@@ -1246,23 +1307,56 @@ $(document).ready(function () {
 	$(document).on("click", "#accountSettings", function (e) {
 		e.preventDefault();
 		accountStep = "settings";
+		showSettingsHome();
 		flipSidebar(true);
 	});
 
 	$(document).on("click", "#accountSettingsBack", function (e) {
 		e.preventDefault();
+		if (!$("#settingsMyDataView").prop("hidden")) {
+			showSettingsHome();
+			return;
+		}
 		accountStep = "in";
 		flipSidebar(false);
 	});
 
 	$(document).on("click", ".settingsNavClick", function (e) {
 		e.preventDefault();
+		var id = this.id;
+		if (id === "settingsMyData") {
+			openMyDataView();
+			return;
+		}
+		if (id === "settingsIdioma") {
+			flipSidebar(false);
+			accountStep = "in";
+			flipLanguagePanel(true);
+			return;
+		}
+		// settingsMyPurchases still stub
+	});
+
+	$(document).on("click", "#myDataSave", function (e) {
+		e.preventDefault();
+		var userId = localStorage.getItem("userId");
+		if (!userId) {
+			ajaxFailed({ status: 401 });
+			return;
+		}
+		var name = String($("#myDataName").val() || "").trim();
+		firewall("/user/v1/" + encodeURIComponent(userId) + "/update", { name: name }).done(function () {
+			localStorage.setItem("userName", name);
+			showMyDataMsg(accountCopy().savedOk);
+		}).fail(ajaxFailed);
 	});
 
 	$(document).on("click", "#accountLogout", function (e) {
 		e.preventDefault();
 		localStorage.removeItem("token");
 		localStorage.removeItem("email");
+		localStorage.removeItem("userId");
+		localStorage.removeItem("userName");
 		accountStep = "email";
 		accountEmail = "";
 		accountCodePrefill = "";
