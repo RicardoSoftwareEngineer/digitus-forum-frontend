@@ -16,6 +16,8 @@
 	--pill-bg: rgba(20, 20, 20, 0.78);
 	--pill-text: #fff;
 	--shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.35);
+	/* product rim on .glass (was TEST-GLASS-PREVIEW Rim) */
+	--glass-rim-inset: inset 0 1px 0 rgba(255, 255, 255, 0.42), inset 0 0 0 1px rgba(255, 255, 255, 0.16);
 	--lesson-toolbar-h: 38px;
 	--lesson-toolbar-gap: 8px;
 }
@@ -76,7 +78,7 @@ body.lesson-page .glass {
 	background: var(--glass-bg);
 	border: 1px solid var(--glass-border);
 	border-radius: var(--radius);
-	box-shadow: var(--shadow);
+	box-shadow: var(--shadow), var(--glass-rim-inset);
 	backdrop-filter: blur(var(--glass-blur));
 	-webkit-backdrop-filter: blur(var(--glass-blur));
 }
