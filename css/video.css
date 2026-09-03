@@ -393,11 +393,8 @@ body.layout-cinema .account-flip-card {
 body.layout-cinema .account-outer-card.is-flipped,
 body.layout-cinema .account-flip-card.is-flipped {
 	/* avançar = esquerda */
-
-body.layout-cinema .account-flip-card.is-flipped {
-	min-height: 220px;
-}
 	transform: rotateY(-180deg);
+	min-height: 220px;
 }
 
 body.layout-cinema .account-flip-card.is-flipped.is-spinning-left,
