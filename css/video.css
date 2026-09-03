@@ -347,7 +347,7 @@ body.layout-cinema .modules-flip-face {
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
-	box-shadow: 0 22px 48px -10px rgba(0, 0, 0, 0.45);
+	box-shadow: 0 22px 48px -10px rgba(0, 0, 0, 0.45), var(--glass-rim-inset);
 }
 
 body.layout-cinema .modules-flip-front {
@@ -433,7 +433,7 @@ body.layout-cinema .sidebar-flip-face {
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
-	box-shadow: 0 22px 48px -10px rgba(0, 0, 0, 0.45);
+	box-shadow: 0 22px 48px -10px rgba(0, 0, 0, 0.45), var(--glass-rim-inset);
 }
 
 body.layout-cinema .sidebar-flip-front {
