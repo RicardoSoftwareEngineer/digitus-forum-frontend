@@ -91,6 +91,7 @@ $(document).ready(function () {
 			idioma: en ? "Language" : "Idioma",
 			myDataTitle: en ? "My details" : "Meus dados",
 			nameLabel: en ? "Name" : "Nome",
+			ageLabel: en ? "Age" : "Idade",
 			save: en ? "Save" : "Salvar",
 			savedOk: en ? "Saved." : "Salvo.",
 			wrongCode: en ? "Wrong code. Try again." : "Código errado. Tenta de novo.",
@@ -234,15 +235,14 @@ $(document).ready(function () {
 		$(".settings-link-label[data-k='myData']").text(c.myData);
 		$(".settings-link-label[data-k='myPurchases']").text(c.myPurchases);
 		$(".settings-link-label[data-k='idioma']").text(c.idioma);
-		$("#settingsMyDataTitle").text(c.myDataTitle);
-		$("#myDataEmailLabel").text(c.email);
-		$("#myDataNameLabel").text(c.nameLabel);
-		$("#myDataSave").text(c.save);
 	}
 
 	function showSettingsHome() {
-		$("#settingsMyDataView").prop("hidden", true);
 		$("#settingsHomeView").prop("hidden", false);
+	}
+
+	function clearMyDataChrome() {
+		$("body").removeClass("my-data-open");
 	}
 
 	function showMyDataMsg(text) {
@@ -253,14 +253,51 @@ $(document).ready(function () {
 		$msg.text(text || "").toggleClass("is-on", !!(text && String(text)));
 	}
 
-	function openMyDataView() {
-		fillSettingsLabels();
-		$("#settingsHomeView").prop("hidden", true);
-		$("#settingsMyDataView").prop("hidden", false);
-		showMyDataMsg("");
+	function openMyDataScreen(animate) {
+		flipSidebar(false);
+		accountStep = "in";
+		flipLanguagePanel(false);
+		localStorage.setItem("lessonSource", "my-data");
+		var c = accountCopy();
+		var seq = ++lessonSeq;
+		var $fields = lessonFields();
+		if (animate) {
+			$fields.addClass("lesson-swap");
+		}
+		var videoEl = document.getElementById("video");
+		if (window.GifPlayer) {
+			window.GifPlayer.mount(videoEl, "", "", "");
+		} else if (videoEl) {
+			videoEl.innerHTML = "";
+		}
 		var email = accountEmail || localStorage.getItem("email") || "";
-		$("#myDataEmail").val(email);
-		$("#myDataName").val(localStorage.getItem("userName") || "");
+		var name = localStorage.getItem("userName") || "";
+		var age = localStorage.getItem("userAge") || "";
+		var html = "";
+		html += "<div class='my-data-panel'>";
+		html += "<label class='account-label' for='myDataName'>" + escapeHtml(c.nameLabel) + "</label>";
+		html += "<input id='myDataName' class='account-input' type='text' autocomplete='name' value='" + escapeHtml(name) + "' />";
+		html += "<label class='account-label' for='myDataAge'>" + escapeHtml(c.ageLabel) + "</label>";
+		html += "<input id='myDataAge' class='account-input' type='number' min='0' max='150' inputmode='numeric' value='" + escapeHtml(age) + "' />";
+		html += "<label class='account-label' for='myDataEmail'>" + escapeHtml(c.email) + "</label>";
+		html += "<input id='myDataEmail' class='account-input' type='email' readonly autocomplete='email' value='" + escapeHtml(email) + "' />";
+		html += "<p class='account-msg' id='myDataMsg'></p>";
+		html += "<button type='button' class='account-btn' id='myDataSave'>" + escapeHtml(c.save) + "</button>";
+		html += "</div>";
+		if (videoEl) {
+			videoEl.innerHTML = html;
+		}
+		$("#previousAndNextVideo").empty();
+		$("#name").text(c.myDataTitle);
+		$("#description").empty();
+		$("#links").empty();
+		$("body").addClass("my-data-open");
+		requestAnimationFrame(function () {
+			if (seq !== lessonSeq) {
+				return;
+			}
+			$fields.removeClass("lesson-swap");
+		});
 		var userId = localStorage.getItem("userId");
 		if (!userId) {
 			return;
@@ -276,12 +313,19 @@ $(document).ready(function () {
 			dataType: "json",
 			headers: headers
 		}).done(function (user) {
+			if (seq !== lessonSeq) {
+				return;
+			}
 			if (user && user.name != null) {
 				$("#myDataName").val(String(user.name));
 				localStorage.setItem("userName", String(user.name));
 			}
 			if (user && user.email) {
 				$("#myDataEmail").val(String(user.email));
+			}
+			if (user && user.age != null && user.age !== "") {
+				$("#myDataAge").val(String(user.age));
+				localStorage.setItem("userAge", String(user.age));
 			}
 		});
 	}
@@ -424,6 +468,7 @@ $(document).ready(function () {
 		if (!src) {
 			return;
 		}
+		clearMyDataChrome();
 		localStorage.setItem("guruPageSrc", page.src || "");
 		localStorage.setItem("lessonSource", "guru-page");
 		markGuruPage(page.src || "");
@@ -664,6 +709,7 @@ $(document).ready(function () {
 
 	function showPaidLock(training, reason) {
 		hidePaidLock();
+		clearMyDataChrome();
 		if (window.GifPlayer) {
 			window.GifPlayer.mount(document.getElementById("video"), "", "", "");
 		} else {
@@ -864,6 +910,7 @@ $(document).ready(function () {
 		if (!videoId) {
 			return;
 		}
+		clearMyDataChrome();
 		source = source || "training";
 		var changed = String(videoId) !== String(localStorage.getItem("videoId"));
 		localStorage.setItem("videoId", videoId);
@@ -1313,10 +1360,6 @@ $(document).ready(function () {
 
 	$(document).on("click", "#accountSettingsBack", function (e) {
 		e.preventDefault();
-		if (!$("#settingsMyDataView").prop("hidden")) {
-			showSettingsHome();
-			return;
-		}
 		accountStep = "in";
 		flipSidebar(false);
 	});
@@ -1325,7 +1368,7 @@ $(document).ready(function () {
 		e.preventDefault();
 		var id = this.id;
 		if (id === "settingsMyData") {
-			openMyDataView();
+			openMyDataScreen(true);
 			return;
 		}
 		if (id === "settingsIdioma") {
@@ -1345,8 +1388,14 @@ $(document).ready(function () {
 			return;
 		}
 		var name = String($("#myDataName").val() || "").trim();
+		var ageRaw = String($("#myDataAge").val() || "").trim();
 		firewall("/user/v1/" + encodeURIComponent(userId) + "/update", { name: name }).done(function () {
 			localStorage.setItem("userName", name);
+			if (ageRaw === "") {
+				localStorage.removeItem("userAge");
+			} else {
+				localStorage.setItem("userAge", ageRaw);
+			}
 			showMyDataMsg(accountCopy().savedOk);
 		}).fail(ajaxFailed);
 	});
@@ -1357,6 +1406,7 @@ $(document).ready(function () {
 		localStorage.removeItem("email");
 		localStorage.removeItem("userId");
 		localStorage.removeItem("userName");
+		localStorage.removeItem("userAge");
 		accountStep = "email";
 		accountEmail = "";
 		accountCodePrefill = "";
