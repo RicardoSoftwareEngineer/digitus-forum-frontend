@@ -199,9 +199,9 @@ body.layout-cinema .player-frame:-webkit-full-screen .yt-player-freeze {
 }
 
 body.layout-cinema .account-box {
-	margin-top: 16px;
-	padding-top: 14px;
-	border-top: 1px solid var(--glass-border);
+	margin-top: auto;
+	padding-top: 0;
+	border-top: none;
 }
 
 body.layout-cinema .account-label {
@@ -356,6 +356,9 @@ body.layout-cinema .settings-logout {
 
 body.layout-cinema .settings-footer {
 	flex: 0 0 auto;
+	margin-top: 0;
+	padding-top: 14px;
+	border-top: 1px solid var(--glass-border);
 }
 
 body.layout-cinema .settings-footer .account-btn {
