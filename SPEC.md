@@ -19,7 +19,7 @@ Vitrine estática (jQuery) **de todos os gurus** no mesmo domínio / mesmo front
 ## REGRA
 - REGRA-LIVE-1: produto vivo = `index.html` → `html/video.html` + `js/accordion.js` + UI de conta (email → código). Backups (`index bkp*`, `bkp/`) **não** são produto.
 - REGRA-LANDING-2: `index2.html` é **proposta** de home (confiança/venda). Não substitui `index.html` até Ricardo fechar. Não é bkp.
-- TEST-CINEMA-MENU-TINT (2026-09-03): cinema — menu esquerdo chips/botões = vidro branco translúcido; menu direito = preto bem clarinho. Sem --accent-show nesses controles. Teste visual; Ricardo julga.
+- TEST-CINEMA-MENU-TINT (2026-09-03): cinema — menus esquerdo e direito chips/botões = vidro branco translúcido (soft 0.14 / stronger 0.24). Sem --accent-show nesses controles. Teste visual; Ricardo julga.
 - REGRA-VIDEO-LAYOUT: player padrão = `html/video.html` cinema (gif grande, gavetas de vidro sobre Trianglify, class `layout-cinema`). Controles no palco: tela cheia (Fullscreen API) e modo cinema (esconde os dois menus; o quadro do gif não cresce). **Revogado** (2026-08-28): `html/video3.html` / `html/video4.html` (propostas experimentais). Fundo Trianglify + `.glass`. Não são bkp.
 - REGRA-API-1: único host de API = firewall. Base no código hoje: `http://localhost:8080/firewall` (ver GAP-BASE).
 - REGRA-I18-1: locale em `localStorage.language` (`pt_BR` / `en_US`). Textos de UI vêm do i18n (via borda).
