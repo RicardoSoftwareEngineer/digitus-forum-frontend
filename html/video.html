@@ -9,34 +9,38 @@
 	  <link rel="icon" type="image/svg+xml" href="./../img/favicon.svg">
 		  <title>Digitus Forum · Cinema</title>
 	  <link rel="stylesheet" href="./../css/layout.css?v=20260826-radius3">
-	  <link rel="stylesheet" href="./../css/video.css?v=20260902-settings-sidebar">
+	  <link rel="stylesheet" href="./../css/video.css?v=20260902-settings-flip-green">
 	</head>
 	<body class="lesson-page layout-cinema">
 		<div id="backgroundBlur"></div>
 
 		<div class="lesson-shell">
-			<aside class="sidebar glass">
-				<div class="pane-body sidebar-flip-scene">
+			<aside class="sidebar">
+				<div class="sidebar-flip-scene">
 					<div class="sidebar-flip-card" id="sidebarFlip">
-						<div class="sidebar-flip-face sidebar-flip-front">
-							<div id="leftAccordion"></div>
-							<div class="account-box" id="accountBox"></div>
+						<div class="sidebar-flip-face sidebar-flip-front glass">
+							<div class="pane-body">
+								<div id="leftAccordion"></div>
+								<div class="account-box" id="accountBox"></div>
+							</div>
 						</div>
-						<div class="sidebar-flip-face sidebar-flip-back">
-							<div class="settings-pane">
-								<div class="settings-pane-main">
-									<div class="sidebar-head brand-head settings-head">
-										<div class="sidebar-icon">⚙️</div>
-										<div><h2 id="settingsTitle">Configurações</h2></div>
+						<div class="sidebar-flip-face sidebar-flip-back glass">
+							<div class="pane-body">
+								<div class="settings-pane">
+									<div class="settings-pane-main">
+										<div class="sidebar-head brand-head settings-head">
+											<div class="sidebar-icon">⚙️</div>
+											<div><h2 id="settingsTitle">Configurações</h2></div>
+										</div>
+										<ul class="topic-nav">
+											<li><a href="#" id="settingsMyData" class="settingsNavClick"><span class="nav-ico">●</span><span class="settings-link-label" data-k="myData">Meus dados</span></a></li>
+											<li><a href="#" id="settingsMyPurchases" class="settingsNavClick"><span class="nav-ico">●</span><span class="settings-link-label" data-k="myPurchases">Minhas compras</span></a></li>
+										</ul>
+										<button type="button" class="account-btn account-btn-ghost settings-logout" id="accountLogout">Deslogar</button>
 									</div>
-									<ul class="topic-nav">
-										<li><a href="#" id="settingsMyData" class="settingsNavClick"><span class="nav-ico">●</span><span class="settings-link-label" data-k="myData">Meus dados</span></a></li>
-										<li><a href="#" id="settingsMyPurchases" class="settingsNavClick"><span class="nav-ico">●</span><span class="settings-link-label" data-k="myPurchases">Minhas compras</span></a></li>
-									</ul>
-									<button type="button" class="account-btn account-btn-ghost settings-logout" id="accountLogout">Deslogar</button>
-								</div>
-								<div class="account-box settings-footer">
-									<button type="button" class="account-btn" id="accountSettingsBack">Voltar</button>
+									<div class="account-box settings-footer">
+										<button type="button" class="account-btn" id="accountSettingsBack">Voltar</button>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -108,5 +112,5 @@
 	<script src="./../js/menu-from-bg.js?v=20260826-accentover"></script>
 	<script src="./../js/gif-sprites.js?v=20260826-sprite"></script>
 	<script src="./../js/gif-player.js?v=20260828-player-m4a"></script>
-	<script src="./../js/accordion.js?v=20260902-settings-sidebar"></script>
+	<script src="./../js/accordion.js?v=20260902-settings-flip-green"></script>
 </html>
