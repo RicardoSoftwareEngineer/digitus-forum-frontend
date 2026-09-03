@@ -94,6 +94,9 @@ $(document).ready(function () {
 			ageLabel: en ? "Age" : "Idade",
 			save: en ? "Save" : "Salvar",
 			savedOk: en ? "Saved." : "Salvo.",
+			purchasesEmpty: en ? "No purchases yet" : "Nenhuma compra ainda",
+			purchasesSubActive: en ? "Java subscription active" : "Mensalidade Java ativa",
+			purchasesLoading: en ? "Loading…" : "Carregando…",
 			wrongCode: en ? "Wrong code. Try again." : "Código errado. Tenta de novo.",
 			emptyCode: en ? "Enter the code" : "Informe o código"
 		};
@@ -242,7 +245,7 @@ $(document).ready(function () {
 	}
 
 	function clearMyDataChrome() {
-		$("body").removeClass("my-data-open");
+		$("body").removeClass("my-data-open my-purchases-open");
 	}
 
 	function showMyDataMsg(text) {
@@ -289,7 +292,7 @@ $(document).ready(function () {
 		$("#name").text(c.myDataTitle);
 		$("#description").empty();
 		$("#links").empty();
-		$("body").addClass("my-data-open");
+		$("body").removeClass("my-purchases-open").addClass("my-data-open");
 		requestAnimationFrame(function () {
 			if (seq !== lessonSeq) {
 				return;
@@ -325,6 +328,90 @@ $(document).ready(function () {
 				$("#myDataAge").val(String(user.age));
 				localStorage.setItem("userAge", String(user.age));
 			}
+		});
+	}
+
+	function openMyPurchasesScreen(animate) {
+		flipLanguagePanel(false);
+		localStorage.setItem("lessonSource", "my-purchases");
+		var c = accountCopy();
+		var seq = ++lessonSeq;
+		var $fields = lessonFields();
+		if (animate) {
+			$fields.addClass("lesson-swap");
+		}
+		var videoEl = document.getElementById("video");
+		if (window.GifPlayer) {
+			window.GifPlayer.mount(videoEl, "", "", "");
+		} else if (videoEl) {
+			videoEl.innerHTML = "";
+		}
+		var html = "";
+		html += "<div class='my-purchases-panel'>";
+		html += "<p class='my-purchases-status'>" + escapeHtml(c.purchasesLoading) + "</p>";
+		html += "</div>";
+		if (videoEl) {
+			videoEl.innerHTML = html;
+		}
+		$("#previousAndNextVideo").empty();
+		$("#name").text(c.myPurchases);
+		$("#description").empty();
+		$("#links").empty();
+		$("body").removeClass("my-data-open").addClass("my-purchases-open");
+		requestAnimationFrame(function () {
+			if (seq !== lessonSeq) {
+				return;
+			}
+			$fields.removeClass("lesson-swap");
+		});
+		function renderPurchases(me) {
+			if (seq !== lessonSeq) {
+				return;
+			}
+			var panel = document.querySelector("#video .my-purchases-panel");
+			if (!panel) {
+				return;
+			}
+			var c2 = accountCopy();
+			var ids = (me && me.purchasedTrainingIds) || [];
+			var parts = [];
+			if (me && me.javaSubscriptionActive) {
+				parts.push("<div class='my-purchases-sub'>" + escapeHtml(c2.purchasesSubActive) + "</div>");
+			}
+			for (var i = 0; i < ids.length; i++) {
+				var tid = ids[i];
+				var t = trainingById(tid);
+				var name = (t && t.name) || String(tid);
+				var sinopse = (t && t.sinopse) || "";
+				parts.push("<button type='button' class='my-purchases-item' data-training-id='" + escapeHtml(String(tid)) + "'>");
+				parts.push("<span class='my-purchases-item-name'>" + escapeHtml(name) + "</span>");
+				if (sinopse) {
+					parts.push("<span class='my-purchases-item-sinopse'>" + escapeHtml(sinopse) + "</span>");
+				}
+				parts.push("</button>");
+			}
+			if (!parts.length) {
+				panel.innerHTML = "<p class='my-purchases-empty'>" + escapeHtml(c2.purchasesEmpty) + "</p>";
+			} else {
+				panel.innerHTML = parts.join("");
+			}
+		}
+		function ensureTrainingsThenRender(me) {
+			if (trainingsForLocale && trainingsForLocale.length) {
+				renderPurchases(me);
+				return;
+			}
+			loadTrainings().done(function (trainings) {
+				trainingsForLocale = trainings || [];
+				renderPurchases(me);
+			}).fail(function () {
+				renderPurchases(me);
+			});
+		}
+		loadBillingMe().done(function (me) {
+			ensureTrainingsThenRender(me || { purchasedTrainingIds: [], javaSubscriptionActive: false });
+		}).fail(function () {
+			ensureTrainingsThenRender({ purchasedTrainingIds: [], javaSubscriptionActive: false });
 		});
 	}
 
@@ -1369,11 +1456,24 @@ $(document).ready(function () {
 			openMyDataScreen(true);
 			return;
 		}
+		if (id === "settingsMyPurchases") {
+			openMyPurchasesScreen(true);
+			return;
+		}
 		if (id === "settingsIdioma") {
 			flipLanguagePanel(true);
 			return;
 		}
-		// settingsMyPurchases still stub
+	});
+
+	$(document).on("click", ".my-purchases-item", function (e) {
+		e.preventDefault();
+		var tid = $(this).attr("data-training-id");
+		if (!tid) {
+			return;
+		}
+		var training = trainingById(tid) || { trainingId: tid, name: String(tid) };
+		openTraining(training, true);
 	});
 
 	$(document).on("click", "#myDataSave", function (e) {
