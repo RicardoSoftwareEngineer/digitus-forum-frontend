@@ -1592,6 +1592,7 @@ $(document).ready(function () {
 		e.preventDefault();
 		closeTrainingPicker();
 		flipModules(true);
+		openListTrainingsScreen(true);
 	});
 
 	$(document).on("click", "#swapTrainingBack", function (e) {
