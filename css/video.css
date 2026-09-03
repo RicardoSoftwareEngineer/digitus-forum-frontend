@@ -51,7 +51,8 @@ body.layout-cinema .flip-card {
 body.layout-cinema #box {
 	min-height: 0;
 	height: 100%;
-	padding: 18px 28px 18px;
+	/* espaço acima do título — quadrado do meio “mais baixo” que as laterais (como antes) */
+	padding: 52px 28px 22px;
 	display: flex;
 	flex-direction: column;
 }
