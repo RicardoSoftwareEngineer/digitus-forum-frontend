@@ -1100,9 +1100,11 @@ body.layout-cinema .modules .topic-nav li.selectedNav a {
 }
 
 body.layout-cinema .modules #accordion h3,
-body.layout-cinema .modules #accordion .h3 {
+body.layout-cinema .modules #accordion .h3,
+body.layout-cinema .modules #accordion .ui-accordion-header {
 	background: rgba(255, 255, 255, 0.14);
 	color: #fff;
+	cursor: pointer;
 }
 
 body.layout-cinema .modules #accordion h3.selectedModule {
@@ -1132,4 +1134,14 @@ body.layout-cinema .modules .account-btn-ghost {
 	background: rgba(255, 255, 255, 0.14);
 	border-color: rgba(255, 255, 255, 0.24);
 	color: #fff;
+}
+
+body.layout-cinema .modules #accordion li a,
+body.layout-cinema .modules #accordion li.selectedGif a,
+body.layout-cinema .modules #swapTrainingBtn,
+body.layout-cinema .modules .account-btn,
+body.layout-cinema .sidebar .topic-nav a,
+body.layout-cinema .sidebar .topic-nav li.selectedNav a,
+body.layout-cinema .sidebar .account-btn {
+	cursor: pointer;
 }
