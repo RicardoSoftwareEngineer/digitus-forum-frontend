@@ -1588,15 +1588,153 @@ $(document).ready(function () {
 		}
 	});
 
+	var swapReturnSnap = null;
+
+	function persistSwapReturn(snap) {
+		swapReturnSnap = snap || null;
+		try {
+			if (snap) {
+				sessionStorage.setItem("swapReturn", JSON.stringify(snap));
+			} else {
+				sessionStorage.removeItem("swapReturn");
+			}
+		} catch (err) {}
+	}
+
+	function readSwapReturn() {
+		if (swapReturnSnap) {
+			return swapReturnSnap;
+		}
+		try {
+			var raw = sessionStorage.getItem("swapReturn");
+			if (raw) {
+				swapReturnSnap = JSON.parse(raw);
+				return swapReturnSnap;
+			}
+		} catch (err) {}
+		return null;
+	}
+
+	function guruPageFromSnap(snap) {
+		var i;
+		var src = (snap && snap.src) || "";
+		var pageId = (snap && (snap.guruPageId || snap.pageId)) || "";
+		if (pageId) {
+			for (i = 0; i < guruPages.length; i++) {
+				if (String(guruPages[i].guruPageId || "") === String(pageId)) {
+					return guruPages[i];
+				}
+			}
+		}
+		if (src) {
+			for (i = 0; i < guruPages.length; i++) {
+				if (String(guruPages[i].src || "") === String(src)) {
+					return guruPages[i];
+				}
+			}
+			return { src: src, guruPageId: pageId, titleKey: (snap && snap.titleKey) || "" };
+		}
+		return null;
+	}
+
+	function captureSwapReturn() {
+		var source = localStorage.getItem("lessonSource") || "";
+		if (source === "list-trainings" || $("#modulesFlip").hasClass("is-flipped")) {
+			return;
+		}
+		var snap = null;
+		if (document.getElementById("paidLock")) {
+			snap = { kind: "paid-lock" };
+		} else if (source === "my-data") {
+			snap = { kind: "my-data" };
+		} else if (source === "my-purchases") {
+			snap = { kind: "my-purchases" };
+		} else if (source === "my-backgrounds") {
+			snap = { kind: "my-backgrounds" };
+		} else if (source === "guru-page") {
+			var src = localStorage.getItem("guruPageSrc") || "";
+			var page = guruPageFromSnap({ src: src });
+			snap = {
+				kind: "guru",
+				src: src,
+				guruPageId: (page && page.guruPageId) || "",
+				titleKey: (page && page.titleKey) || ""
+			};
+		} else if (source === "training" || source === "nav") {
+			snap = {
+				kind: "lesson",
+				source: source,
+				videoId: localStorage.getItem("videoId") || "",
+				moduleId: localStorage.getItem("moduleId") || ""
+			};
+		} else {
+			var videoId = localStorage.getItem("videoId") || localStorage.getItem(lastVideoKey()) || "";
+			if (videoId) {
+				snap = {
+					kind: "lesson",
+					source: "training",
+					videoId: videoId,
+					moduleId: localStorage.getItem("moduleId") || localStorage.getItem(lastModuleKey()) || ""
+				};
+			} else {
+				snap = { kind: "paid-lock" };
+			}
+		}
+		persistSwapReturn(snap);
+	}
+
+	function restoreSwapReturn() {
+		var snap = readSwapReturn();
+		persistSwapReturn(null);
+		if (!snap) {
+			var videoId = localStorage.getItem("videoId") || localStorage.getItem(lastVideoKey()) || "";
+			var moduleId = localStorage.getItem("moduleId") || localStorage.getItem(lastModuleKey()) || "";
+			if (videoId) {
+				goToLesson(videoId, moduleId, true, "training");
+			}
+			return;
+		}
+		if (snap.kind === "my-data") {
+			openMyDataScreen(true);
+			return;
+		}
+		if (snap.kind === "my-purchases") {
+			openMyPurchasesScreen(true);
+			return;
+		}
+		if (snap.kind === "my-backgrounds") {
+			openBackgroundsScreen(true);
+			return;
+		}
+		if (snap.kind === "guru") {
+			var page = guruPageFromSnap(snap);
+			if (page) {
+				openGuruPage(page, true);
+			}
+			return;
+		}
+		if (snap.kind === "lesson") {
+			goToLesson(snap.videoId, snap.moduleId, true, snap.source || "training");
+			return;
+		}
+		var training = trainingById(localStorage.getItem("internationalization.training_id"));
+		if (training) {
+			openTraining(training, false);
+		}
+	}
+
 	$(document).on("click", "#swapTrainingBtn", function (e) {
 		e.preventDefault();
 		closeTrainingPicker();
+		captureSwapReturn();
 		flipModules(true);
+		openListTrainingsScreen(true);
 	});
 
 	$(document).on("click", "#swapTrainingBack", function (e) {
 		e.preventDefault();
 		flipModules(false);
+		restoreSwapReturn();
 	});
 
 	$(document).on("click", ".swapNavClick", function (e) {
