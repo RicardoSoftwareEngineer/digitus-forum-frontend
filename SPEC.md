@@ -1,9 +1,9 @@
 <!-- para IA. não é README de humano. -->
 # SPEC — frontend (vitrine)
 
-status: v0.8
-sha: `350d076`
-data: 2026-08-28
+status: v0.9
+sha: `pending`
+data: 2026-09-02
 
 ## Como usar
 - Este arquivo é a fonte. Código ≠ spec → **bug de código**. Spec errada → Ricardo muda **este** arquivo, depois o código.
@@ -27,7 +27,8 @@ Vitrine estática (jQuery) **de todos os gurus** no mesmo domínio / mesmo front
 - REGRA-AUTH-1: vitrine de **treinamento gratuito** é pública (sem token). Login + compra só para **treinamento pago** (REGRA-AUTH-PAID no firewall). Conta existe mesmo assim (testar cadastro/login).
 - REGRA-IDIOMA-1: troca pt/en = i18n (`localStorage.language`). **Não** troca `trainingId` nem usa `familyId`.
 - REGRA-CONTA-1: UI = email → CONTRATO-EV-SEND → tela de código. **Mock:** campos do código já vêm populados com `readableNumber` da API. Usuário confirma. CONTRATO-EV-OK → token.
-- REGRA-CONTA-2: sem campos de senha. Cadastro não pede nome (nome depois no perfil/user update).
+- REGRA-CONTA-2: sem campos de senha. Cadastro não pede nome/idade (preenchidos depois em Meus dados).
+- REGRA-CONTA-MYDATA: Configurações → Meus dados abre formulário no **centro do cinema** (lessonSource `my-data`, painel em `#video`), não na sidebar. Campos: Nome, Idade, Email (readonly). Salva `POST /firewall/user/v1/{userId}/update` body `{name, age?}`; cache `userName`/`userAge` no localStorage (limpa no logout).
 - REGRA-CONTA-3: um fluxo só. Email novo cria conta; existente entra.
 - REGRA-TOKEN-STORE: token (só o UUID) em `localStorage`. **Não** senha. **Não** cookie. Persiste entre dias e abas até logout explícito ou o cache da borda expirar (~4 dias). Header `Authorization: Bearer <uuid>`. Cookie `HttpOnly` é upgrade futuro (GAP-EMAIL-REAL), não agora.
 - REGRA-GURU-FRONT: um domínio, um front, vários gurus. Lançamento: guru `java`. Aluno global (mesmo user em qualquer guru).

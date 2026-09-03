@@ -1389,12 +1389,19 @@ $(document).ready(function () {
 		}
 		var name = String($("#myDataName").val() || "").trim();
 		var ageRaw = String($("#myDataAge").val() || "").trim();
-		firewall("/user/v1/" + encodeURIComponent(userId) + "/update", { name: name }).done(function () {
+		var body = { name: name };
+		if (ageRaw !== "") {
+			var ageNum = parseInt(ageRaw, 10);
+			if (!isNaN(ageNum)) {
+				body.age = ageNum;
+			}
+		}
+		firewall("/user/v1/" + encodeURIComponent(userId) + "/update", body).done(function () {
 			localStorage.setItem("userName", name);
 			if (ageRaw === "") {
 				localStorage.removeItem("userAge");
 			} else {
-				localStorage.setItem("userAge", ageRaw);
+				localStorage.setItem("userAge", String(body.age));
 			}
 			showMyDataMsg(accountCopy().savedOk);
 		}).fail(ajaxFailed);
