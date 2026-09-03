@@ -115,9 +115,11 @@ $(document).ready(function () {
 
 	function emailFrontHtml(c) {
 		var html = "";
+		html += "<form id='accountEmailForm' action='#' style='margin:0;padding:0;border:0'>";
 		html += "<label class='account-label' for='accountEmail'>" + escapeHtml(c.email) + "</label>";
 		html += "<input id='accountEmail' class='account-input' type='email' autocomplete='email' value='" + escapeHtml(accountEmail) + "' />";
-		html += "<button type='button' class='account-btn' id='accountSend'>" + escapeHtml(c.send) + "</button>";
+		html += "<button type='submit' class='account-btn' id='accountSend'>" + escapeHtml(c.send) + "</button>";
+		html += "</form>";
 		return html;
 	}
 
@@ -133,10 +135,12 @@ $(document).ready(function () {
 
 	function codeBackHtml(c) {
 		var html = "";
+		html += "<form id='accountCodeForm' action='#' style='margin:0;padding:0;border:0'>";
 		html += "<label class='account-label' for='accountCode'>" + escapeHtml(c.code) + "</label>";
 		html += "<input id='accountCode' class='account-input' type='text' inputmode='numeric' maxlength='6' autocomplete='one-time-code' value='" + escapeHtml(accountCodePrefill) + "' />";
 		html += "<p class='account-msg' id='accountCodeMsg'></p>";
-		html += "<button type='button' class='account-btn' id='accountConfirm'>" + escapeHtml(c.confirm) + "</button>";
+		html += "<button type='submit' class='account-btn' id='accountConfirm'>" + escapeHtml(c.confirm) + "</button>";
+		html += "</form>";
 		html += "<button type='button' class='account-btn account-btn-ghost' id='accountBack'>" + escapeHtml(c.back) + "</button>";
 		return html;
 	}
@@ -195,16 +199,54 @@ $(document).ready(function () {
 		}
 	}
 
+	function isEnterKey(e) {
+		return e.key === "Enter" || e.which === 13 || e.keyCode === 13;
+	}
+
+	function focusAccountCode() {
+		var $code = $("#accountCode");
+		if (!$code.length) {
+			return;
+		}
+		$code.trigger("focus").select();
+	}
+
 	function flipAccountCard(toCode) {
 		var $card = $("#accountBox .account-flip-card");
 		if (!$card.length) {
 			renderAccount();
+			if (toCode) {
+				setTimeout(focusAccountCode, 0);
+			}
 			return;
 		}
 		clearCodeMsg();
+		$card.off("transitionend.accountCodeFocus");
 		if (toCode) {
+			$("#accountEmail").trigger("blur");
 			$("#accountCode").val(accountCodePrefill);
+			var alreadyFlipped = $card.hasClass("is-flipped");
 			$card.addClass("is-flipped");
+			if (alreadyFlipped) {
+				focusAccountCode();
+				return;
+			}
+			var focused = false;
+			function focusWhenUsable() {
+				if (focused) {
+					return;
+				}
+				focused = true;
+				$card.off("transitionend.accountCodeFocus");
+				focusAccountCode();
+			}
+			$card.on("transitionend.accountCodeFocus", function (e) {
+				if (e.target !== $card[0]) {
+					return;
+				}
+				focusWhenUsable();
+			});
+			setTimeout(focusWhenUsable, 520);
 		} else {
 			$("#accountCode").val("");
 			$card.removeClass("is-flipped");
@@ -1620,39 +1662,31 @@ $(document).ready(function () {
 		closeStripeOverlay();
 	});
 
-	$(document).on("keydown", "#accountEmail", function (e) {
-		if (e.key !== "Enter") {
+	var accountSendBusy = false;
+
+	function submitAccountEmail() {
+		if (accountSendBusy) {
 			return;
 		}
-		e.preventDefault();
-		$("#accountSend").trigger("click");
-	});
-
-	$(document).on("keydown", "#accountCode", function (e) {
-		if (e.key !== "Enter") {
-			return;
-		}
-		e.preventDefault();
-		$("#accountConfirm").trigger("click");
-	});
-
-	$(document).on("click", "#accountSend", function (e) {
-		e.preventDefault();
 		var email = String($("#accountEmail").val() || "").trim();
 		if (!email) {
 			alert(localStorage.getItem("language") === "en_US" ? "Email is required" : "Informe o email");
 			return;
 		}
+		accountSendBusy = true;
 		firewall("/emailVerification/v1/sendValidationEmail", { email: email }).done(function (res) {
+			accountSendBusy = false;
 			accountEmail = email;
 			accountCodePrefill = res && res.readableNumber != null ? String(res.readableNumber) : "";
 			accountStep = "code";
 			flipAccountCard(true);
-		}).fail(ajaxFailed);
-	});
+		}).fail(function (xhr) {
+			accountSendBusy = false;
+			ajaxFailed(xhr);
+		});
+	}
 
-	$(document).on("click", "#accountConfirm", function (e) {
-		e.preventDefault();
+	function submitAccountCode() {
 		var $btn = $("#accountConfirm");
 		if ($btn.data("busy")) {
 			return;
@@ -1697,6 +1731,42 @@ $(document).ready(function () {
 			}
 			ajaxFailed(xhr);
 		});
+	}
+
+	$(document).on("keydown", "#accountEmail", function (e) {
+		if (!isEnterKey(e)) {
+			return;
+		}
+		e.preventDefault();
+		submitAccountEmail();
+	});
+
+	$(document).on("keydown", "#accountCode", function (e) {
+		if (!isEnterKey(e)) {
+			return;
+		}
+		e.preventDefault();
+		submitAccountCode();
+	});
+
+	$(document).on("submit", "#accountEmailForm", function (e) {
+		e.preventDefault();
+		submitAccountEmail();
+	});
+
+	$(document).on("submit", "#accountCodeForm", function (e) {
+		e.preventDefault();
+		submitAccountCode();
+	});
+
+	$(document).on("click", "#accountSend", function (e) {
+		e.preventDefault();
+		submitAccountEmail();
+	});
+
+	$(document).on("click", "#accountConfirm", function (e) {
+		e.preventDefault();
+		submitAccountCode();
 	});
 
 	$(document).on("input", "#accountCode", function () {
