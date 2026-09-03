@@ -1608,7 +1608,6 @@ $(document).ready(function () {
 		}
 		if (id === "swapListTrainings") {
 			openListTrainingsScreen(true);
-			flipModules(false);
 			return;
 		}
 	});
