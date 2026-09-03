@@ -97,6 +97,12 @@ $(document).ready(function () {
 			purchasesEmpty: en ? "No purchases yet" : "Nenhuma compra ainda",
 			purchasesSubActive: en ? "Java subscription active" : "Mensalidade Java ativa",
 			purchasesLoading: en ? "Loading…" : "Carregando…",
+			saveBackground: en ? "Save background color" : "Salvar cor de fundo",
+			alwaysChangeBackground: en ? "Always change background color" : "Sempre trocar cor de fundo",
+			backgrounds: en ? "Background colors" : "Cores de fundo",
+			backgroundsEmpty: en ? "No saved backgrounds yet" : "Nenhuma cor de fundo salva",
+			backgroundsLoading: en ? "Loading…" : "Carregando…",
+			backgroundSavedOk: en ? "Background saved." : "Cor de fundo salva.",
 			swapTraining: en ? "Switch training" : "Trocar treinamento",
 			swapList: en ? "List trainings" : "Listar treinamentos",
 			swapFav: en ? "Favorites" : "Favoritos",
@@ -117,8 +123,11 @@ $(document).ready(function () {
 
 	function signedFrontHtml(c, shown) {
 		var html = "";
+		var auto = localStorage.getItem("backgroundAuto") !== "false";
+		var bgLabel = auto ? c.saveBackground : c.alwaysChangeBackground;
 		html += "<p class='account-signed-email'>" + escapeHtml(shown) + "</p>";
 		html += "<button type='button' class='account-btn' id='accountSettings'>" + escapeHtml(c.settings) + "</button>";
+		html += "<button type='button' class='account-btn account-btn-ghost' id='saveBackgroundBtn'>" + escapeHtml(bgLabel) + "</button>";
 		return html;
 	}
 
@@ -242,6 +251,7 @@ $(document).ready(function () {
 		$("#accountSettingsBack").text(c.settingsBack);
 		$(".settings-link-label[data-k='myData']").text(c.myData);
 		$(".settings-link-label[data-k='myPurchases']").text(c.myPurchases);
+		$(".settings-link-label[data-k='backgrounds']").text(c.backgrounds);
 		$(".settings-link-label[data-k='idioma']").text(c.idioma);
 	}
 
@@ -250,7 +260,7 @@ $(document).ready(function () {
 	}
 
 	function clearMyDataChrome() {
-		$("body").removeClass("my-data-open my-purchases-open");
+		$("body").removeClass("my-data-open my-purchases-open my-backgrounds-open");
 	}
 
 	function showMyDataMsg(text) {
@@ -297,7 +307,7 @@ $(document).ready(function () {
 		$("#name").text(c.myDataTitle);
 		$("#description").empty();
 		$("#links").empty();
-		$("body").removeClass("my-purchases-open").addClass("my-data-open");
+		$("body").removeClass("my-purchases-open my-backgrounds-open").addClass("my-data-open");
 		requestAnimationFrame(function () {
 			if (seq !== lessonSeq) {
 				return;
@@ -362,7 +372,7 @@ $(document).ready(function () {
 		$("#name").text(c.myPurchases);
 		$("#description").empty();
 		$("#links").empty();
-		$("body").removeClass("my-data-open").addClass("my-purchases-open");
+		$("body").removeClass("my-data-open my-backgrounds-open").addClass("my-purchases-open");
 		requestAnimationFrame(function () {
 			if (seq !== lessonSeq) {
 				return;
@@ -417,6 +427,197 @@ $(document).ready(function () {
 			ensureTrainingsThenRender(me || { purchasedTrainingIds: [], javaSubscriptionActive: false });
 		}).fail(function () {
 			ensureTrainingsThenRender({ purchasedTrainingIds: [], javaSubscriptionActive: false });
+		});
+	}
+
+
+	function syncSaveBackgroundBtn() {
+		var c = accountCopy();
+		var auto = localStorage.getItem("backgroundAuto") !== "false";
+		var label = auto ? c.saveBackground : c.alwaysChangeBackground;
+		$("#saveBackgroundBtn").text(label);
+	}
+
+	function syncBackgroundLocalPrefs(prefs) {
+		if (!prefs) {
+			return;
+		}
+		var auto = prefs.backgroundAuto !== false && prefs.backgroundAuto !== "false";
+		localStorage.setItem("backgroundAuto", auto ? "true" : "false");
+		if (!auto && prefs.pinnedBackgroundId) {
+			localStorage.setItem("backgroundPinnedId", String(prefs.pinnedBackgroundId));
+		} else {
+			localStorage.removeItem("backgroundPinnedId");
+		}
+		if (!auto && prefs.wallpaperData && typeof window.isSafeWallpaper === "function"
+				&& window.isSafeWallpaper(prefs.wallpaperData)) {
+			localStorage.setItem("backgroundPinnedUrl", prefs.wallpaperData);
+			if (typeof window.applyWallpaper === "function") {
+				window.applyWallpaper(prefs.wallpaperData, true);
+			}
+			if (typeof window.syncMenuFromBackground === "function") {
+				window.syncMenuFromBackground();
+			}
+		} else if (auto) {
+			localStorage.removeItem("backgroundPinnedUrl");
+		}
+		syncSaveBackgroundBtn();
+	}
+
+	function loadBackgroundPrefs() {
+		if (!tokenUuid()) {
+			return $.Deferred().resolve(null).promise();
+		}
+		return firewall("/background/v1/prefs", {}).done(function (prefs) {
+			syncBackgroundLocalPrefs(prefs);
+		});
+	}
+
+	var ITALIAN_WOMAN_NAMES = [
+		"Giulia", "Sofia", "Francesca", "Chiara", "Alessandra", "Valentina", "Martina",
+		"Giorgia", "Elena", "Isabella", "Beatrice", "Aurora", "Serena", "Lucia",
+		"Federica", "Greta", "Camilla", "Vittoria", "Ludovica", "Noemi"
+	];
+
+	function colorNameFromRgb(r, g, b, en) {
+		var max = Math.max(r, g, b);
+		var min = Math.min(r, g, b);
+		var l = (max + min) / 2 / 255;
+		var s = max === min ? 0 : (max - min) / (255 - Math.abs(max + min - 255));
+		if (s < 0.12 || l < 0.12 || l > 0.9) {
+			return en ? "Gray" : "Cinza";
+		}
+		var h;
+		var d = max - min;
+		if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) * 60;
+		else if (max === g) h = ((b - r) / d + 2) * 60;
+		else h = ((r - g) / d + 4) * 60;
+		if (h < 15 || h >= 345) return en ? "Red" : "Vermelho";
+		if (h < 40) return en ? "Orange" : "Laranja";
+		if (h < 70) return en ? "Yellow" : "Amarelo";
+		if (h < 160) return en ? "Green" : "Verde";
+		if (h < 255) return en ? "Blue" : "Azul";
+		if (h < 290) return en ? "Purple" : "Roxo";
+		if (h < 345) return en ? "Pink" : "Rosa";
+		if (l < 0.35 && s < 0.45) return en ? "Brown" : "Marrom";
+		return en ? "Gray" : "Cinza";
+	}
+
+	function sampleDominantColor(dataUrl, done) {
+		var img = new Image();
+		img.onload = function () {
+			var canvas = document.createElement("canvas");
+			var w = Math.max(80, Math.min(img.width, 640));
+			var h = Math.max(80, Math.min(img.height, 640));
+			canvas.width = w;
+			canvas.height = h;
+			var ctx = canvas.getContext("2d");
+			ctx.drawImage(img, 0, 0, w, h);
+			var best = { score: -1, r: 255, g: 122, b: 61 };
+			function consider(x, y) {
+				var p = ctx.getImageData(x, y, 1, 1).data;
+				var rr = p[0] / 255, gg = p[1] / 255, bb = p[2] / 255;
+				var mx = Math.max(rr, gg, bb), mn = Math.min(rr, gg, bb);
+				var l = (mx + mn) / 2;
+				var s = mx === mn ? 0 : (mx - mn) / (1 - Math.abs(mx + mn - 1));
+				var score = s * (1 - Math.abs(l - 0.48) * 1.4);
+				if (score > best.score) {
+					best = { score: score, r: p[0], g: p[1], b: p[2] };
+				}
+			}
+			var x, y;
+			for (x = 8; x < w * 0.28; x += 18) {
+				for (y = 8; y < h - 8; y += 22) {
+					consider(x, y);
+				}
+			}
+			for (x = Math.floor(w * 0.4); x < w * 0.7; x += 28) {
+				for (y = Math.floor(h * 0.25); y < h * 0.7; y += 28) {
+					consider(x, y);
+				}
+			}
+			done(best.r, best.g, best.b);
+		};
+		img.onerror = function () {
+			done(255, 122, 61);
+		};
+		img.src = dataUrl;
+	}
+
+	function buildBackgroundName(r, g, b) {
+		var en = localStorage.getItem("language") === "en_US";
+		var color = colorNameFromRgb(r, g, b, en);
+		var name = ITALIAN_WOMAN_NAMES[Math.floor(Math.random() * ITALIAN_WOMAN_NAMES.length)];
+		return color + " " + name;
+	}
+
+	function openBackgroundsScreen(animate) {
+		flipLanguagePanel(false);
+		localStorage.setItem("lessonSource", "my-backgrounds");
+		var c = accountCopy();
+		var seq = ++lessonSeq;
+		var $fields = lessonFields();
+		if (animate) {
+			$fields.addClass("lesson-swap");
+		}
+		var videoEl = document.getElementById("video");
+		if (window.GifPlayer) {
+			window.GifPlayer.mount(videoEl, "", "", "");
+		} else if (videoEl) {
+			videoEl.innerHTML = "";
+		}
+		var html = "";
+		html += "<div class='my-backgrounds-panel'>";
+		html += "<p class='my-backgrounds-status'>" + escapeHtml(c.backgroundsLoading) + "</p>";
+		html += "</div>";
+		if (videoEl) {
+			videoEl.innerHTML = html;
+		}
+		$("#previousAndNextVideo").empty();
+		$("#name").text(c.backgrounds);
+		$("#description").empty();
+		$("#links").empty();
+		$("body").removeClass("my-data-open my-purchases-open").addClass("my-backgrounds-open");
+		requestAnimationFrame(function () {
+			if (seq !== lessonSeq) {
+				return;
+			}
+			$fields.removeClass("lesson-swap");
+		});
+		firewall("/background/v1/list", {}).done(function (rows) {
+			if (seq !== lessonSeq) {
+				return;
+			}
+			var panel = document.querySelector("#video .my-backgrounds-panel");
+			if (!panel) {
+				return;
+			}
+			var c2 = accountCopy();
+			var list = rows || [];
+			if (!list.length) {
+				panel.innerHTML = "<p class='my-backgrounds-empty'>" + escapeHtml(c2.backgroundsEmpty) + "</p>";
+				return;
+			}
+			var parts = [];
+			for (var i = 0; i < list.length; i++) {
+				var row = list[i] || {};
+				var id = row.id || row.backgroundId || "";
+				var name = row.name || id;
+				var swatch = row.dominantColor || "#888";
+				parts.push("<button type='button' class='my-backgrounds-item' data-background-id='" + escapeHtml(String(id)) + "'>");
+				parts.push("<span class='my-backgrounds-swatch' style='background-color:" + escapeHtml(String(swatch)) + "'></span>");
+				parts.push("<span class='my-backgrounds-item-name'>" + escapeHtml(name) + "</span>");
+				parts.push("</button>");
+			}
+			panel.innerHTML = parts.join("");
+		}).fail(function () {
+			if (seq !== lessonSeq) {
+				return;
+			}
+			var panel = document.querySelector("#video .my-backgrounds-panel");
+			if (panel) {
+				panel.innerHTML = "<p class='my-backgrounds-empty'>" + escapeHtml(accountCopy().backgroundsEmpty) + "</p>";
+			}
 		});
 	}
 
@@ -1462,6 +1663,7 @@ $(document).ready(function () {
 			clearCodeMsg();
 			rollInnerToSigned();
 			billingMeCache = null;
+			loadBackgroundPrefs();
 			var current = trainingById(localStorage.getItem("internationalization.training_id"));
 			if (current) {
 				openTraining(current, true);
@@ -1516,6 +1718,10 @@ $(document).ready(function () {
 			openMyPurchasesScreen(true);
 			return;
 		}
+		if (id === "settingsBackgrounds") {
+			openBackgroundsScreen(true);
+			return;
+		}
 		if (id === "settingsIdioma") {
 			flipLanguagePanel(true);
 			return;
@@ -1559,6 +1765,65 @@ $(document).ready(function () {
 		}).fail(ajaxFailed);
 	});
 
+
+	$(document).on("click", "#saveBackgroundBtn", function (e) {
+		e.preventDefault();
+		if (!tokenUuid()) {
+			return;
+		}
+		var auto = localStorage.getItem("backgroundAuto") !== "false";
+		if (!auto) {
+			firewall("/background/v1/setAuto", {}).done(function (prefs) {
+				syncBackgroundLocalPrefs(prefs || { backgroundAuto: true });
+			}).fail(ajaxFailed);
+			return;
+		}
+		var visible = typeof window.getVisibleWallpaperDataUrl === "function"
+			? window.getVisibleWallpaperDataUrl()
+			: "";
+		if (!visible || (typeof window.isSafeWallpaper === "function" && !window.isSafeWallpaper(visible))) {
+			alert(localStorage.getItem("language") === "en_US"
+				? "No background to save."
+				: "Nenhuma cor de fundo para salvar.");
+			return;
+		}
+		sampleDominantColor(visible, function (r, g, b) {
+			var name = buildBackgroundName(r, g, b);
+			var dominant = "rgb(" + r + "," + g + "," + b + ")";
+			firewall("/background/v1/save", {
+				name: name,
+				wallpaperData: visible,
+				dominantColor: dominant
+			}).done(function (saved) {
+				var bgId = saved && (saved.id || saved.backgroundId);
+				if (!bgId) {
+					localStorage.setItem("backgroundAuto", "false");
+					localStorage.setItem("backgroundPinnedUrl", visible);
+					syncSaveBackgroundBtn();
+					return;
+				}
+				firewall("/background/v1/select", { backgroundId: bgId }).done(function (res) {
+					syncBackgroundLocalPrefs(res || {
+						backgroundAuto: false,
+						pinnedBackgroundId: bgId,
+						wallpaperData: visible
+					});
+				}).fail(ajaxFailed);
+			}).fail(ajaxFailed);
+		});
+	});
+
+	$(document).on("click", ".my-backgrounds-item", function (e) {
+		e.preventDefault();
+		var backgroundId = $(this).attr("data-background-id");
+		if (!backgroundId) {
+			return;
+		}
+		firewall("/background/v1/select", { backgroundId: backgroundId }).done(function (res) {
+			syncBackgroundLocalPrefs(res || { backgroundAuto: false, pinnedBackgroundId: backgroundId });
+		}).fail(ajaxFailed);
+	});
+
 	$(document).on("click", "#accountLogout", function (e) {
 		e.preventDefault();
 		localStorage.removeItem("token");
@@ -1566,6 +1831,9 @@ $(document).ready(function () {
 		localStorage.removeItem("userId");
 		localStorage.removeItem("userName");
 		localStorage.removeItem("userAge");
+		localStorage.removeItem("backgroundPinnedId");
+		localStorage.removeItem("backgroundPinnedUrl");
+		localStorage.setItem("backgroundAuto", "true");
 		accountStep = "email";
 		accountEmail = "";
 		accountCodePrefill = "";
@@ -1574,6 +1842,9 @@ $(document).ready(function () {
 	});
 
 	renderAccount();
+	if (tokenUuid()) {
+		loadBackgroundPrefs();
+	}
 
 	loadI18n().done(function () {
 		updateChrome();

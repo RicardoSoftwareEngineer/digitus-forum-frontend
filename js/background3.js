@@ -35,6 +35,14 @@ function asBgImage(dataUrl) {
 	return "url(\"" + value.replace(/"/g, "") + "\")";
 }
 
+function unwrapBgDataUrl(cssUrl) {
+	if (!cssUrl || cssUrl === "null") {
+		return "";
+	}
+	var m = String(cssUrl).match(/url\(\s*(['"]?)(.+?)\1\s*\)/i);
+	return m ? m[2] : String(cssUrl);
+}
+
 function ensureWallpaperLayers() {
 	if (document.getElementById("wallpaperBack")) {
 		return;
@@ -88,9 +96,48 @@ function applyWallpaper(dataUrl, fade) {
 	}, 1000);
 }
 
+function getVisibleWallpaperDataUrl() {
+	var front = document.getElementById("wallpaperFront");
+	var back = document.getElementById("wallpaperBack");
+	var src = "";
+	if (front && front.classList.contains("is-visible") && front.style.backgroundImage) {
+		src = unwrapBgDataUrl(front.style.backgroundImage);
+	}
+	if (!isSafeWallpaper(src) && back && back.style.backgroundImage) {
+		src = unwrapBgDataUrl(back.style.backgroundImage);
+	}
+	if (!isSafeWallpaper(src) && document.body && document.body.style.backgroundImage) {
+		src = unwrapBgDataUrl(document.body.style.backgroundImage);
+	}
+	return isSafeWallpaper(src) ? src : "";
+}
+
+function backgroundAutoEnabled() {
+	return localStorage.getItem("backgroundAuto") !== "false";
+}
+
 var wallpaperHasShown = false;
 
+window.applyWallpaper = applyWallpaper;
+window.getVisibleWallpaperDataUrl = getVisibleWallpaperDataUrl;
+window.isSafeWallpaper = isSafeWallpaper;
+window.backgroundAutoEnabled = backgroundAutoEnabled;
+
 window.advanceBackground = function () {
+	if (!backgroundAutoEnabled()) {
+		var pinned = localStorage.getItem("backgroundPinnedUrl");
+		if (!isSafeWallpaper(pinned)) {
+			pinned = getVisibleWallpaperDataUrl();
+		}
+		if (isSafeWallpaper(pinned)) {
+			applyWallpaper(pinned, wallpaperHasShown);
+			wallpaperHasShown = true;
+			if (typeof window.syncMenuFromBackground === "function") {
+				window.syncMenuFromBackground();
+			}
+		}
+		return;
+	}
 	var ready = localStorage.getItem("backgroundUrl");
 	if (!isSafeWallpaper(ready)) {
 		ready = generateWallpaper();
