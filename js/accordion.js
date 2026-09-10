@@ -353,6 +353,7 @@ $(document).ready(function () {
 			videoEl.innerHTML = html;
 		}
 		$("#previousAndNextVideo").empty();
+		setLessonModuleLabel("");
 		$("#name").text(c.myDataTitle);
 		$("#description").empty();
 		$("#links").empty();
@@ -420,6 +421,7 @@ $(document).ready(function () {
 			videoEl.innerHTML = html;
 		}
 		$("#previousAndNextVideo").empty();
+		setLessonModuleLabel("");
 		$("#name").text(c.myPurchases);
 		$("#description").empty();
 		$("#links").empty();
@@ -507,6 +509,7 @@ $(document).ready(function () {
 			videoEl.innerHTML = html;
 		}
 		$("#previousAndNextVideo").empty();
+		setLessonModuleLabel("");
 		$("#name").text(c.swapTraining);
 		$("#description").empty();
 		$("#links").empty();
@@ -759,6 +762,7 @@ $(document).ready(function () {
 			videoEl.innerHTML = html;
 		}
 		$("#previousAndNextVideo").empty();
+		setLessonModuleLabel("");
 		$("#name").text(c.backgrounds);
 		$("#description").empty();
 		$("#links").empty();
@@ -871,11 +875,40 @@ $(document).ready(function () {
 	}
 
 	function lessonFields() {
-		return $("#name, #description, #links, #video");
+		return $("#lessonModule, #name, #description, #links, #video");
 	}
 
 	var trainingsForLocale = [];
 	var trainingGifOrder = [];
+	var moduleLabelById = {};
+
+	function setLessonModuleLabel(text) {
+		var label = String(text || "").trim();
+		var $el = $("#lessonModule");
+		if (!$el.length) {
+			return;
+		}
+		if (!label) {
+			$el.text("").attr("hidden", true);
+			return;
+		}
+		$el.text(label).removeAttr("hidden");
+	}
+
+	function moduleLabelForId(moduleId) {
+		var id = String(moduleId || "");
+		if (!id) {
+			return "";
+		}
+		if (moduleLabelById[id]) {
+			return moduleLabelById[id];
+		}
+		var $h3 = $("#accordion h3").filter(function () {
+			return $(this).next("div").find("a.trainingGifClick[data-training-module='" + id.replace(/'/g, "\\'") + "']").length;
+		}).first();
+		return $.trim($h3.text() || "");
+	}
+
 
 	function lastVideoKey() {
 		return "guru." + GURU_ID + ".lastVideoId";
@@ -1037,6 +1070,7 @@ $(document).ready(function () {
 			videoEl.appendChild(iframe);
 		}
 		$("#previousAndNextVideo").empty();
+		setLessonModuleLabel("");
 		$("#name").text(pageTitle(page));
 		$("#description").empty();
 		$("#links").empty();
@@ -1054,16 +1088,19 @@ $(document).ready(function () {
 			$acc.accordion("destroy");
 		}
 		trainingGifOrder = [];
+		moduleLabelById = {};
 		var videoId = localStorage.getItem("trainingVideoId");
 		var moduleId = localStorage.getItem("trainingModuleId");
 		var active = 0;
 		var html = "";
 		for (var i = 0; i < modules.length; i++) {
 			var m = modules[i];
+			var modLabel = (i18("module") || "Módulo") + " " + (m.number || "") + " · " + (m.name || "");
+			moduleLabelById[String(m.moduleId)] = modLabel;
 			if (String(m.moduleId) === String(moduleId)) {
 				active = i;
 			}
-			html += "<h3 class='" + (String(m.moduleId) === String(moduleId) ? "selectedModule" : "") + "'>" + escapeHtml(i18("module")) + " " + escapeHtml(m.number) + " · " + escapeHtml(m.name) + "</h3>";
+			html += "<h3 class='" + (String(m.moduleId) === String(moduleId) ? "selectedModule" : "") + "'>" + escapeHtml(modLabel) + "</h3>";
 			html += "<div class='module-panel'><ul class='module-lessons'>";
 			var videos = m.videos || [];
 			for (var j = 0; j < videos.length; j++) {
@@ -1400,6 +1437,7 @@ $(document).ready(function () {
 			nav += "<a id='nextVideo' href='#'>" + escapeHtml(i18("next_video") || "Next") + "</a>";
 		}
 		$("#previousAndNextVideo").html(nav);
+		setLessonModuleLabel(moduleLabelForId(localStorage.getItem("trainingModuleId") || localStorage.getItem("moduleId")));
 		$("#name").text(video.name || "");
 		$("#description").text(video.description || "");
 		var links = "";
