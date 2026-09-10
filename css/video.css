@@ -1009,7 +1009,10 @@ body.layout-cinema #video .list-trainings-panel .list-trainings-item {
 }
 
 body.layout-cinema #video .list-trainings-panel .list-trainings-item:hover {
-	border-color: var(--accent-show);
+	border-color: rgba(255, 255, 255, 0.92);
+	background: rgba(255, 255, 255, 0.20);
+	/* +1px visual sem layout shift */
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
 }
 
 body.layout-cinema #video .list-trainings-panel .list-trainings-item-top {
