@@ -865,6 +865,46 @@ $(document).ready(function () {
 		return "guru." + GURU_ID + ".lastModuleId";
 	}
 
+	function lastVideoKeyForTraining(trainingId) {
+		var tid = String(trainingId || localStorage.getItem("internationalization.training_id") || "");
+		if (!tid) {
+			return lastVideoKey();
+		}
+		return "guru." + GURU_ID + ".training." + tid + ".lastVideoId";
+	}
+
+	function lastModuleKeyForTraining(trainingId) {
+		var tid = String(trainingId || localStorage.getItem("internationalization.training_id") || "");
+		if (!tid) {
+			return lastModuleKey();
+		}
+		return "guru." + GURU_ID + ".training." + tid + ".lastModuleId";
+	}
+
+	function lessonInModules(modules, videoId) {
+		if (!modules || !videoId) {
+			return null;
+		}
+		for (var i = 0; i < modules.length; i++) {
+			var videos = modules[i].videos || [];
+			for (var j = 0; j < videos.length; j++) {
+				if (String(videos[j].videoId) === String(videoId)) {
+					return { videoId: videos[j].videoId, moduleId: modules[i].moduleId };
+				}
+			}
+		}
+		return null;
+	}
+
+	function resumeOrFirstLesson(modules, trainingId) {
+		var lastVid = localStorage.getItem(lastVideoKeyForTraining(trainingId));
+		var hit = lessonInModules(modules, lastVid);
+		if (hit) {
+			return hit;
+		}
+		return firstLesson(modules);
+	}
+
 	function titleFromSrc(src) {
 		var name = String(src || "").split("?")[0].split("/").pop() || "";
 		name = name.replace(/\.html$/i, "").replace(/[-_]+/g, " ").trim();
@@ -1250,6 +1290,8 @@ $(document).ready(function () {
 	function openTraining(training, goToFirst) {
 		applyTrainingMeta(training);
 		fillTrainingPicker(trainingsForLocale, training.trainingId);
+		flipModules(false);
+		$("body").removeClass("list-trainings-open my-purchases-open my-data-open my-backgrounds-open");
 		return ensureTrainingAccess(training).done(function (owned) {
 			if (!owned) {
 				return;
@@ -1257,9 +1299,9 @@ $(document).ready(function () {
 			hidePaidLock();
 			return loadModules().done(function (modules) {
 				if (goToFirst) {
-					var first = firstLesson(modules);
-					if (first) {
-						goToLesson(first.videoId, first.moduleId, true, "training");
+					var lesson = resumeOrFirstLesson(modules, training.trainingId);
+					if (lesson) {
+						goToLesson(lesson.videoId, lesson.moduleId, true, "training");
 					}
 				}
 			});
@@ -1410,6 +1452,11 @@ $(document).ready(function () {
 			localStorage.setItem("trainingModuleId", moduleId || "");
 			localStorage.setItem(lastVideoKey(), videoId);
 			localStorage.setItem(lastModuleKey(), moduleId || "");
+			var tid = localStorage.getItem("internationalization.training_id");
+			if (tid) {
+				localStorage.setItem(lastVideoKeyForTraining(tid), videoId);
+				localStorage.setItem(lastModuleKeyForTraining(tid), moduleId || "");
+			}
 		}
 		localStorage.setItem("isTraining", "true");
 		if (changed && typeof window.advanceBackground === "function") {
