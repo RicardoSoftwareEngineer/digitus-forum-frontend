@@ -1139,34 +1139,105 @@ body.layout-cinema .modules .topic-nav li.selectedNav a {
 	box-shadow: none;
 }
 
+/* Cards oficiais (mesmo visual de Buscar treinamentos) no menu de módulos */
+body.layout-cinema .modules #accordion {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
 body.layout-cinema .modules #accordion h3,
 body.layout-cinema .modules #accordion .h3,
 body.layout-cinema .modules #accordion .ui-accordion-header {
-	background: rgba(255, 255, 255, 0.14);
+	margin: 0;
+	padding: 10px 12px;
+	border-radius: 8px;
+	border: 1px solid var(--glass-border);
+	background: rgba(255, 255, 255, 0.10);
 	color: #fff;
+	box-shadow: none;
 	cursor: pointer;
 }
 
-body.layout-cinema .modules #accordion h3.selectedModule {
-	background: rgba(255, 255, 255, 0.24);
+body.layout-cinema .modules #accordion h3:hover,
+body.layout-cinema .modules #accordion .ui-accordion-header:hover {
+	border-color: rgba(255, 255, 255, 0.92);
+	background: rgba(255, 255, 255, 0.20);
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+}
+
+body.layout-cinema .modules #accordion h3.selectedModule,
+body.layout-cinema .modules #accordion h3.ui-state-active,
+body.layout-cinema .modules #accordion .ui-accordion-header.ui-state-active {
+	border-color: rgba(255, 255, 255, 0.92);
+	background: rgba(255, 255, 255, 0.20);
 	color: #fff;
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+}
+
+body.layout-cinema .modules #accordion .ui-accordion-content,
+body.layout-cinema .modules #accordion > div {
+	padding: 8px 0 0;
+	border: none;
+	background: transparent;
+	margin: 0;
+}
+
+body.layout-cinema .modules #accordion ul {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+body.layout-cinema .modules #accordion li a {
+	display: block;
+	box-sizing: border-box;
+	padding: 10px 12px;
+	border-radius: 8px;
+	border: 1px solid var(--glass-border);
+	background: rgba(255, 255, 255, 0.10);
+	color: #fff;
+	text-decoration: none;
+	font-size: 13px;
+	font-weight: 400;
 }
 
 body.layout-cinema .modules #accordion li a:hover {
-	background: rgba(255, 255, 255, 0.14);
+	border-color: rgba(255, 255, 255, 0.92);
+	background: rgba(255, 255, 255, 0.20);
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
 	color: #fff;
+	text-decoration: none;
 }
 
 body.layout-cinema .modules #accordion li.selectedGif a {
-	background: rgba(255, 255, 255, 0.24);
+	border-color: rgba(255, 255, 255, 0.92);
+	background: rgba(255, 255, 255, 0.20);
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
 	color: #fff;
+	font-weight: 700;
+}
+
+body.layout-cinema .modules #swapTrainingBtn {
+	border: 1px solid var(--glass-border);
+	background: rgba(255, 255, 255, 0.10);
+	border-radius: 8px;
+}
+
+body.layout-cinema .modules #swapTrainingBtn:hover {
+	border-color: rgba(255, 255, 255, 0.92);
+	background: rgba(255, 255, 255, 0.20);
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
 }
 
 body.layout-cinema .modules .account-btn,
-body.layout-cinema .modules .settings-footer .account-btn,
-body.layout-cinema .modules #swapTrainingBtn {
+body.layout-cinema .modules .settings-footer .account-btn {
 	background: rgba(255, 255, 255, 0.24);
 	border-color: transparent;
+	color: #fff;
+}
+
+body.layout-cinema .modules #swapTrainingBtn {
 	color: #fff;
 }
 
