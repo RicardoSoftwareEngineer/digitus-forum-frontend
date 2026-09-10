@@ -1162,8 +1162,36 @@ body.layout-cinema .modules #accordion .moduleDescription {
 	color: rgba(255, 255, 255, 0.55);
 }
 
-body.layout-cinema .modules #accordion ul {
-	margin-left: 10px;
+body.layout-cinema .modules #accordion .moduleDescription {
+	display: none;
+}
+
+body.layout-cinema .modules #accordion .module-panel {
+	padding: 6px 0 2px;
+}
+
+body.layout-cinema .modules #accordion ul.module-lessons {
+	position: relative;
+	margin: 0 0 0 12px;
+	padding: 0 0 0 14px;
+	border-left: 1px solid rgba(255, 255, 255, 0.35);
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+body.layout-cinema .modules #accordion ul.module-lessons > li {
+	position: relative;
+}
+
+body.layout-cinema .modules #accordion ul.module-lessons > li::before {
+	content: "";
+	position: absolute;
+	left: -14px;
+	top: 50%;
+	width: 12px;
+	height: 1px;
+	background: rgba(255, 255, 255, 0.35);
 }
 
 body.layout-cinema .modules #accordion li a {
@@ -1226,6 +1254,8 @@ body.layout-cinema .modules #accordion ul {
 	flex-direction: column;
 	gap: 8px;
 }
+
+/* tree connectors live on ul.module-lessons */
 
 body.layout-cinema .modules #accordion li a {
 	display: block;

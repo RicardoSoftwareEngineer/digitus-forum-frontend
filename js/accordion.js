@@ -1064,7 +1064,7 @@ $(document).ready(function () {
 				active = i;
 			}
 			html += "<h3 class='" + (String(m.moduleId) === String(moduleId) ? "selectedModule" : "") + "'>" + escapeHtml(i18("module")) + " " + escapeHtml(m.number) + " · " + escapeHtml(m.name) + "</h3>";
-			html += "<div><p class='moduleDescription'>" + escapeHtml(m.description || "") + "</p><ul>";
+			html += "<div class='module-panel'><ul class='module-lessons'>";
 			var videos = m.videos || [];
 			for (var j = 0; j < videos.length; j++) {
 				var v = videos[j];
