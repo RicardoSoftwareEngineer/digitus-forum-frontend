@@ -1052,6 +1052,12 @@ body.layout-cinema #video .list-trainings-panel .list-trainings-badge-paid {
 	background: rgba(255, 122, 61, 0.35);
 }
 
+body.layout-cinema #video .list-trainings-panel .list-trainings-badge-free {
+	color: #fff;
+	border-color: rgba(46, 204, 113, 0.95);
+	background: rgba(46, 204, 113, 0.35);
+}
+
 /* TEST-CINEMA-MENU-TINT: both menus = white glass soft 0.14 / stronger 0.24. No --accent-show on these chips. */
 body.layout-cinema .sidebar .sidebar-icon,
 body.layout-cinema .sidebar .brand-head:hover .sidebar-icon {
