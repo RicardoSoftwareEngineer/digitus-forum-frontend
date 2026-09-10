@@ -103,7 +103,7 @@ $(document).ready(function () {
 			backgroundsEmpty: en ? "No saved backgrounds yet" : "Nenhuma cor de fundo salva",
 			backgroundsLoading: en ? "Loading…" : "Carregando…",
 			backgroundSavedOk: en ? "Background saved." : "Cor de fundo salva.",
-			swapTraining: en ? "Switch training" : "Trocar treinamento",
+			swapTraining: en ? "Search trainings" : "Buscar treinamentos",
 			swapList: en ? "List trainings" : "Listar treinamentos",
 			swapFav: en ? "Favorites" : "Favoritos",
 			swapBuy: en ? "Purchases" : "Compras",
@@ -507,7 +507,7 @@ $(document).ready(function () {
 			videoEl.innerHTML = html;
 		}
 		$("#previousAndNextVideo").empty();
-		$("#name").text(c.swapList);
+		$("#name").text(c.swapTraining);
 		$("#description").empty();
 		$("#links").empty();
 		$("body").removeClass("my-data-open my-purchases-open my-backgrounds-open").addClass("list-trainings-open");
@@ -1652,7 +1652,7 @@ $(document).ready(function () {
 	$(document).on("click", "#swapTrainingBtn", function (e) {
 		e.preventDefault();
 		closeTrainingPicker();
-		flipModules(true);
+		openListTrainingsScreen(true);
 	});
 
 	$(document).on("click", "#swapTrainingBack", function (e) {
