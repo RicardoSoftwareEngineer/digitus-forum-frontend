@@ -959,10 +959,24 @@ body.layout-cinema #video .list-trainings-panel .list-trainings-search {
 	-webkit-appearance: none;
 	appearance: none;
 	outline: none;
-	color: inherit;
+	color: #fff;
 	font: inherit;
 	font-size: 13px;
 	flex-shrink: 0;
+}
+
+body.layout-cinema #video .list-trainings-panel .list-trainings-search::placeholder {
+	color: rgba(255, 255, 255, 0.72);
+	opacity: 1;
+}
+
+body.layout-cinema #video .list-trainings-panel .list-trainings-search::-webkit-input-placeholder {
+	color: rgba(255, 255, 255, 0.72);
+}
+
+body.layout-cinema #video .list-trainings-panel .list-trainings-search::-moz-placeholder {
+	color: rgba(255, 255, 255, 0.72);
+	opacity: 1;
 }
 
 body.layout-cinema #video .list-trainings-panel .list-trainings-search:hover,
