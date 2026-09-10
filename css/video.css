@@ -1139,6 +1139,44 @@ body.layout-cinema .modules .topic-nav li.selectedNav a {
 	box-shadow: none;
 }
 
+/* Hierarquia título (módulo) × subtítulo (descrição) × aula */
+body.layout-cinema .modules .modules-title {
+	color: #fff;
+	font-weight: 700;
+	opacity: 1;
+}
+
+body.layout-cinema .modules #accordion h3,
+body.layout-cinema .modules #accordion .h3,
+body.layout-cinema .modules #accordion .ui-accordion-header {
+	font-weight: 700;
+	color: #fff;
+}
+
+body.layout-cinema .modules #accordion .moduleDescription {
+	margin: 0 0 8px;
+	padding: 0 2px;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 1.35;
+	color: rgba(255, 255, 255, 0.55);
+}
+
+body.layout-cinema .modules #accordion ul {
+	margin-left: 10px;
+}
+
+body.layout-cinema .modules #accordion li a {
+	font-weight: 500;
+	font-size: 13px;
+	color: rgba(255, 255, 255, 0.92);
+}
+
+body.layout-cinema .modules #accordion li.selectedGif a {
+	font-weight: 700;
+	color: #fff;
+}
+
 /* Cards oficiais (mesmo visual de Buscar treinamentos) no menu de módulos */
 body.layout-cinema .modules #accordion {
 	display: flex;
