@@ -531,6 +531,16 @@ $(document).ready(function () {
 			}
 			return s.slice(0, 117).replace(/\s+\S*$/, "") + "…";
 		}
+		function focusListSearch() {
+			var el = document.getElementById("listTrainingsSearch");
+			if (!el) {
+				return;
+			}
+			el.focus();
+			if (typeof el.select === "function" && el.value) {
+				el.select();
+			}
+		}
 		function renderList(trainings, query) {
 			if (seq !== lessonSeq) {
 				return;
@@ -546,8 +556,9 @@ $(document).ready(function () {
 				var t = trainings[i] || {};
 				var name = t.name || String(t.trainingId || "");
 				var sinopse = t.sinopse || "";
+				var description = t.description || "";
 				if (q) {
-					var hay = (name + " " + sinopse).toLowerCase();
+					var hay = (name + " " + sinopse + " " + description).toLowerCase();
 					if (hay.indexOf(q) === -1) {
 						continue;
 					}
@@ -571,26 +582,35 @@ $(document).ready(function () {
 			}
 		}
 		function paint(trainings) {
-			renderList(trainings, $("#listTrainingsSearch").val());
-			$("#listTrainingsSearch").off("input.listTrainings").on("input.listTrainings", function () {
-				renderList(trainings, $(this).val());
+			var list = trainings || [];
+			renderList(list, $("#listTrainingsSearch").val());
+			$("#listTrainingsSearch").off("input.listTrainings keyup.listTrainings").on("input.listTrainings keyup.listTrainings", function () {
+				renderList(list, $(this).val());
+			});
+			requestAnimationFrame(function () {
+				if (seq !== lessonSeq) {
+					return;
+				}
+				focusListSearch();
 			});
 		}
+		// Catálogo em memória → filtro local instantâneo; refresh em background.
 		if (trainingsForLocale && trainingsForLocale.length) {
-			paint(trainingsForLocale);
-			return;
+			paint(trainingsForLocale.slice());
 		}
 		loadTrainings().done(function (trainings) {
 			trainingsForLocale = trainings || [];
 			if (seq !== lessonSeq) {
 				return;
 			}
-			paint(trainingsForLocale);
+			paint(trainingsForLocale.slice());
 		}).fail(function () {
 			if (seq !== lessonSeq) {
 				return;
 			}
-			paint([]);
+			if (!(trainingsForLocale && trainingsForLocale.length)) {
+				paint([]);
+			}
 		});
 	}
 
