@@ -1167,7 +1167,8 @@ body.layout-cinema .modules #accordion .moduleDescription {
 }
 
 body.layout-cinema .modules #accordion .module-panel {
-	padding: 6px 0 2px;
+	/* mesmo respiro da horizontal→card (~2px) */
+	padding: 2px 0 2px;
 }
 
 body.layout-cinema .modules #accordion ul.module-lessons {
@@ -1243,7 +1244,7 @@ body.layout-cinema .modules #accordion .ui-accordion-header.ui-state-active {
 
 body.layout-cinema .modules #accordion .ui-accordion-content,
 body.layout-cinema .modules #accordion > div {
-	padding: 8px 0 0;
+	padding: 0;
 	border: none;
 	background: transparent;
 	margin: 0;
