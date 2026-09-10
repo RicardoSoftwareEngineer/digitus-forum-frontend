@@ -32,7 +32,7 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
 ## REGRA
 - REGRA-MVP1-PAY: provedor = Stripe **Embedded** Checkout (`ui_mode=embedded`). Avulso `mode=payment` (`card` só até PIX no Dashboard). Mensalidade `mode=subscription` (`card` só). Sem redirect pra stripe.com. `pk_test_` só via CONTRATO-STRIPE-PK.
 - REGRA-MVP1-STRIPE-TEST: só `sk_test_` / `pk_test_` (e webhook secret de test) no env. Dashboard em Test mode. Cartão `4242…`. Sem dinheiro real. Live só quando Ricardo pedir.
-- REGRA-MVP1-SUB-JAVA: assinatura ativa (mensalidade Java R$ 59; Stripe `price_` depois) → acesso a trainings **pagos** do guru `java`. Gratuitos continuam públicos.
+- REGRA-MVP1-SUB-JAVA: assinatura ativa (mensalidade Java R$ 60; Stripe `price_` depois) → acesso a trainings **pagos** do guru `java`. Gratuitos continuam públicos.
 - REGRA-MVP1-AVULSO: compra avulsa → acesso àquele `trainingId` (pago). Preço avulso = `DADOS-TRAINING.price` daquele training (centavos BRL). Independente da mensalidade.
 - REGRA-MVP1-LISTA: aluno logado vê lista dos trainings que comprou avulso + flag da assinatura java.
 - REGRA-MVP1-GURU-SHOW: UI mostra um guru (`java`). Sistema aceita N gurus.
@@ -41,13 +41,13 @@ fonte: este arquivo é o recorte do produto até o MVP1. SPEC.md de cada repo co
 - REGRA-MVP1-OPEN: ao abrir o guru: último vídeo assistido daquele guru (client) **ou**, se não houver, a primeira página da esquerda.
 - REGRA-MVP1-AUDIO: aula = `gif` + áudio. Path áudio: `buckets/digitus-forum-media/videos/{videoId}.m4a`. Front baixa o arquivo **inteiro** antes de tocar. Gzip na hora **não**. Compactar = encode em disco (m4a/opus), não no request.
 - REGRA-MVP1-WEBHOOK: webhook verificado se `STRIPE_WEBHOOK_SECRET` (senão 503). Confirmação local = CONTRATO-STRIPE-CONFIRM (retrieve session) para não depender de URL pública.
-- REGRA-MVP1-UX: Comprar (avulso) e Assinar (R$ 59, mensalidade java) no vidro do pago. Abre Embedded Checkout **na nossa página** (overlay de vidro no centro; não estica o cinema). Sem form nosso, sem senha, sem conta Stripe, sem `pk_test_` no repo. PIX off até Dashboard.
+- REGRA-MVP1-UX: Comprar (avulso) e Assinar (R$ 60, mensalidade java) no vidro do pago. Abre Embedded Checkout **na nossa página** (overlay de vidro no centro; não estica o cinema). Sem form nosso, sem senha, sem conta Stripe, sem `pk_test_` no repo. PIX off até Dashboard.
 - REGRA-MVP1-TRUST: aviso pequeno acima do embed (i18n `billing_trust_line`): «O Digitus Forum não salva nem recebe o número do cartão. O pagamento vai direto para a Stripe, uma das maiores processadoras de cartões do mundo.» Marca: **Stripe** (não “Strype”).
 
 ## DADOS (MVP1)
 | id | onde | campos |
 |---|---|---|
-| DADOS-ASSINATURA | user MS | id, userId, scope=`guru`, guruId (`java` no MVP1), stripeCustomerId, stripeSubscriptionId, status (active/canceled/past_due), deleted. Mensalidade Java = R$ 59 (5900 centavos BRL); Stripe `price_` depois. |
+| DADOS-ASSINATURA | user MS | id, userId, scope=`guru`, guruId (`java` no MVP1), stripeCustomerId, stripeSubscriptionId, status (active/canceled/past_due), deleted. Mensalidade Java = R$ 60 (6000 centavos BRL); Stripe `price_` depois. |
 | DADOS-COMPRA | user MS | id, userId, trainingId, stripeCheckoutSessionId, stripePaymentIntentId, status paid, createdIn |
 | DADOS-TRAINING | course MS | guruId (string, MVP1=`java`), paid (boolean), price (integer centavos BRL, avulso daquele training). Gratuito = paid=false AND price=0. Java Junior = gratuito. |
 | DADOS-GURU-PAGE | course MS | guruPageId, guruId, titleKey (i18n `keyy`), src (path estático), position, deleted |
@@ -72,3 +72,13 @@ Quem grava página/guru: operador, SQL **local**. Sem CONTRATO de escrita públi
 - GAP-AUDIO: **revogado como “não sabemos o path”**. Path fechado. Código do player ainda não toca: isso é alinhamento, não GAP de produto.
 - GAP-COMPRA: **revogado**. DADOS-COMPRA / DADOS-ASSINATURA no user MS.
 - GAP-GURU-NAV: ainda aberto (path vs seletor). MVP1 mostra só java, não bloqueia.
+
+## DADOS-CATALOG-LAUNCH (front, 2026-09-10)
+Vitrine = course `retrieveAll` (**top 9**). Catálogo seed local:
+- Java Junior (grátis, grande)
+- Java Pleno (R$ 300)
+- 3 curtos grátis (~10 min)
+- 3 curtos R$ 10
+- Java Senior teaser `[Em breve]` (grátis até o lançamento)
+Esteira (roadmap) ainda **não** aparece na UI (GAP-CATALOG-ROADMAP no course SPEC). Listar treinamentos já lista o que `retrieveAll`/busca devolver.
+Stripe avulso/mensalidade: ver firewall SPEC (GAPs de price_).
