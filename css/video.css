@@ -965,9 +965,12 @@ body.layout-cinema #video .list-trainings-panel .list-trainings-search {
 	flex-shrink: 0;
 }
 
+body.layout-cinema #video .list-trainings-panel .list-trainings-search:hover,
 body.layout-cinema #video .list-trainings-panel .list-trainings-search:focus {
 	outline: none;
-	border-color: rgba(255, 255, 255, 0.42);
+	border-color: rgba(255, 255, 255, 0.92);
+	background: rgba(255, 255, 255, 0.20);
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
 }
 
 body.layout-cinema #video .list-trainings-panel .list-trainings-search::-webkit-search-decoration,
