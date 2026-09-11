@@ -80,5 +80,5 @@ Vitrine = course `retrieveAll` (**top 9**). Catálogo seed local:
 - 3 curtos grátis (~10 min)
 - 3 curtos R$ 10
 - Java Senior teaser `[Em breve]` (grátis até o lançamento)
-Esteira (roadmap) ainda **não** aparece na UI (GAP-CATALOG-ROADMAP no course SPEC). Listar treinamentos já lista o que `retrieveAll`/busca devolver.
+Esteira (roadmap) na UI: link **Esteira de treinamentos** no flip direito + tela centro com ordem estática (MVP1 client; fecha metade front de GAP-CATALOG-ROADMAP). Listar treinamentos já lista o que `retrieveAll`/busca devolver.
 Stripe avulso/mensalidade: ver firewall SPEC (GAPs de price_).
