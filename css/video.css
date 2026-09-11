@@ -1466,6 +1466,7 @@ body.layout-cinema .modules #accordion li.selectedGif a {
 
 body.layout-cinema .modules #swapTrainingBtn {
 	padding: 10px 12px;
+	margin: 1px;
 	border: 1px solid var(--glass-border);
 	background: rgba(255, 255, 255, 0.10);
 	border-radius: 8px;
@@ -1476,9 +1477,9 @@ body.layout-cinema .modules #swapTrainingBtn {
 body.layout-cinema .modules #swapTrainingBtn:hover {
 	border-color: rgba(255, 255, 255, 0.92);
 	background: rgba(255, 255, 255, 0.20);
-	box-shadow: none;
-	outline: 1px solid rgba(255, 255, 255, 0.92);
-	outline-offset: -1px;
+	/* borda grossa (= Sobre): borda + anel */
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	outline: none;
 }
 
 body.layout-cinema .modules .account-btn,
