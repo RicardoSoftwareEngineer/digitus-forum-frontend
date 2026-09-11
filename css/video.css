@@ -1244,41 +1244,48 @@ body.layout-cinema .modules #accordion {
 
 body.layout-cinema .modules #accordion h3,
 body.layout-cinema .modules #accordion .h3,
-body.layout-cinema .modules #accordion .ui-accordion-header {
+body.layout-cinema .modules #accordion .ui-accordion-header,
+body.layout-cinema .modules #accordion .ui-accordion-header.ui-corner-top,
+body.layout-cinema .modules #accordion .ui-accordion-header.ui-corner-all {
 	margin: 0;
 	padding: 10px 12px;
-	border-radius: 8px;
-	border: 1px solid var(--glass-border);
+	/* jQuery UI troca ui-corner-all → ui-corner-top no ativo e “come” a borda de baixo */
+	border-radius: 8px !important;
+	border: 1px solid var(--glass-border) !important;
 	background: rgba(255, 255, 255, 0.10);
+	background-image: none !important;
 	color: #fff;
 	box-shadow: none;
 	cursor: pointer;
+	position: relative;
+	z-index: 1;
 }
 
 body.layout-cinema .modules #accordion h3:hover,
 body.layout-cinema .modules #accordion .ui-accordion-header:hover {
-	border-color: rgba(255, 255, 255, 0.92);
+	border-color: rgba(255, 255, 255, 0.92) !important;
 	background: rgba(255, 255, 255, 0.20);
 	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
 }
 
 /* selectedModule = aula atual em outro módulo — não competir com o clicado */
 body.layout-cinema .modules #accordion h3.selectedModule {
-	border-color: var(--glass-border);
+	border-color: var(--glass-border) !important;
 	background: rgba(255, 255, 255, 0.10);
 	color: #fff;
 	box-shadow: none;
 }
 
-/* só o módulo expandido/clicado fica “ativado” */
+/* só o módulo expandido/clicado fica “ativado” — mesma grossura das aulas */
 body.layout-cinema .modules #accordion h3.ui-state-active,
 body.layout-cinema .modules #accordion .ui-accordion-header.ui-state-active,
 body.layout-cinema .modules #accordion h3.ui-state-active.selectedModule,
 body.layout-cinema .modules #accordion .ui-accordion-header.ui-state-active.selectedModule {
-	border-color: rgba(255, 255, 255, 0.92);
+	border-color: rgba(255, 255, 255, 0.92) !important;
 	background: rgba(255, 255, 255, 0.20);
 	color: #fff;
 	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	z-index: 2;
 }
 
 body.layout-cinema .modules #accordion .ui-accordion-content,
