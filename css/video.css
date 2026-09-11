@@ -1183,14 +1183,15 @@ body.layout-cinema .modules #accordion .moduleDescription {
 }
 
 body.layout-cinema .modules #accordion .module-panel {
-	/* mesmo respiro da horizontal→card (~2px) */
+	/* vão vertical ≈ vão horizontal (~2px) */
 	padding: 2px 0 2px;
 }
 
 body.layout-cinema .modules #accordion ul.module-lessons {
 	position: relative;
-	margin: 0 0 0 12px;
-	padding: 0 0 0 14px;
+	/* vertical encostada nos cards: padding = comprimento do traço + 2px */
+	margin: 0 0 0 18px;
+	padding: 0 0 0 8px;
 	border-left: 1px solid rgba(255, 255, 255, 0.35);
 	display: flex;
 	flex-direction: column;
@@ -1204,9 +1205,9 @@ body.layout-cinema .modules #accordion ul.module-lessons > li {
 body.layout-cinema .modules #accordion ul.module-lessons > li::before {
 	content: "";
 	position: absolute;
-	left: -14px;
+	left: -8px;
 	top: 50%;
-	width: 12px;
+	width: 6px;
 	height: 1px;
 	background: rgba(255, 255, 255, 0.35);
 }
@@ -1249,9 +1250,19 @@ body.layout-cinema .modules #accordion .ui-accordion-header:hover {
 	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
 }
 
-body.layout-cinema .modules #accordion h3.selectedModule,
+/* selectedModule = aula atual em outro módulo — não competir com o clicado */
+body.layout-cinema .modules #accordion h3.selectedModule {
+	border-color: var(--glass-border);
+	background: rgba(255, 255, 255, 0.10);
+	color: #fff;
+	box-shadow: none;
+}
+
+/* só o módulo expandido/clicado fica “ativado” */
 body.layout-cinema .modules #accordion h3.ui-state-active,
-body.layout-cinema .modules #accordion .ui-accordion-header.ui-state-active {
+body.layout-cinema .modules #accordion .ui-accordion-header.ui-state-active,
+body.layout-cinema .modules #accordion h3.ui-state-active.selectedModule,
+body.layout-cinema .modules #accordion .ui-accordion-header.ui-state-active.selectedModule {
 	border-color: rgba(255, 255, 255, 0.92);
 	background: rgba(255, 255, 255, 0.20);
 	color: #fff;
