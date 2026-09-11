@@ -1763,3 +1763,17 @@ body.layout-cinema #video .esteira-panel .esteira-badge-next {
 	border-color: rgba(255, 255, 255, 0.35);
 	color: #fff;
 }
+
+
+/* cabeçalhos de treinamento: só título + subtítulo (sem coluna de ícone) */
+body.layout-cinema .sidebar #leftAccordion > .brand-head .sidebar-icon,
+body.layout-cinema .modules #trainingPickerBtn .sidebar-icon,
+body.layout-cinema .modules .training-picker-list .sidebar-icon {
+	display: none;
+}
+
+body.layout-cinema .sidebar #leftAccordion > .brand-head,
+body.layout-cinema .modules #trainingPickerBtn.brand-head {
+	min-height: 0;
+	gap: 0;
+}

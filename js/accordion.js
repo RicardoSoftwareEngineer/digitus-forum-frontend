@@ -1142,7 +1142,6 @@ $(document).ready(function () {
 		var desc = (i18("guru_java_sinopse") || "Vitrine") + " com texto longo de teste: segunda linha da sinopse do guru e uma terceira linha pra estressar o layout";
 		var selectedSrc = localStorage.getItem("guruPageSrc") || "";
 		var html = "<div class='sidebar-head brand-head'>";
-		html += "<div class='sidebar-icon'>☕</div>";
 		html += "<div><h2>" + escapeHtml(title) + "</h2><p>" + escapeHtml(desc) + "</p></div>";
 		html += "</div><ul class='topic-nav'>";
 		for (var i = 0; i < guruPages.length; i++) {
@@ -1336,7 +1335,7 @@ $(document).ready(function () {
 			var c = trainingsForLocale[i];
 			var current = String(c.trainingId) === String(selected && selected.trainingId) ? " is-current" : "";
 			html += "<li><button type='button' class='" + current.trim() + "' data-training='" + escapeHtml(c.trainingId) + "'>";
-			html += "<div class='sidebar-icon'>🎓</div><div><h2>" + escapeHtml(c.name || "") + "</h2><p>" + escapeHtml(c.sinopse || "") + "</p></div>";
+			html += "<div><h2>" + escapeHtml(c.name || "") + "</h2><p>" + escapeHtml(c.sinopse || "") + "</p></div>";
 			html += "</button></li>";
 		}
 		$("#trainingPickerList").html(html);
