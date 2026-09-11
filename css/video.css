@@ -1011,14 +1011,13 @@ body.layout-cinema #video .list-trainings-panel .list-trainings-search {
 	box-sizing: border-box;
 	padding: 10px 12px;
 	border-radius: 8px;
-	border: 1px solid rgba(255, 255, 255, 0.92);
+	border: 1px solid var(--glass-border);
 	background: rgba(255, 255, 255, 0.10);
 	background-clip: padding-box;
 	-webkit-appearance: none;
 	appearance: none;
 	outline: none;
-	/* borda grossa padrão (= Sobre): borda + anel */
-	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	box-shadow: none;
 	color: #fff;
 	font: inherit;
 	font-size: 13px;
