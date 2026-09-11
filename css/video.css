@@ -1,11 +1,20 @@
 /* Cinema: gif no palco, menus em gavetas de vidro por cima do fundo. */
 
+/* evita barra de rolagem da página quando o conteúdo cabe (100vh + padding estourava) */
+html:has(body.layout-cinema),
+body.layout-cinema {
+	height: 100%;
+	overflow: hidden;
+}
+
 body.layout-cinema .lesson-shell {
 	display: block;
 	position: relative;
-	min-height: 100vh;
+	box-sizing: border-box;
+	height: 100%;
+	min-height: 0;
 	padding: 14px 18px 22px;
-	overflow: visible;
+	overflow: hidden;
 }
 
 body.layout-cinema #backgroundBlur {
@@ -15,12 +24,16 @@ body.layout-cinema #backgroundBlur {
 
 body.layout-cinema .center-col {
 	width: min(1320px, 100%);
+	height: 100%;
 	margin: 0 auto;
 	align-self: stretch;
+	min-height: 0;
+	box-sizing: border-box;
 }
 
 body.layout-cinema .lesson-align {
-	min-height: calc(100vh - 32px);
+	height: 100%;
+	min-height: 0;
 	grid-template-columns: minmax(0, 1fr);
 	grid-template-rows: minmax(0, 1fr) auto;
 	/* layout.css usa align-items:start; no cinema o palco precisa esticar senão #video fica com 0px */
@@ -426,7 +439,8 @@ body.layout-cinema .modules-flip-back .pane-body {
 body.layout-cinema .modules-flip-front #accordion {
 	flex: 1 1 auto;
 	min-height: 0;
-	overflow: auto;
+	overflow-x: hidden;
+	overflow-y: auto; /* só aparece quando os módulos não cabem */
 }
 
 body.layout-cinema .modules-flip-front .settings-footer {
@@ -518,6 +532,8 @@ body.layout-cinema .sidebar-flip-back .pane-body {
 body.layout-cinema .sidebar-flip-front #leftAccordion {
 	flex: 1 1 auto;
 	min-height: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 body.layout-cinema .sidebar-flip-front .account-box {
@@ -1150,6 +1166,7 @@ body.layout-cinema .sidebar .topic-nav {
 	/* 1px pra o anel externo (box-shadow) não ser cortado pelo overflow do vidro */
 	padding: 1px;
 	box-sizing: border-box;
+	overflow: visible;
 }
 
 body.layout-cinema .sidebar .topic-nav > li {
