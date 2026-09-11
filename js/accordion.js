@@ -1735,8 +1735,9 @@ $(document).ready(function () {
 	$(document).on("click", "#swapTrainingBtn", function (e) {
 		e.preventDefault();
 		closeTrainingPicker();
-		/* abre o menu do painel direito; o link interno abre a busca */
+		/* menu da direita + tela de listar com foco no Buscar */
 		flipModules(true);
+		openListTrainingsScreen(true);
 	});
 
 	$(document).on("click", "#swapTrainingBack", function (e) {
