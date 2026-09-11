@@ -1029,6 +1029,11 @@ $(document).ready(function () {
 	function clearAccordionSelection() {
 		$("#accordion li.selectedGif").removeClass("selectedGif");
 		$("#accordion h3.selectedModule").removeClass("selectedModule");
+		/* fecha módulo ativo (ui-state-active) pra não competir com Sobre/Como funciona */
+		var $acc = $("#accordion");
+		if ($acc.hasClass("ui-accordion")) {
+			$acc.accordion("option", "active", false);
+		}
 	}
 
 	function markGuruPage(src) {
@@ -1121,6 +1126,8 @@ $(document).ready(function () {
 					$("#accordion h3").removeClass("selectedModule");
 					if (ui.newHeader && ui.newHeader.length) {
 						ui.newHeader.addClass("selectedModule");
+						/* módulo da direita ativo → desliga título da esquerda */
+						$(".topic-nav li").removeClass("selectedNav");
 					}
 				}
 			});
