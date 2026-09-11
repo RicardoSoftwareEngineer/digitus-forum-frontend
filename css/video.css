@@ -1141,6 +1141,14 @@ body.layout-cinema .sidebar .brand-head:hover .sidebar-icon {
 /* menu guru (Sobre / Como funciona): mesmo card dos módulos */
 body.layout-cinema .sidebar .topic-nav {
 	gap: 8px;
+	/* 1px pra o anel externo (box-shadow) não ser cortado pelo overflow do vidro */
+	padding: 1px;
+	box-sizing: border-box;
+}
+
+body.layout-cinema .sidebar .topic-nav > li {
+	/* garante que o anel não vaze do item pro clip do pai sem folga */
+	margin: 0;
 }
 
 body.layout-cinema .sidebar .topic-nav .nav-ico {
