@@ -111,6 +111,11 @@ body.layout-cinema #box {
 	padding: 52px 28px 22px;
 	display: flex;
 	flex-direction: column;
+	box-shadow: var(--glass-rim-inset);
+}
+
+body.layout-cinema .flip-face.glass {
+	box-shadow: var(--glass-rim-inset);
 }
 
 body.layout-cinema #video {
@@ -150,7 +155,7 @@ body.layout-cinema .modules {
 	margin-top: 0;
 	height: auto;
 	width: min(300px, 26vw);
-	box-shadow: 0 22px 48px -10px rgba(0, 0, 0, 0.45);
+	box-shadow: none;
 }
 
 body.layout-cinema .sidebar {
@@ -416,7 +421,8 @@ body.layout-cinema .modules-flip-face {
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
-	box-shadow: 0 22px 48px -10px rgba(0, 0, 0, 0.45), var(--glass-rim-inset);
+	/* sem sombra escura — só o rim claro do vidro */
+	box-shadow: var(--glass-rim-inset);
 }
 
 body.layout-cinema .modules-flip-front {
@@ -503,7 +509,7 @@ body.layout-cinema .sidebar-flip-face {
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
-	box-shadow: 0 22px 48px -10px rgba(0, 0, 0, 0.45), var(--glass-rim-inset);
+	box-shadow: var(--glass-rim-inset);
 }
 
 body.layout-cinema .sidebar-flip-front {
