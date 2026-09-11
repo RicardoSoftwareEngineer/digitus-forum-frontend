@@ -105,6 +105,7 @@ $(document).ready(function () {
 			backgroundSavedOk: en ? "Background saved." : "Cor de fundo salva.",
 			swapTraining: en ? "Search trainings" : "Buscar treinamentos",
 			swapList: en ? "Search trainings" : "Buscar treinamentos",
+			swapEsteira: en ? "Training roadmap" : "Esteira de treinamentos",
 			swapFav: en ? "Favorites" : "Favoritos",
 			swapBuy: en ? "Purchases" : "Compras",
 			swapOrders: en ? "Order list" : "Lista de pedidos",
@@ -113,6 +114,10 @@ $(document).ready(function () {
 			listTrainingsPaid: en ? "Paid" : "Pago",
 			listTrainingsEmpty: en ? "No trainings found" : "Nenhum treinamento encontrado",
 			listTrainingsLoading: en ? "Loading…" : "Carregando…",
+			esteiraIntro: en ? "Order in which trainings land on the platform — build anticipation for what is coming next." : "Ordem em que os treinamentos entram na plataforma — cria expectativa do que vem a seguir.",
+			esteiraAvail: en ? "Available" : "Disponível",
+			esteiraSoon: en ? "Coming soon" : "Em breve",
+			esteiraNext: en ? "Next" : "Próximo",
 			wrongCode: en ? "Wrong code. Try again." : "Código errado. Tenta de novo.",
 			emptyCode: en ? "Enter the code" : "Informe o código"
 		};
@@ -307,7 +312,7 @@ $(document).ready(function () {
 	}
 
 	function clearMyDataChrome() {
-		$("body").removeClass("my-data-open my-purchases-open my-backgrounds-open list-trainings-open");
+		$("body").removeClass("my-data-open my-purchases-open my-backgrounds-open list-trainings-open esteira-open");
 	}
 
 	function showMyDataMsg(text) {
@@ -357,7 +362,7 @@ $(document).ready(function () {
 		$("#name").text(c.myDataTitle);
 		$("#description").empty();
 		$("#links").empty();
-		$("body").removeClass("my-purchases-open my-backgrounds-open list-trainings-open").addClass("my-data-open");
+		$("body").removeClass("my-purchases-open my-backgrounds-open list-trainings-open esteira-open").addClass("my-data-open");
 		requestAnimationFrame(function () {
 			if (seq !== lessonSeq) {
 				return;
@@ -425,7 +430,7 @@ $(document).ready(function () {
 		$("#name").text(c.myPurchases);
 		$("#description").empty();
 		$("#links").empty();
-		$("body").removeClass("my-data-open my-backgrounds-open list-trainings-open").addClass("my-purchases-open");
+		$("body").removeClass("my-data-open my-backgrounds-open list-trainings-open esteira-open").addClass("my-purchases-open");
 		requestAnimationFrame(function () {
 			if (seq !== lessonSeq) {
 				return;
@@ -514,7 +519,7 @@ $(document).ready(function () {
 		$("#name").text(c.swapTraining);
 		$("#description").empty();
 		$("#links").empty();
-		$("body").removeClass("my-data-open my-purchases-open my-backgrounds-open").addClass("list-trainings-open");
+		$("body").removeClass("my-data-open my-purchases-open my-backgrounds-open esteira-open").addClass("list-trainings-open");
 		requestAnimationFrame(function () {
 			if (seq !== lessonSeq) {
 				return;
@@ -615,6 +620,119 @@ $(document).ready(function () {
 			if (!(trainingsForLocale && trainingsForLocale.length)) {
 				paint([]);
 			}
+		});
+	}
+
+	function esteiraRoadmapItems(c) {
+		var en = localStorage.getItem("language") === "en_US";
+		return [
+			{
+				order: 1,
+				name: "Java Junior",
+				status: "avail",
+				badge: c.esteiraAvail,
+				blurb: en
+					? "Free foundation track — already on the platform."
+					: "Trilha base gratuita — já na plataforma."
+			},
+			{
+				order: 2,
+				name: "Java Pleno",
+				status: "avail",
+				badge: c.esteiraAvail + " · R$ 300,00",
+				blurb: en
+					? "Paid continuation after Junior."
+					: "Continuação paga depois do Junior."
+			},
+			{
+				order: 3,
+				name: en ? "Java shorts" : "Curtos Java",
+				status: "avail",
+				badge: c.esteiraAvail,
+				blurb: en
+					? "Short ~10 min modules (free + paid)."
+					: "Módulos curtos ~10 min (grátis + pagos)."
+			},
+			{
+				order: 4,
+				name: "Java Senior",
+				status: "soon",
+				badge: c.esteiraSoon,
+				blurb: en
+					? "Next big drop on the Java track — teaser live as Coming soon."
+					: "Próximo grande drop da esteira Java — teaser [Em breve] na vitrine."
+			},
+			{
+				order: 5,
+				name: en ? "More tracks" : "Novas trilhas",
+				status: "next",
+				badge: c.esteiraNext,
+				blurb: en
+					? "More trainings in the pipeline — order TBD as we ship."
+					: "Mais treinamentos no pipeline — ordem a definir conforme lançamos."
+			}
+		];
+	}
+
+	function openEsteiraScreen(animate) {
+		flipLanguagePanel(false);
+		localStorage.setItem("lessonSource", "esteira");
+		$("#leftAccordion .topic-nav li").removeClass("selectedNav");
+		clearAccordionSelection();
+		markSwapNav("swapEsteira");
+		var c = accountCopy();
+		var seq = ++lessonSeq;
+		var $fields = lessonFields();
+		if (animate) {
+			$fields.addClass("lesson-swap");
+		}
+		var videoEl = document.getElementById("video");
+		if (window.GifPlayer) {
+			window.GifPlayer.mount(videoEl, "", "", "");
+		} else if (videoEl) {
+			videoEl.innerHTML = "";
+		}
+		var items = esteiraRoadmapItems(c);
+		var parts = [];
+		parts.push("<div class='esteira-panel'>");
+		parts.push("<p class='esteira-intro'>" + escapeHtml(c.esteiraIntro) + "</p>");
+		parts.push("<div class='esteira-list'>");
+		for (var i = 0; i < items.length; i++) {
+			var it = items[i];
+			var badgeClass = "esteira-badge";
+			if (it.status === "avail") {
+				badgeClass += " esteira-badge-avail";
+			} else if (it.status === "soon") {
+				badgeClass += " esteira-badge-soon";
+			} else {
+				badgeClass += " esteira-badge-next";
+			}
+			parts.push("<div class='esteira-item'>");
+			parts.push("<span class='esteira-item-top'>");
+			parts.push("<span class='esteira-order'>#" + String(it.order) + "</span>");
+			parts.push("<span class='esteira-item-name'>" + escapeHtml(it.name) + "</span>");
+			parts.push("<span class='" + badgeClass + "'>" + escapeHtml(it.badge) + "</span>");
+			parts.push("</span>");
+			if (it.blurb) {
+				parts.push("<span class='esteira-item-blurb'>" + escapeHtml(it.blurb) + "</span>");
+			}
+			parts.push("</div>");
+		}
+		parts.push("</div></div>");
+		if (videoEl) {
+			videoEl.innerHTML = parts.join("");
+		}
+		$("#previousAndNextVideo").empty();
+		setLessonModuleLabel("");
+		$("#name").text(c.swapEsteira);
+		$("#description").empty();
+		$("#links").empty();
+		$("body").removeClass("my-data-open my-purchases-open my-backgrounds-open list-trainings-open").addClass("esteira-open");
+		requestAnimationFrame(function () {
+			if (seq !== lessonSeq) {
+				return;
+			}
+			$fields.removeClass("lesson-swap");
 		});
 	}
 
@@ -767,7 +885,7 @@ $(document).ready(function () {
 		$("#name").text(c.backgrounds);
 		$("#description").empty();
 		$("#links").empty();
-		$("body").removeClass("my-data-open my-purchases-open list-trainings-open").addClass("my-backgrounds-open");
+		$("body").removeClass("my-data-open my-purchases-open list-trainings-open esteira-open").addClass("my-backgrounds-open");
 		requestAnimationFrame(function () {
 			if (seq !== lessonSeq) {
 				return;
@@ -830,6 +948,7 @@ $(document).ready(function () {
 		$("#swapTrainingBtn").text(c.swapTraining);
 		$("#swapTrainingBack").text(c.settingsBack);
 		$(".swap-link-label[data-k='list']").text(c.swapList);
+		$(".swap-link-label[data-k='esteira']").text(c.swapEsteira);
 		$(".swap-link-label[data-k='fav']").text(c.swapFav);
 		$(".swap-link-label[data-k='buy']").text(c.swapBuy);
 		$(".swap-link-label[data-k='orders']").text(c.swapOrders);
@@ -1769,6 +1888,10 @@ $(document).ready(function () {
 		}
 		if (id === "swapListTrainings") {
 			openListTrainingsScreen(true);
+			return;
+		}
+		if (id === "swapEsteira") {
+			openEsteiraScreen(true);
 			return;
 		}
 	});
