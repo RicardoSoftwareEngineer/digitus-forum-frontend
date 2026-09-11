@@ -449,8 +449,13 @@ body.layout-cinema .modules-flip-front #accordion {
 	overflow-y: auto; /* só aparece quando os módulos não cabem */
 }
 
-body.layout-cinema .modules-flip-front .settings-footer {
+body.layout-cinema .modules-flip-front .settings-footer,
+body.layout-cinema .modules-flip-back .settings-footer {
 	margin-top: auto;
+	/* 1px: anel/borda do Buscar e Voltar não comem à direita (overflow do vidro) */
+	padding-left: 1px;
+	padding-right: 1px;
+	box-sizing: border-box;
 }
 
 body.layout-cinema .modules-flip-back {
@@ -1494,7 +1499,9 @@ body.layout-cinema .modules #accordion li.selectedGif a {
 
 body.layout-cinema .modules #swapTrainingBtn {
 	padding: 10px 12px;
-	margin: 1px;
+	margin: 0;
+	width: 100%;
+	box-sizing: border-box;
 	border: 1px solid var(--glass-border);
 	background: rgba(255, 255, 255, 0.10);
 	border-radius: 8px;
@@ -1512,7 +1519,9 @@ body.layout-cinema .modules #swapTrainingBtn:hover {
 
 body.layout-cinema .modules #swapTrainingBack {
 	padding: 10px 12px;
-	margin: 1px;
+	margin: 0;
+	width: 100%;
+	box-sizing: border-box;
 	border: 1px solid var(--glass-border);
 	background: rgba(255, 255, 255, 0.10);
 	border-radius: 8px;
@@ -1529,8 +1538,8 @@ body.layout-cinema .modules #swapTrainingBack:hover {
 	outline: none;
 }
 
-body.layout-cinema .modules .account-btn,
-body.layout-cinema .modules .settings-footer .account-btn {
+/* card glass: #swapTrainingBtn / #swapTrainingBack definem borda; não forçar transparent aqui */
+body.layout-cinema .modules .account-btn:not(#swapTrainingBtn):not(#swapTrainingBack) {
 	background: rgba(255, 255, 255, 0.24);
 	border-color: transparent;
 	color: #fff;
