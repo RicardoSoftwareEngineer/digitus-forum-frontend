@@ -104,7 +104,7 @@ $(document).ready(function () {
 			backgroundsLoading: en ? "Loading…" : "Carregando…",
 			backgroundSavedOk: en ? "Background saved." : "Cor de fundo salva.",
 			swapTraining: en ? "Search trainings" : "Buscar treinamentos",
-			swapList: en ? "List trainings" : "Listar treinamentos",
+			swapList: en ? "Search trainings" : "Buscar treinamentos",
 			swapFav: en ? "Favorites" : "Favoritos",
 			swapBuy: en ? "Purchases" : "Compras",
 			swapOrders: en ? "Order list" : "Lista de pedidos",
@@ -1735,7 +1735,8 @@ $(document).ready(function () {
 	$(document).on("click", "#swapTrainingBtn", function (e) {
 		e.preventDefault();
 		closeTrainingPicker();
-		openListTrainingsScreen(true);
+		/* abre o menu do painel direito; o link interno abre a busca */
+		flipModules(true);
 	});
 
 	$(document).on("click", "#swapTrainingBack", function (e) {
