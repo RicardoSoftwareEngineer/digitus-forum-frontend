@@ -1113,7 +1113,17 @@ $(document).ready(function () {
 		}
 		$acc.html(html);
 		if (modules.length) {
-			$acc.accordion({ heightStyle: "content", collapsible: true, active: active });
+			$acc.accordion({
+				heightStyle: "content",
+				collapsible: true,
+				active: active,
+				activate: function (event, ui) {
+					$("#accordion h3").removeClass("selectedModule");
+					if (ui.newHeader && ui.newHeader.length) {
+						ui.newHeader.addClass("selectedModule");
+					}
+				}
+			});
 		}
 	}
 
@@ -1376,18 +1386,6 @@ $(document).ready(function () {
 		$("#accordion a.trainingGifClick").filter(function () {
 			return String($(this).attr("data-training-video")) === String(videoId);
 		}).parent("li").addClass("selectedGif");
-		$("#accordion h3").removeClass("selectedModule");
-		var $match = $("#accordion a.trainingGifClick").filter(function () {
-			return String($(this).attr("data-training-video")) === String(videoId);
-		}).first();
-		var $h3 = $match.closest("div").prev("h3");
-		$h3.addClass("selectedModule");
-		if ($("#accordion").hasClass("ui-accordion") && $h3.length) {
-			var idx = $("#accordion > h3").index($h3);
-			if (idx >= 0) {
-				$("#accordion").accordion("option", "active", idx);
-			}
-		}
 	}
 
 	function lessonMediaPath(videoId, ext) {
@@ -1519,6 +1517,17 @@ $(document).ready(function () {
 		localStorage.setItem("isTraining", "true");
 		if (changed && typeof window.advanceBackground === "function") {
 			window.advanceBackground();
+		}
+		if (source === "training" && moduleId && $("#accordion").hasClass("ui-accordion")) {
+			var $h3 = $("#accordion a.trainingGifClick").filter(function () {
+				return String($(this).attr("data-training-module")) === String(moduleId);
+			}).first().closest("div").prev("h3");
+			var idx = $("#accordion > h3").index($h3);
+			if (idx >= 0) {
+				$("#accordion").accordion("option", "active", idx);
+				$("#accordion h3").removeClass("selectedModule");
+				$h3.addClass("selectedModule");
+			}
 		}
 		loadLesson(animate);
 	}
