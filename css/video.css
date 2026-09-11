@@ -524,7 +524,9 @@ body.layout-cinema .sidebar-flip-front .account-box {
 	flex: 0 0 auto;
 	margin-top: auto;
 	margin-bottom: 0;
-	padding-bottom: 0;
+	padding: 1px;
+	padding-bottom: 1px;
+	box-sizing: border-box;
 }
 
 body.layout-cinema .sidebar-flip-back {
@@ -1009,13 +1011,14 @@ body.layout-cinema #video .list-trainings-panel .list-trainings-search {
 	box-sizing: border-box;
 	padding: 10px 12px;
 	border-radius: 8px;
-	border: 1px solid var(--glass-border);
+	border: 1px solid rgba(255, 255, 255, 0.92);
 	background: rgba(255, 255, 255, 0.10);
 	background-clip: padding-box;
 	-webkit-appearance: none;
 	appearance: none;
 	outline: none;
-	box-shadow: none;
+	/* borda grossa padrão (= Sobre): borda + anel */
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
 	color: #fff;
 	font: inherit;
 	font-size: 13px;
@@ -1040,9 +1043,8 @@ body.layout-cinema #video .list-trainings-panel .list-trainings-search:hover,
 body.layout-cinema #video .list-trainings-panel .list-trainings-search:focus {
 	border-color: rgba(255, 255, 255, 0.92);
 	background: rgba(255, 255, 255, 0.20);
-	box-shadow: none;
-	outline: 1px solid rgba(255, 255, 255, 0.92);
-	outline-offset: -1px;
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	outline: none;
 }
 
 body.layout-cinema #video .list-trainings-panel .list-trainings-search::-webkit-search-decoration,
@@ -1187,11 +1189,11 @@ body.layout-cinema .sidebar .topic-nav li.selectedNav a {
 body.layout-cinema .sidebar .account-input {
 	padding: 10px 12px;
 	border-radius: 8px;
-	border: 1px solid var(--glass-border);
+	border: 1px solid rgba(255, 255, 255, 0.92);
 	background: rgba(255, 255, 255, 0.10);
 	background-clip: padding-box;
 	color: #fff;
-	box-shadow: none;
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
 	outline: none;
 }
 
@@ -1199,9 +1201,8 @@ body.layout-cinema .sidebar .account-input:hover,
 body.layout-cinema .sidebar .account-input:focus {
 	border-color: rgba(255, 255, 255, 0.92);
 	background: rgba(255, 255, 255, 0.20);
-	box-shadow: none;
-	outline: 1px solid rgba(255, 255, 255, 0.92);
-	outline-offset: -1px;
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	outline: none;
 }
 
 body.layout-cinema .sidebar .account-input:-webkit-autofill,
@@ -1220,19 +1221,19 @@ body.layout-cinema .sidebar .account-btn,
 body.layout-cinema .sidebar .settings-footer .account-btn {
 	padding: 10px 12px;
 	border-radius: 8px;
-	border: 1px solid var(--glass-border);
+	border: 1px solid rgba(255, 255, 255, 0.92);
 	background: rgba(255, 255, 255, 0.10);
 	color: #fff;
-	box-shadow: none;
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	outline: none;
 }
 
 body.layout-cinema .sidebar .account-btn:hover,
 body.layout-cinema .sidebar .settings-footer .account-btn:hover {
 	border-color: rgba(255, 255, 255, 0.92);
 	background: rgba(255, 255, 255, 0.20);
-	box-shadow: none;
-	outline: 1px solid rgba(255, 255, 255, 0.92);
-	outline-offset: -1px;
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	outline: none;
 }
 
 body.layout-cinema .sidebar .account-btn-ghost {
