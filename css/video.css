@@ -1387,9 +1387,9 @@ body.layout-cinema .modules #accordion h3:hover,
 body.layout-cinema .modules #accordion .ui-accordion-header:hover {
 	border-color: rgba(255, 255, 255, 0.92) !important;
 	background: rgba(255, 255, 255, 0.20);
-	box-shadow: none;
-	outline: 1px solid rgba(255, 255, 255, 0.92);
-	outline-offset: -1px;
+	/* título = borda mais grossa (borda + anel) */
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	outline: none;
 }
 
 /* selectedModule = aula atual em outro módulo — não competir com o clicado */
@@ -1409,9 +1409,8 @@ body.layout-cinema .modules #accordion .ui-accordion-header.ui-state-active.sele
 	border-color: rgba(255, 255, 255, 0.92) !important;
 	background: rgba(255, 255, 255, 0.20);
 	color: #fff;
-	box-shadow: none;
-	outline: 1px solid rgba(255, 255, 255, 0.92);
-	outline-offset: -1px;
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	outline: none;
 	z-index: 2;
 }
 
@@ -1449,7 +1448,9 @@ body.layout-cinema .modules #accordion li a {
 body.layout-cinema .modules #accordion li a:hover {
 	border-color: rgba(255, 255, 255, 0.92);
 	background: rgba(255, 255, 255, 0.20);
-	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	/* subtítulo/aula = borda mais fina (só 1px) */
+	box-shadow: none;
+	outline: none;
 	color: #fff;
 	text-decoration: none;
 }
@@ -1457,7 +1458,8 @@ body.layout-cinema .modules #accordion li a:hover {
 body.layout-cinema .modules #accordion li.selectedGif a {
 	border-color: rgba(255, 255, 255, 0.92);
 	background: rgba(255, 255, 255, 0.20);
-	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	box-shadow: none;
+	outline: none;
 	color: #fff;
 	font-weight: 700;
 }
