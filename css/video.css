@@ -21,26 +21,66 @@ body.layout-cinema .center-col {
 
 body.layout-cinema .lesson-align {
 	min-height: calc(100vh - 32px);
-	grid-template-rows: minmax(0, 1fr) 38px;
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-rows: minmax(0, 1fr) auto;
 	/* layout.css usa align-items:start; no cinema o palco precisa esticar senão #video fica com 0px */
 	align-items: stretch;
+	row-gap: 12px;
 }
 
 body.layout-cinema .stage {
+	grid-column: 1;
 	grid-row: 1;
 	min-height: 0;
 	height: auto;
 	align-self: stretch;
+	width: 100%;
 	/* sidebars: top/bottom 16px; center glass visibly shorter (~44px more inset) */
 	margin-top: 44px;
-	margin-bottom: 44px;
+	margin-bottom: 0;
+}
+
+/* faixa sob o player: anterior | próximo */
+body.layout-cinema #previousAndNextVideo {
+	display: flex;
+	grid-column: 1;
+	grid-row: 2;
+	justify-content: space-between;
+	align-items: stretch;
+	gap: 12px;
+	width: 100%;
+	margin: 0 0 28px;
+	z-index: 2;
 }
 
 body.layout-cinema #previousVideo,
 body.layout-cinema #nextVideo {
-	grid-row: 2;
+	grid-column: unset;
+	grid-row: unset;
 	margin-top: 0;
-	align-self: end;
+	align-self: stretch;
+	flex: 0 1 auto;
+	width: auto;
+	min-width: 160px;
+	height: auto;
+	min-height: 42px;
+	padding: 10px 16px;
+	border-radius: 8px;
+	border: 1px solid var(--glass-border);
+	background: rgba(255, 255, 255, 0.10);
+	color: #fff;
+	box-shadow: none;
+	font-weight: 500;
+}
+
+body.layout-cinema #previousVideo:hover,
+body.layout-cinema #nextVideo:hover,
+body.layout-cinema #previousAndNextVideo a:hover {
+	border-color: rgba(255, 255, 255, 0.92);
+	background: rgba(255, 255, 255, 0.20);
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	color: #fff;
+	text-decoration: none;
 }
 
 body.layout-cinema .flip-scene,
