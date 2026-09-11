@@ -1183,16 +1183,28 @@ body.layout-cinema .modules #accordion .moduleDescription {
 }
 
 body.layout-cinema .modules #accordion .module-panel {
-	/* vão vertical ≈ vão horizontal (~2px) */
-	padding: 2px 0 2px;
+	position: relative;
+	padding: 0;
+	margin: 0;
+}
+
+/* linha vertical sobe até ~2px do título (mesmo vão da horizontal→card) */
+body.layout-cinema .modules #accordion .module-panel::before {
+	content: "";
+	position: absolute;
+	left: 18px;
+	top: 2px;
+	bottom: 0;
+	width: 1px;
+	background: rgba(255, 255, 255, 0.35);
+	pointer-events: none;
 }
 
 body.layout-cinema .modules #accordion ul.module-lessons {
 	position: relative;
-	/* vertical encostada nos cards: padding = comprimento do traço + 2px */
 	margin: 0 0 0 18px;
 	padding: 0 0 0 8px;
-	border-left: 1px solid rgba(255, 255, 255, 0.35);
+	border-left: none;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
@@ -1270,11 +1282,13 @@ body.layout-cinema .modules #accordion .ui-accordion-header.ui-state-active.sele
 }
 
 body.layout-cinema .modules #accordion .ui-accordion-content,
+body.layout-cinema .modules #accordion .ui-accordion-content.ui-widget-content,
+body.layout-cinema .modules #accordion > div.module-panel,
 body.layout-cinema .modules #accordion > div {
-	padding: 0;
-	border: none;
-	background: transparent;
-	margin: 0;
+	padding: 0 !important;
+	border: none !important;
+	background: transparent !important;
+	margin: 0 !important;
 }
 
 body.layout-cinema .modules #accordion ul {
