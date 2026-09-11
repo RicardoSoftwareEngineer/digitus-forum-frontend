@@ -1680,6 +1680,15 @@ $(document).ready(function () {
 
 	$(document).on("fullscreenchange webkitfullscreenchange", syncFullscreenBtn);
 
+	$(document).on("click", "#advanceBgBtn", function (e) {
+		e.preventDefault();
+		if (typeof window.refreshBackgroundNow === "function") {
+			window.refreshBackgroundNow();
+		} else if (typeof window.advanceBackground === "function") {
+			window.advanceBackground();
+		}
+	});
+
 	$(document).on("click", "#toggleCinema", function (e) {
 		e.preventDefault();
 		e.stopPropagation();

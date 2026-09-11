@@ -150,4 +150,15 @@ window.advanceBackground = function () {
 	}
 };
 
+
+window.refreshBackgroundNow = function () {
+	var ready = generateWallpaper();
+	applyWallpaper(ready, wallpaperHasShown);
+	wallpaperHasShown = true;
+	localStorage.setItem("backgroundUrl", generateWallpaper());
+	if (typeof window.syncMenuFromBackground === "function") {
+		window.syncMenuFromBackground();
+	}
+};
+
 window.advanceBackground();

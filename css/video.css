@@ -1513,3 +1513,38 @@ body.layout-cinema .sidebar .topic-nav li.selectedNav a,
 body.layout-cinema .sidebar .account-btn {
 	cursor: pointer;
 }
+
+/* ∞ no topo: trocar Trianglify / cor de fundo */
+body.layout-cinema .advance-bg-btn {
+	position: fixed;
+	top: 10px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 30;
+	box-sizing: border-box;
+	min-width: 42px;
+	height: 36px;
+	padding: 0 14px;
+	border-radius: 8px;
+	border: 1px solid var(--glass-border);
+	background: rgba(255, 255, 255, 0.10);
+	color: #fff;
+	font-size: 22px;
+	line-height: 1;
+	font-weight: 500;
+	cursor: pointer;
+	box-shadow: none;
+	outline: none;
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+}
+
+body.layout-cinema .advance-bg-btn:hover {
+	border-color: rgba(255, 255, 255, 0.92);
+	background: rgba(255, 255, 255, 0.20);
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+}
+
+body.layout-cinema.is-cinema-mode .advance-bg-btn {
+	opacity: 0.35;
+}
