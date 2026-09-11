@@ -1189,11 +1189,11 @@ body.layout-cinema .sidebar .topic-nav li.selectedNav a {
 body.layout-cinema .sidebar .account-input {
 	padding: 10px 12px;
 	border-radius: 8px;
-	border: 1px solid rgba(255, 255, 255, 0.92);
+	border: 1px solid var(--glass-border);
 	background: rgba(255, 255, 255, 0.10);
 	background-clip: padding-box;
 	color: #fff;
-	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	box-shadow: none;
 	outline: none;
 }
 
@@ -1221,10 +1221,10 @@ body.layout-cinema .sidebar .account-btn,
 body.layout-cinema .sidebar .settings-footer .account-btn {
 	padding: 10px 12px;
 	border-radius: 8px;
-	border: 1px solid rgba(255, 255, 255, 0.92);
+	border: 1px solid var(--glass-border);
 	background: rgba(255, 255, 255, 0.10);
 	color: #fff;
-	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	box-shadow: none;
 	outline: none;
 }
 
