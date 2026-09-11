@@ -1158,20 +1158,20 @@ body.layout-cinema .sidebar .topic-nav a {
 	box-shadow: none;
 }
 
-body.layout-cinema .sidebar .topic-nav a:hover {
+body.layout-cinema .sidebar .topic-nav a:hover,
+body.layout-cinema .sidebar .topic-nav li.selectedNav a {
 	border-color: rgba(255, 255, 255, 0.92);
 	background: rgba(255, 255, 255, 0.20);
-	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	/* anel pra dentro — overflow:hidden do vidro não “come” topo/esquerda */
+	box-shadow: none;
+	outline: 1px solid rgba(255, 255, 255, 0.92);
+	outline-offset: -1px;
 	color: #fff;
 	text-decoration: none;
 }
 
 body.layout-cinema .sidebar .topic-nav li.selectedNav a {
-	border-color: rgba(255, 255, 255, 0.92);
-	background: rgba(255, 255, 255, 0.20);
-	color: #fff;
 	font-weight: 700;
-	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
 }
 
 body.layout-cinema .sidebar .account-input,
@@ -1335,8 +1335,9 @@ body.layout-cinema .modules #accordion h3:hover,
 body.layout-cinema .modules #accordion .ui-accordion-header:hover {
 	border-color: rgba(255, 255, 255, 0.92) !important;
 	background: rgba(255, 255, 255, 0.20);
-	/* inset: overflow:hidden do painel não corta topo/esquerda (anel externo sim) */
-	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.92);
+	box-shadow: none;
+	outline: 1px solid rgba(255, 255, 255, 0.92);
+	outline-offset: -1px;
 }
 
 /* selectedModule = aula atual em outro módulo — não competir com o clicado */
@@ -1345,9 +1346,10 @@ body.layout-cinema .modules #accordion h3.selectedModule {
 	background: rgba(255, 255, 255, 0.10);
 	color: #fff;
 	box-shadow: none;
+	outline: none;
 }
 
-/* só o módulo expandido/clicado fica “ativado” — mesma grossura das aulas */
+/* só o módulo expandido/clicado fica “ativado” */
 body.layout-cinema .modules #accordion h3.ui-state-active,
 body.layout-cinema .modules #accordion .ui-accordion-header.ui-state-active,
 body.layout-cinema .modules #accordion h3.ui-state-active.selectedModule,
@@ -1355,7 +1357,9 @@ body.layout-cinema .modules #accordion .ui-accordion-header.ui-state-active.sele
 	border-color: rgba(255, 255, 255, 0.92) !important;
 	background: rgba(255, 255, 255, 0.20);
 	color: #fff;
-	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.92);
+	box-shadow: none;
+	outline: 1px solid rgba(255, 255, 255, 0.92);
+	outline-offset: -1px;
 	z-index: 2;
 }
 
