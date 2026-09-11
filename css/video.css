@@ -1319,11 +1319,12 @@ body.layout-cinema .modules #accordion .module-panel::before {
 body.layout-cinema .modules #accordion ul.module-lessons {
 	position: relative;
 	margin: 0 0 0 18px;
-	padding: 0 0 0 8px;
+	padding: 0 1px 0 8px;
 	border-left: none;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
+	box-sizing: border-box;
 }
 
 body.layout-cinema .modules #accordion ul.module-lessons > li {
@@ -1356,6 +1357,9 @@ body.layout-cinema .modules #accordion {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
+	/* 1px pra o anel externo (hover/ativo) não ser cortado à direita pelo overflow do vidro */
+	padding: 1px;
+	box-sizing: border-box;
 }
 
 body.layout-cinema .modules #accordion h3,
