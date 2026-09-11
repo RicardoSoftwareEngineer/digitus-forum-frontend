@@ -1058,6 +1058,9 @@ body.layout-cinema #video .list-trainings-panel .list-trainings-list {
 	overflow-y: auto;
 	flex: 1;
 	min-height: 0;
+	/* 1px pra o anel externo do hover não ser cortado (topo/lados) */
+	padding: 1px;
+	box-sizing: border-box;
 }
 
 body.layout-cinema #video .list-trainings-panel .list-trainings-empty,
@@ -1082,6 +1085,8 @@ body.layout-cinema #video .list-trainings-panel .list-trainings-item {
 	font: inherit;
 	text-align: left;
 	cursor: pointer;
+	/* evita clip do anel quando o scroll da lista corta overflow */
+	flex-shrink: 0;
 }
 
 body.layout-cinema #video .list-trainings-panel .list-trainings-item:hover {
