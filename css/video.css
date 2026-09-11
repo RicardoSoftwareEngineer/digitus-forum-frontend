@@ -1135,15 +1135,43 @@ body.layout-cinema .sidebar .brand-head:hover .sidebar-icon {
 	box-shadow: none;
 }
 
-body.layout-cinema .sidebar .topic-nav a:hover {
-	background: rgba(255, 255, 255, 0.14);
+/* menu guru (Sobre / Como funciona): mesmo card dos módulos */
+body.layout-cinema .sidebar .topic-nav {
+	gap: 8px;
+}
+
+body.layout-cinema .sidebar .topic-nav .nav-ico {
+	display: none;
+}
+
+body.layout-cinema .sidebar .topic-nav a {
+	display: block;
+	box-sizing: border-box;
+	padding: 10px 12px;
+	border-radius: 8px;
+	border: 1px solid var(--glass-border);
+	background: rgba(255, 255, 255, 0.10);
 	color: #fff;
+	font-size: 13px;
+	font-weight: 500;
+	text-decoration: none;
+	box-shadow: none;
+}
+
+body.layout-cinema .sidebar .topic-nav a:hover {
+	border-color: rgba(255, 255, 255, 0.92);
+	background: rgba(255, 255, 255, 0.20);
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	color: #fff;
+	text-decoration: none;
 }
 
 body.layout-cinema .sidebar .topic-nav li.selectedNav a {
-	background: rgba(255, 255, 255, 0.24);
+	border-color: rgba(255, 255, 255, 0.92);
+	background: rgba(255, 255, 255, 0.20);
 	color: #fff;
-	box-shadow: none;
+	font-weight: 700;
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
 }
 
 body.layout-cinema .sidebar .account-input,
