@@ -399,7 +399,7 @@ $(document).ready(function () {
 	function openMyPurchasesScreen(animate) {
 		flipLanguagePanel(false);
 		localStorage.setItem("lessonSource", "my-purchases");
-		$(".topic-nav li").removeClass("selectedNav");
+		$("#leftAccordion .topic-nav li").removeClass("selectedNav");
 		clearAccordionSelection();
 		var c = accountCopy();
 		var seq = ++lessonSeq;
@@ -486,8 +486,9 @@ $(document).ready(function () {
 	function openListTrainingsScreen(animate) {
 		flipLanguagePanel(false);
 		localStorage.setItem("lessonSource", "list-trainings");
-		$(".topic-nav li").removeClass("selectedNav");
+		$("#leftAccordion .topic-nav li").removeClass("selectedNav");
 		clearAccordionSelection();
+		markSwapNav("swapListTrainings");
 		var c = accountCopy();
 		var seq = ++lessonSeq;
 		var $fields = lessonFields();
@@ -834,6 +835,18 @@ $(document).ready(function () {
 		$(".swap-link-label[data-k='orders']").text(c.swapOrders);
 	}
 
+	function clearSwapNavSelection() {
+		$(".modules-flip-back .topic-nav li").removeClass("selectedNav");
+	}
+
+	function markSwapNav(linkId) {
+		clearSwapNavSelection();
+		if (!linkId) {
+			return;
+		}
+		$("#" + linkId).parent("li").addClass("selectedNav");
+	}
+
 	function flipModules(toSwap) {
 		var $card = $("#modulesFlip");
 		if (!$card.length) {
@@ -844,6 +857,7 @@ $(document).ready(function () {
 			$card.addClass("is-flipped");
 		} else {
 			$card.removeClass("is-flipped");
+			clearSwapNavSelection();
 		}
 	}
 
@@ -1748,6 +1762,7 @@ $(document).ready(function () {
 	$(document).on("click", ".swapNavClick", function (e) {
 		e.preventDefault();
 		var id = this.id;
+		markSwapNav(id);
 		if (id === "swapPurchases") {
 			openMyPurchasesScreen(true);
 			return;

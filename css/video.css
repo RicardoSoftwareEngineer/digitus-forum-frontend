@@ -1598,11 +1598,16 @@ body.layout-cinema .modules-flip-back .topic-nav a {
 	box-shadow: none;
 }
 
-body.layout-cinema .modules-flip-back .topic-nav a:hover {
+body.layout-cinema .modules-flip-back .topic-nav a:hover,
+body.layout-cinema .modules-flip-back .topic-nav li.selectedNav a {
 	border-color: rgba(255, 255, 255, 0.92);
 	background: rgba(255, 255, 255, 0.20);
 	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
 	color: #fff;
 	text-decoration: none;
+}
+
+body.layout-cinema .modules-flip-back .topic-nav li.selectedNav a {
+	font-weight: 700;
 }
 
