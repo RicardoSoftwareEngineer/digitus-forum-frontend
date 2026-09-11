@@ -1571,3 +1571,38 @@ body.layout-cinema .advance-bg-btn:hover {
 body.layout-cinema.is-cinema-mode .advance-bg-btn {
 	opacity: 0.35;
 }
+
+/* menu verso direita (Buscar treinamentos): mesmo card do menu esquerdo */
+body.layout-cinema .modules-flip-back .topic-nav {
+	gap: 8px;
+	padding: 1px;
+	box-sizing: border-box;
+	overflow: visible;
+}
+
+body.layout-cinema .modules-flip-back .topic-nav .nav-ico {
+	display: none;
+}
+
+body.layout-cinema .modules-flip-back .topic-nav a {
+	display: block;
+	box-sizing: border-box;
+	padding: 10px 12px;
+	border-radius: 8px;
+	border: 1px solid var(--glass-border);
+	background: rgba(255, 255, 255, 0.10);
+	color: #fff;
+	font-size: 13px;
+	font-weight: 500;
+	text-decoration: none;
+	box-shadow: none;
+}
+
+body.layout-cinema .modules-flip-back .topic-nav a:hover {
+	border-color: rgba(255, 255, 255, 0.92);
+	background: rgba(255, 255, 255, 0.20);
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	color: #fff;
+	text-decoration: none;
+}
+
