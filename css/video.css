@@ -1510,6 +1510,25 @@ body.layout-cinema .modules #swapTrainingBtn:hover {
 	outline: none;
 }
 
+body.layout-cinema .modules #swapTrainingBack {
+	padding: 10px 12px;
+	margin: 1px;
+	border: 1px solid var(--glass-border);
+	background: rgba(255, 255, 255, 0.10);
+	border-radius: 8px;
+	box-shadow: none;
+	outline: none;
+	color: #fff;
+}
+
+body.layout-cinema .modules #swapTrainingBack:hover {
+	border-color: rgba(255, 255, 255, 0.92);
+	background: rgba(255, 255, 255, 0.20);
+	/* borda grossa (= links do flip / Buscar) */
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.92);
+	outline: none;
+}
+
 body.layout-cinema .modules .account-btn,
 body.layout-cinema .modules .settings-footer .account-btn {
 	background: rgba(255, 255, 255, 0.24);
